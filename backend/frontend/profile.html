@@ -32,6 +32,7 @@
       border-radius: 12px;
       width: 100%;
       max-width: 400px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     }
 
     h2 {
@@ -50,6 +51,7 @@
       color: #8b949e;
       margin-bottom: 0.4rem;
       text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
     input,
@@ -61,10 +63,12 @@
       padding: 0.65rem;
       color: #e6edf3;
       outline: none;
+      font-family: inherit;
     }
 
-    input:focus {
+    input:focus, select:focus {
       border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
     }
 
     .btn {
@@ -77,10 +81,17 @@
       font-weight: 600;
       cursor: pointer;
       margin-top: 1rem;
+      font-family: inherit;
+      transition: background 0.2s;
     }
 
     .btn:hover {
       background: #1d4ed8;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
     .back-link {
@@ -94,6 +105,7 @@
 
     .back-link:hover {
       color: #e6edf3;
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -132,20 +144,17 @@
   </div>
 
   <script>
-    const API_URL = "https://sms-student-management-system-1.onrender.com"; //  Aapka Live Render URL
+    const API_URL = "https://sms-student-management-system-1.onrender.com"; 
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-    // Safety check: Agar user login nahi hai ya student nahi hai, redirect to login
     if (!token) window.location.href = 'login.html';
 
-    // Dynamic user key handling for both formats (id or _id)
     const currentUserId = user.id || user._id || '';
 
-    // 📥 1. Load current database data into inputs when page opens
+    // 📥 1. Load data safely with standard structural fallbacks
     async function loadCurrentProfile() {
       try {
-        // 🛠️ FIX: Standard user profiling route fetch mechanism mapped properly
         const res = await fetch(`${API_URL}/api/students/me`, {
           method: 'GET',
           headers: {
@@ -155,12 +164,15 @@
         });
         const data = await res.json();
 
-        if (res.ok) {
-          document.getElementById('pName').value = data.name || '';
-          document.getElementById('pRollNo').value = data.rollNo || '';
-          document.getElementById('pCourse').value = data.course || '';
-          document.getElementById('pBranch').value = data.branch || '';
-          document.getElementById('pYear').value = data.year || '1';
+        if (res.ok && data) {
+          // ✅ Added object destruction fallback block to prevent data drops
+          const studentData = data.student || data;
+
+          document.getElementById('pName').value = studentData.name || '';
+          document.getElementById('pRollNo').value = studentData.rollNo || '';
+          document.getElementById('pCourse').value = studentData.course || '';
+          document.getElementById('pBranch').value = studentData.branch || '';
+          document.getElementById('pYear').value = studentData.year || '1';
         } else {
           console.error('Failed to load profile data:', data.message);
         }
@@ -169,7 +181,7 @@
       }
     }
 
-    // 💾 2. Save updated data and direct jump to dashboard
+    // 💾 2. Save changes and handle dynamic state sync
     document.getElementById('saveProfileBtn').addEventListener('click', async () => {
       const saveBtn = document.getElementById('saveProfileBtn');
 
@@ -178,7 +190,7 @@
         rollNo: document.getElementById('pRollNo').value.trim(),
         course: document.getElementById('pCourse').value.trim(),
         branch: document.getElementById('pBranch').value.trim(),
-        year: parseInt(document.getElementById('pYear').value)
+        year: parseInt(document.getElementById('pYear').value) || 1
       };
 
       if (!payload.name) {
@@ -186,18 +198,16 @@
         return;
       }
 
-      // UI Loading state
       saveBtn.disabled = true;
       saveBtn.textContent = 'Saving Changes...';
 
       try {
-        // 🛠️ FIX: Hit endpoint changed slightly if routing matches standard POST updates or custom PUT mapping
         const res = await fetch(`${API_URL}/api/students/me`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
-            'user-id': currentUserId // Core verification header
+            'user-id': currentUserId 
           },
           body: JSON.stringify(payload)
         });
@@ -205,8 +215,7 @@
         const data = await res.json();
 
         if (res.ok) {
-          // 🛠️ FIX: Localstorage sync includes rollNo and course fields update dynamically 
-          // taaki student calendar instantly unhe read kar sake!
+          // ✅ Sync updated values back into localStorage session instantly
           const updatedUserSession = { 
             ...user, 
             name: payload.name,
@@ -216,24 +225,21 @@
           localStorage.setItem('user', JSON.stringify(updatedUserSession));
 
           alert('Profile updated successfully! 🎉');
-
-          // Instant dynamic jump to main landing page
           window.location.href = 'index.html';
         } else {
           alert('Server Refusal: ' + (data.message || 'Failed to update profile data.'));
         }
       } catch (error) {
         console.error('Error during profile save operation:', error);
-        alert('Network Error: Cannot connect to the registration server.');
+        alert('Network Error: Cannot connect to the server.');
       } finally {
         saveBtn.disabled = false;
         saveBtn.textContent = 'Save Changes';
       }
     });
 
-    // Execute on load
     loadCurrentProfile();
-</script>
+  </script>
 </body>
 
 </html>
