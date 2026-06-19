@@ -432,7 +432,7 @@
     <span class="nav-icon">🏠</span> Dashboard
   </a>
 
-  <div id="adminNav">
+  <div id="adminNav" style="display:none;">
     <div class="nav-section">Management</div>
     <a class="nav-item" href="students.html">
       <span class="nav-icon">👨‍🎓</span> Students
@@ -510,18 +510,15 @@
       <div class="welcome-emoji" id="welcomeEmoji">🎓</div>
     </div>
 
-    <div class="stats-grid" id="statsGrid">
-      </div>
-
-    <div class="bottom-grid" id="bottomGrid">
-      </div>
+    <div class="stats-grid" id="statsGrid"></div>
+    <div class="bottom-grid" id="bottomGrid"></div>
 
   </div>
 </div>
 
 <script>
   // ─── Config ─────────────────────────────────────────
-  const API_URL = "https://sms-student-management-system-1.onrender.com"; //  Aapka Live Render URL
+  const API_URL = "https://sms-student-management-system-1.onrender.com"; 
   // ────────────────────────────────────────────────────
 
   // Auth guard
@@ -556,7 +553,7 @@
   roleBadge.textContent = role;
   roleBadge.className   = `badge ${role}`;
 
-  // Show role-specific nav
+  // Correct display mapping initialization fix
   if (role === 'admin') {
     document.getElementById('adminNav').style.display   = 'block';
     document.getElementById('studentNav').style.display = 'none';
@@ -588,13 +585,13 @@
     window.location.href = 'login.html';
   });
 
-  // ── API helper (Updated to include dynamic header verification) ──
+  // ── API helper ──
   async function apiFetch(endpoint) {
     const userObj = JSON.parse(localStorage.getItem('user') || '{}');
     const res = await fetch(`${API_URL}${endpoint}`, {
       headers: { 
         'Authorization': `Bearer ${token}`,
-        'user-id': userObj.id || userObj._id || '' // Sends current user's database ID
+        'user-id': userObj.id || userObj._id || '' 
       }
     });
     if (res.status === 401) { localStorage.clear(); window.location.href = 'login.html'; }
@@ -608,7 +605,6 @@
     const statsGrid  = document.getElementById('statsGrid');
     const bottomGrid = document.getElementById('bottomGrid');
 
-    // Skeleton while loading
     statsGrid.innerHTML = Array(5).fill(`
       <div class="stat-card blue">
         <div class="skeleton" style="width:40px;height:40px;border-radius:10px;"></div>
@@ -617,7 +613,6 @@
       </div>`).join('');
 
     try {
-      // Fetch stats from backend — adjust endpoints to match yours
       const [studentsRes, coursesRes, attendanceRes, feesRes, resultsRes] = await Promise.allSettled([
         apiFetch('/api/students/count'),
         apiFetch('/api/courses/count'),
@@ -665,7 +660,6 @@
         </div>
       `;
 
-      // Fetch recent students
       let recentStudents = [];
       try {
         const data = await apiFetch('/api/students?limit=5&sort=createdAt');
@@ -733,7 +727,7 @@
   }
 
   // ─────────────────────────────────────────────────────────────────
-  // STUDENT DASHBOARD (With dynamic API bindings and fallback data)
+  // STUDENT DASHBOARD
   // ─────────────────────────────────────────────────────────────────
   async function loadStudentDashboard() {
     const statsGrid  = document.getElementById('statsGrid');
@@ -759,7 +753,7 @@
       const fees       = feesRes.status       === 'fulfilled' ? feesRes.value       : {};
       const results    = resultsRes.status    === 'fulfilled' ? resultsRes.value    : {};
 
-      const attPct  = attendance.percentage ?? 0;
+      const attPct   = attendance.percentage ?? 0;
       const attColor = attPct >= 75 ? 'var(--success)' : attPct >= 50 ? 'var(--warning)' : 'var(--danger)';
 
       statsGrid.innerHTML = `
@@ -789,7 +783,6 @@
         </div>
       `;
 
-      // Profile info + progress panels
       bottomGrid.innerHTML = `
         <div class="panel">
           <div class="panel-header">
@@ -855,8 +848,7 @@
               <div class="stat-sub">${results.latestExam ?? ''}</div>
             </div>
           </div>
-        </div>
-      `;
+        </div>`;
 
     } catch (err) {
       console.error('Student dashboard error:', err);
@@ -871,7 +863,5 @@
     loadStudentDashboard();
   }
 </script>
-          
-
 </body>
 </html>
