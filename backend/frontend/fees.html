@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fees | Student Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117; --surface: #161b22; --surface2: #1c2128;
+      --border: #30363d; --accent: #2563eb; --accent-h: #1d4ed8;
+      --text: #e6edf3; --muted: #8b949e;
+      --success: #3fb950; --warning: #e3b341; --danger: #f85149; --purple: #7c3aed;
+    }
+
+    body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text); min-height: 100vh; display: flex; }
+
+    .sidebar { width: 240px; min-height: 100vh; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; transition: transform 0.3s; }
+    .sidebar-brand { display: flex; align-items: center; gap: 0.6rem; padding: 1.25rem 1rem; border-bottom: 1px solid var(--border); }
+    .brand-icon { width: 34px; height: 34px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+    .brand-text { font-size: 0.9rem; font-weight: 700; }
+    .brand-sub  { font-size: 0.68rem; color: var(--muted); }
+    .nav-section { padding: 1rem 0.75rem 0.25rem; font-size: 0.68rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .nav-item { display: flex; align-items: center; gap: 0.65rem; padding: 0.55rem 0.875rem; margin: 0.1rem 0.5rem; border-radius: 8px; font-size: 0.875rem; font-weight: 500; color: var(--muted); text-decoration: none; transition: background 0.15s, color 0.15s; }
+    .nav-item:hover { background: var(--surface2); color: var(--text); }
+    .nav-item.active { background: rgba(37,99,235,0.15); color: #93c5fd; }
+    .nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+    .sidebar-footer { margin-top: auto; padding: 1rem; border-top: 1px solid var(--border); }
+    .user-card { display: flex; align-items: center; gap: 0.65rem; padding: 0.5rem; }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+    .user-name { font-size: 0.85rem; font-weight: 600; }
+    .user-role { font-size: 0.72rem; color: var(--muted); }
+    .logout-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.875rem; margin: 0.5rem; border-radius: 8px; font-size: 0.85rem; color: var(--danger); cursor: pointer; background: none; border: none; font-family: inherit; width: calc(100% - 1rem); transition: background 0.15s; }
+    .logout-btn:hover { background: rgba(248,81,73,0.1); }
+
+    .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; gap: 0.75rem; flex-wrap: wrap; }
+    .topbar-left { display: flex; align-items: center; gap: 0.75rem; }
+    .hamburger { display: none; background: none; border: none; color: var(--text); font-size: 1.25rem; cursor: pointer; }
+    .page-title { font-size: 1.1rem; font-weight: 700; }
+    .page-sub   { font-size: 0.78rem; color: var(--muted); margin-top: 0.1rem; }
+    .content { padding: 1.5rem; flex: 1; }
+
+    /* Summary Cards */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; position: relative; overflow: hidden; transition: transform 0.2s, border-color 0.2s; }
+    .stat-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+    .stat-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .stat-card.blue::after   { background: var(--accent); }
+    .stat-card.green::after  { background: var(--success); }
+    .stat-card.yellow::after { background: var(--warning); }
+    .stat-card.red::after    { background: var(--danger); }
+    .stat-icon { font-size: 1.4rem; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 0.75rem; }
+    .stat-card.blue   .stat-icon { background: rgba(37,99,235,0.15); }
+    .stat-card.green  .stat-icon { background: rgba(63,185,80,0.15); }
+    .stat-card.yellow .stat-icon { background: rgba(227,179,65,0.15); }
+    .stat-card.red    .stat-icon { background: rgba(248,81,73,0.15); }
+    .stat-label { font-size: 0.75rem; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.3rem; }
+    .stat-value { font-size: 1.6rem; font-weight: 700; }
+    .stat-sub   { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; }
+
+    /* Progress bar inside stat card */
+    .stat-progress { margin-top: 0.75rem; }
+    .prog-bar { height: 5px; border-radius: 3px; background: var(--border); overflow: hidden; }
+    .prog-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+    .prog-label { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--muted); margin-top: 0.3rem; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 0.25rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.3rem; margin-bottom: 1.5rem; width: fit-content; }
+    .tab { padding: 0.5rem 1.1rem; border-radius: 7px; font-size: 0.875rem; font-weight: 500; cursor: pointer; color: var(--muted); border: none; background: none; font-family: inherit; transition: background 0.15s, color 0.15s; }
+    .tab.active { background: var(--accent); color: #fff; }
+    .tab:not(.active):hover { background: var(--surface2); color: var(--text); }
+    .tab-content { display: none; }
+    .tab-content.show { display: block; }
+
+    /* Panel */
+    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1.25rem; }
+    .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 0.75rem; }
+    .panel-title { font-size: 0.95rem; font-weight: 600; }
+
+    /* Toolbar */
+    .toolbar { display: flex; gap: 0.75rem; padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; align-items: center; }
+    .search-box { display: flex; align-items: center; gap: 0.5rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 0.875rem; flex: 1; min-width: 180px; }
+    .search-box input { background: none; border: none; outline: none; color: var(--text); font-family: inherit; font-size: 0.875rem; width: 100%; }
+    .search-box input::placeholder { color: var(--muted); }
+    select.filter-sel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 0.875rem; color: var(--text); font-family: inherit; font-size: 0.85rem; outline: none; cursor: pointer; }
+    select.filter-sel:focus { border-color: var(--accent); }
+    select.filter-sel option { background: var(--surface2); }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    th { padding: 0.65rem 1rem; text-align: left; font-size: 0.72rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; background: var(--surface2); border-bottom: 1px solid var(--border); white-space: nowrap; }
+    td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface2); }
+
+    .avatar-sm { width: 30px; height: 30px; border-radius: 50%; background: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.72rem; flex-shrink: 0; }
+    .name-cell { display: flex; align-items: center; gap: 0.5rem; }
+    .st-name { font-weight: 500; }
+    .st-sub  { font-size: 0.75rem; color: var(--muted); }
+
+    .pill { display: inline-block; padding: 0.15rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; }
+    .pill.paid    { background: rgba(63,185,80,0.15);  color: var(--success); }
+    .pill.pending { background: rgba(227,179,65,0.15); color: var(--warning); }
+    .pill.overdue { background: rgba(248,81,73,0.15);  color: var(--danger); }
+
+    .amt { font-weight: 600; font-size: 0.9rem; }
+    .amt.paid    { color: var(--success); }
+    .amt.pending { color: var(--warning); }
+    .amt.total   { color: var(--text); }
+
+    .btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 1rem; border-radius: 8px; font-size: 0.875rem; font-weight: 600; font-family: inherit; cursor: pointer; border: none; transition: background 0.2s; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-h); }
+    .btn-ghost { background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+    .btn-ghost:hover { background: var(--surface2); }
+    .btn-pay-sm { background: rgba(63,185,80,0.12); color: var(--success); border: 1px solid rgba(63,185,80,0.3); padding: 0.28rem 0.6rem; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 600; transition: background 0.15s; }
+    .btn-pay-sm:hover { background: rgba(63,185,80,0.25); }
+    .btn-pay-sm:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ─── 🌟 100% RESPONSIVE MODAL FIXES ─── */
+    .modal-backdrop { 
+      display: none; 
+      position: fixed; 
+      inset: 0; 
+      background: rgba(0,0,0,0.7); 
+      z-index: 200; 
+      align-items: center; 
+      justify-content: center; 
+      padding: 1rem; 
+    }
+    .modal-backdrop.show { display: flex; }
+    
+    .modal { 
+      background: var(--surface); 
+      border: 1px solid var(--border); 
+      border-radius: 12px; 
+      width: 100%; 
+      max-width: 480px; 
+      position: relative; 
+      max-height: 90vh; /* Prevents overflow from viewport */
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+    .modal::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--success), var(--accent)); border-radius: 12px 12px 0 0; }
+    
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem 0.5rem 1.5rem; flex-shrink: 0; }
+    .modal-title { font-size: 1.05rem; font-weight: 700; }
+    .modal-close { background: none; border: none; color: var(--muted); font-size: 1.25rem; cursor: pointer; }
+    .modal-close:hover { color: var(--text); }
+    
+    /* Dedicated internal scroll track prevent window crops */
+    .modal-body { 
+      padding: 1rem 1.5rem; 
+      overflow-y: auto; 
+      flex: 1; 
+    }
+    .modal-footer { display: flex; gap: 0.75rem; justify-content: flex-end; padding: 0.75rem 1.5rem 1.25rem 1.5rem; flex-shrink: 0; border-top: 1px solid rgba(255,255,255,0.02); }
+
+    .form-group { margin-bottom: 0.85rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0rem; }
+    label { display: block; font-size: 0.72rem; font-weight: 600; color: var(--muted); margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    input.form-input, select.form-sel2 { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.75rem; color: var(--text); font-size: 0.875rem; font-family: inherit; outline: none; transition: border-color 0.2s; }
+    input.form-input:focus, select.form-sel2:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+    input.form-input::placeholder { color: var(--muted); }
+    select.form-sel2 option { background: var(--surface2); }
+
+    .info-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.85rem; }
+    .info-row { display: flex; justify-content: space-between; font-size: 0.82rem; padding: 0.15rem 0; }
+    .info-key { color: var(--muted); }
+    .info-val { font-weight: 500; }
+
+    .alert { display: none; align-items: center; gap: 0.5rem; padding: 0.65rem 0.875rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1rem; }
+    .alert.error   { background: rgba(248,81,73,0.1);  border: 1px solid rgba(248,81,73,0.3);  color: var(--danger); }
+    .alert.success { background: rgba(63,185,80,0.1);  border: 1px solid rgba(63,185,80,0.3);  color: var(--success); }
+    .alert.show    { display: flex; }
+
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+    .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .overlay.show { display: block; }
+      .main { margin-left: 0; }
+      .hamburger { display: block; }
+      .form-row { grid-template-columns: 1fr; gap: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="overlay" id="overlay"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">🎓</div>
+    <div><div class="brand-text">SMS Portal</div><div class="brand-sub">Student Management</div></div>
+  </div>
+  <div class="nav-section">Main</div>
+  <a class="nav-item" href="index.html"><span class="nav-icon">🏠</span> Dashboard</a>
+  <div class="nav-section">Management</div>
+  <a class="nav-item" href="students.html"><span class="nav-icon">👨‍🎓</span> Students</a>
+  <a class="nav-item" href="attendance.html"><span class="nav-icon">📋</span> Attendance</a>
+  <a class="nav-item active" href="fees.html"><span class="nav-icon">💰</span> Fees</a>
+  <a class="nav-item" href="results.html"><span class="nav-icon">📊</span> Results</a>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="avatar" id="sidebarAvatar">?</div>
+      <div><div class="user-name" id="sidebarName">—</div><div class="user-role" id="sidebarRole">—</div></div>
+    </div>
+    <button class="logout-btn" id="logoutBtn">🚪 Sign out</button>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" id="hamburger">☰</button>
+      <div><div class="page-title">Fees Management</div><div class="page-sub">Track total, paid & pending fees</div></div>
+    </div>
+    <button class="btn btn-primary" id="addFeeBtn">➕ Assign Fee</button>
+  </header>
+
+  <div class="content">
+    <div class="alert success" id="successAlert"><span>✅</span><span id="successMsg">Done!</span></div>
+    <div class="alert error"   id="errorAlert">  <span>⚠️</span><span id="errorMsg">Error.</span></div>
+
+    <div class="stats-grid">
+      <div class="stat-card blue">
+        <div class="stat-icon">💼</div>
+        <div class="stat-label">Total Fees</div>
+        <div class="stat-value" id="statTotal">₹—</div>
+        <div class="stat-sub" id="statTotalCount">— students</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon">✅</div>
+        <div class="stat-label">Paid Fees</div>
+        <div class="stat-value" id="statPaid">₹—</div>
+        <div class="stat-sub" id="statPaidCount">— students paid</div>
+        <div class="stat-progress">
+          <div class="prog-bar"><div class="prog-fill" id="paidBar" style="background:var(--success);width:0%"></div></div>
+          <div class="prog-label"><span>Paid</span><span id="paidPct">0%</span></div>
+        </div>
+      </div>
+      <div class="stat-card yellow">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-label">Pending Fees</div>
+        <div class="stat-value" id="statPending">₹—</div>
+        <div class="stat-sub" id="statPendingCount">— students pending</div>
+        <div class="stat-progress">
+          <div class="prog-bar"><div class="prog-fill" id="pendingBar" style="background:var(--warning);width:0%"></div></div>
+          <div class="prog-label"><span>Pending</span><span id="pendingPct">0%</span></div>
+        </div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-icon">🚨</div>
+        <div class="stat-label">Overdue Fees</div>
+        <div class="stat-value" id="statOverdue">₹—</div>
+        <div class="stat-sub" id="statOverdueCount">— students overdue</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="all">All Students</button>
+      <button class="tab" data-tab="pending">⏳ Pending</button>
+      <button class="tab" data-tab="paid">✅ Paid</button>
+      <button class="tab" data-tab="overdue">🚨 Overdue</button>
+    </div>
+
+    <div class="panel">
+      <div class="toolbar">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" id="searchInput" placeholder="Search by name or roll no..." />
+        </div>
+        <select class="filter-sel" id="courseFilter"><option value="">All Courses</option></select>
+        <select class="filter-sel" id="yearFilter">
+          <option value="">All Years</option>
+          <option value="1">Year 1</option><option value="2">Year 2</option>
+          <option value="3">Year 3</option><option value="4">Year 4</option>
+        </select>
+        <button class="btn btn-ghost" id="resetBtn">↺ Reset</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Course / Year</th>
+              <th>Total Fee</th>
+              <th>Paid</th>
+              <th>Pending</th>
+              <th>Due Date</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="8"><div class="empty-state"><div class="empty-icon">⏳</div><p>Loading fees...</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="feeModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">Assign Fee</span>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="alert error" id="modalError"><span>⚠️</span><span id="modalErrorMsg">—</span></div>
+      <input type="hidden" id="editFeeId" />
+
+      <div class="form-group">
+        <label>Student</label>
+        <select class="form-sel2" id="fStudent"><option value="">Select student</option></select>
+      </div>
+
+      <div class="info-box" id="studentPreview" style="display:none;">
+        <div class="info-row"><span class="info-key">Name</span><span class="info-val" id="previewName">—</span></div>
+        <div class="info-row"><span class="info-key">Roll No</span><span class="info-val" id="previewRoll">—</span></div>
+        <div class="info-row"><span class="info-key">Course</span><span class="info-val" id="previewCourse">—</span></div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Total Fee (₹)</label>
+          <input class="form-input" type="number" id="fTotal" placeholder="e.g. 50000" min="0" />
+        </div>
+        <div class="form-group">
+          <label>Amount Paid (₹)</label>
+          <input class="form-input" type="number" id="fPaid" placeholder="e.g. 25000" min="0" value="0" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Due Date</label>
+          <input class="form-input" type="date" id="fDueDate" />
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select class="form-sel2" id="fStatus">
+            <option value="pending">Pending</option>
+            <option value="paid">Paid</option>
+            <option value="overdue">Overdue</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Remarks</label>
+        <input class="form-input" type="text" id="fRemarks" placeholder="e.g. Semester 1 fee" />
+      </div>
+
+      <div class="info-box" style="margin-bottom:0;">
+        <div class="info-row">
+          <span class="info-key">Pending Amount</span>
+          <span class="info-val" id="pendingPreview" style="color:var(--warning);">₹0</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="cancelBtn">Cancel</button>
+      <button class="btn btn-primary" id="saveBtn">
+        <div class="spinner-sm" id="saveSpinner"></div>
+        <span id="saveBtnText">Assign Fee</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_BASE = 'http://localhost:5000';
+  const token = localStorage.getItem('token');
+  const user  = JSON.parse(localStorage.getItem('user') || '{}');
+  if (!token) window.location.href = 'login.html';
+
+  const name = user.name || 'User';
+  document.getElementById('sidebarAvatar').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('sidebarName').textContent   = name;
+  document.getElementById('sidebarRole').textContent   = user.role || '—';
+  document.getElementById('logoutBtn').addEventListener('click', () => { localStorage.clear(); window.location.href = 'login.html'; });
+
+  const sidebar   = document.getElementById('sidebar');
+  const overlay   = document.getElementById('overlay');
+  document.getElementById('hamburger').addEventListener('click', () => { sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
+  overlay.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('show'); });
+
+  // Navigation tab selections handlers
+  let activeTab = 'all';
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      activeTab = tab.dataset.tab;
+      applyFilters();
+    });
+  });
+
+  async function api(endpoint, method = 'GET', body = null) {
+    const opts = { method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(`${API_BASE}${endpoint}`, opts);
+    if (res.status === 401) { localStorage.clear(); window.location.href = 'login.html'; }
+    return res.json();
+  }
+
+  let allFees = [];
+  let students = [];
+
+  async function loadData() {
+    try {
+      const [feesData, studentsData] = await Promise.all([
+        api('/api/fees'),
+        api('/api/students')
+      ]);
+
+      allFees  = Array.isArray(feesData)    ? feesData    : (feesData.fees      ?? []);
+      students = Array.isArray(studentsData) ? studentsData : (studentsData.students ?? []);
+
+      populateFilters();
+      populateStudentSelect();
+      calcSummary();
+      applyFilters();
+    } catch (err) {
+      document.getElementById('tableBody').innerHTML =
+        `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">⚠️</div><p>Cannot connect to backend.</p></div></td></tr>`;
+    }
+  }
+
+  function populateFilters() {
+    const courses = [...new Set(allFees.map(f => f.course).filter(Boolean))].sort();
+    const sel = document.getElementById('courseFilter');
+    sel.innerHTML = '<option value="">All Courses</option>';
+    courses.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; sel.appendChild(o); });
+  }
+
+  function populateStudentSelect() {
+    const sel = document.getElementById('fStudent');
+    sel.innerHTML = '<option value="">Select student</option>';
+    students.forEach(s => {
+      const o = document.createElement('option');
+      o.value = s._id;
+      o.textContent = `${s.name} — ${s.rollNo ?? ''}`;
+      sel.appendChild(o);
+    });
+  }
+
+  function calcSummary() {
+    let total = 0, paid = 0, pending = 0, overdue = 0;
+    let paidCount = 0, pendingCount = 0, overdueCount = 0;
+
+    allFees.forEach(f => {
+      total   += f.totalFee   ?? 0;
+      paid    += f.paidAmount ?? 0;
+      pending += (f.totalFee ?? 0) - (f.paidAmount ?? 0);
+      if (f.status === 'paid')    paidCount++;
+      if (f.status === 'pending') pendingCount++;
+      if (f.status === 'overdue') { overdueCount++; overdue += (f.totalFee ?? 0) - (f.paidAmount ?? 0); }
+    });
+
+    const paidPct    = total > 0 ? Math.round((paid / total) * 100)    : 0;
+    const pendingPct = total > 0 ? Math.round((pending / total) * 100) : 0;
+
+    document.getElementById('statTotal').textContent        = `₹${fmt(total)}`;
+    document.getElementById('statTotalCount').textContent   = `${allFees.length} students`;
+    document.getElementById('statPaid').textContent         = `₹${fmt(paid)}`;
+    document.getElementById('statPaidCount').textContent    = `${paidCount} students paid`;
+    document.getElementById('statPending').textContent      = `₹${fmt(pending)}`;
+    document.getElementById('statPendingCount').textContent = `${pendingCount} students pending`;
+    document.getElementById('statOverdue').textContent      = `₹${fmt(overdue)}`;
+    document.getElementById('statOverdueCount').textContent = `${overdueCount} students overdue`;
+
+    document.getElementById('paidBar').style.width    = `${paidPct}%`;
+    document.getElementById('pendingBar').style.width = `${pendingPct}%`;
+    document.getElementById('paidPct').textContent    = `${paidPct}%`;
+    document.getElementById('pendingPct').textContent = `${pendingPct}%`;
+  }
+
+  function fmt(n) {
+    return Number(n).toLocaleString('en-IN');
+  }
+
+  function applyFilters() {
+    const q       = document.getElementById('searchInput').value.toLowerCase();
+    const course  = document.getElementById('courseFilter').value;
+    const year    = document.getElementById('yearFilter').value;
+
+    let filtered = allFees.filter(f => {
+      const matchQ  = !q      || f.studentName?.toLowerCase().includes(q) || f.rollNo?.toLowerCase().includes(q);
+      const matchC  = !course || f.course === course;
+      const matchY  = !year   || String(f.year) === year;
+      const matchT  = activeTab === 'all' || f.status === activeTab;
+      return matchQ && matchC && matchY && matchT;
+    });
+
+    renderTable(filtered);
+  }
+
+  function renderTable(data) {
+    const tbody = document.getElementById('tableBody');
+    if (data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">🔍</div><p>No fees records found.</p></div></td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.map(f => {
+      const total   = f.totalFee   ?? 0;
+      const paid    = f.paidAmount ?? 0;
+      const pending = total - paid;
+      const initials = (f.studentName ?? '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+      const statusClass = f.status === 'paid' ? 'paid' : f.status === 'overdue' ? 'overdue' : 'pending';
+      const isPaid = f.status === 'paid';
+
+      return `
+        <tr>
+          <td>
+            <div class="name-cell">
+              <div class="avatar-sm">${initials}</div>
+              <div><div class="st-name">${f.studentName ?? '—'}</div><div class="st-sub">${f.rollNo ?? ''}</div></div>
+            </div>
+          </td>
+          <td>${f.course ?? '—'} / Year ${f.year ?? '—'}</td>
+          <td><span class="amt total">₹${fmt(total)}</span></td>
+          <td><span class="amt paid">₹${fmt(paid)}</span></td>
+          <td><span class="amt pending">₹${fmt(pending)}</span></td>
+          <td style="color:var(--muted);font-size:0.82rem;">${f.dueDate ? new Date(f.dueDate).toLocaleDateString('en-IN') : '—'}</td>
+          <td><span class="pill ${statusClass}">${f.status ?? 'pending'}</span></td>
+          <td>
+            <button class="btn-pay-sm" onclick="openEdit('${f._id}')" ${isPaid ? 'disabled' : ''}>
+              ${isPaid ? '✅ Paid' : '💳 Update'}
+            </button>
+          </td>
+        </tr>`;
+    }).join('');
+  }
+
+  // Filter Event Listeners
+  ['searchInput','courseFilter','yearFilter'].forEach(id => {
+    document.getElementById(id).addEventListener('input',  applyFilters);
+    document.getElementById(id).addEventListener('change', applyFilters);
+  });
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('courseFilter').value = '';
+    document.getElementById('yearFilter').value = '';
+    applyFilters();
+  });
+
+  // Dynamic live calculations assignment triggers
+  ['fTotal','fPaid'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updatePendingPreview);
+  });
+
+  function updatePendingPreview() {
+    const total = parseFloat(document.getElementById('fTotal').value) || 0;
+    const paid  = parseFloat(document.getElementById('fPaid').value)  || 0;
+    document.getElementById('pendingPreview').textContent = `₹${fmt(Math.max(0, total - paid))}`;
+  }
+
+  // Dropdown student selection metadata lookups triggers
+  document.getElementById('fStudent').addEventListener('change', function() {
+    const s = students.find(s => s._id === this.value);
+    if (s) {
+      document.getElementById('studentPreview').style.display = 'block';
+      document.getElementById('previewName').textContent   = s.name ?? '—';
+      document.getElementById('previewRoll').textContent   = s.rollNo ?? '—';
+      document.getElementById('previewCourse').textContent = s.course ?? '—';
+    } else {
+      document.getElementById('studentPreview').style.display = 'none';
+    }
+  });
+
+  // Modal Open Actions - Fresh Assignation Mode
+  window.openAdd = function() {
+    document.getElementById('modalTitle').textContent  = 'Assign Fee';
+    document.getElementById('saveBtnText').textContent = 'Assign Fee';
+    document.getElementById('editFeeId').value = '';
+    document.getElementById('fStudent').value  = '';
+    document.getElementById('fStudent').disabled = false;
+    document.getElementById('fTotal').value    = '';
+    document.getElementById('fPaid').value     = '0';
+    document.getElementById('fDueDate').value  = '';
+    document.getElementById('fStatus').value   = 'pending';
+    document.getElementById('fRemarks').value  = '';
+    document.getElementById('studentPreview').style.display = 'none';
+    document.getElementById('pendingPreview').textContent = '₹0';
+    hideModalError();
+    document.getElementById('feeModal').classList.add('show');
+  };
+
+  // Modal Open Actions - Update Balance Mode
+  window.openEdit = function(id) {
+    const f = allFees.find(f => f._id === id);
+    if (!f) return;
+    document.getElementById('modalTitle').textContent  = 'Update Fee';
+    document.getElementById('saveBtnText').textContent = 'Save Changes';
+    document.getElementById('editFeeId').value = id;
+
+    document.getElementById('fStudent').value    = f.studentId ?? '';
+    document.getElementById('fStudent').disabled = true;
+    document.getElementById('fTotal').value      = f.totalFee   ?? '';
+    document.getElementById('fPaid').value       = f.paidAmount ?? 0;
+    document.getElementById('fDueDate').value    = f.dueDate ? f.dueDate.split('T')[0] : '';
+    document.getElementById('fStatus').value     = f.status ?? 'pending';
+    document.getElementById('fRemarks').value    = f.remarks ?? '';
+
+    document.getElementById('studentPreview').style.display = 'block';
+    document.getElementById('previewName').textContent   = f.studentName ?? '—';
+    document.getElementById('previewRoll').textContent   = f.rollNo ?? '—';
+    document.getElementById('previewCourse').textContent = f.course ?? '—';
+    updatePendingPreview();
+    hideModalError();
+    document.getElementById('feeModal').classList.add('show');
+  };
+
+  window.closeModal = function() {
+    document.getElementById('feeModal').classList.remove('show');
+    document.getElementById('fStudent').disabled = false;
+  };
+
+  document.getElementById('addFeeBtn').addEventListener('click', openAdd);
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  document.getElementById('cancelBtn').addEventListener('click', closeModal);
+
+  // Core Submit Handler with Dynamic Validation Guard
+  document.getElementById('saveBtn').addEventListener('click', async () => {
+    hideModalError();
+    const id        = document.getElementById('editFeeId').value;
+    const studentId = document.getElementById('fStudent').value;
+    
+    // Strict numeric translation resolves validation drops
+    const totalFee  = Number(document.getElementById('fTotal').value);
+    const paidAmount= Number(document.getElementById('fPaid').value) || 0;
+    
+    const dueDate   = document.getElementById('fDueDate').value;
+    const status    = document.getElementById('fStatus').value;
+    const remarks   = document.getElementById('fRemarks').value.trim();
+
+    if (!id && !studentId)                { showModalError('Please select a student.');       return; }
+    if (isNaN(totalFee) || totalFee <= 0) { showModalError('Enter a valid total fee.'); return; }
+    if (paidAmount > totalFee)    { showModalError('Paid amount cannot exceed total fee.'); return; }
+    if (!dueDate)                 { showModalError('Please select a due date.');       return; }
+
+    const payload = { studentId, totalFee, paidAmount, dueDate, status, remarks };
+
+    setSaveLoading(true);
+    try {
+      const endpoint = id ? `/api/fees/${id}` : '/api/fees';
+      const method   = id ? 'PUT' : 'POST';
+      const res = await api(endpoint, method, payload);
+      if (res.error) { showModalError(res.message || 'Failed to save.'); return; }
+      closeModal();
+      showAlert('success', id ? 'Fee updated successfully! 🎉' : 'Fee assigned successfully! 🚀');
+      await loadData();
+    } catch (err) {
+      showModalError('Server error. Please try again.');
+    } finally {
+      setSaveLoading(false);
+    }
+  });
+
+  function setSaveLoading(on) {
+    document.getElementById('saveBtn').disabled = on;
+    document.getElementById('saveSpinner').style.display = on ? 'block' : 'none';
+  }
+
+  function showModalError(msg) {
+    document.getElementById('modalErrorMsg').textContent = msg;
+    document.getElementById('modalError').classList.add('show');
+  }
+  function hideModalError() { document.getElementById('modalError').classList.remove('show'); }
+
+  let alertTimer;
+  function showAlert(type, msg) {
+    const el    = document.getElementById(type === 'success' ? 'successAlert' : 'errorAlert');
+    const msgEl = document.getElementById(type === 'success' ? 'successMsg'  : 'errorMsg');
+    msgEl.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(alertTimer);
+    alertTimer = setTimeout(() => el.classList.remove('show'), 3500);
+  }
+
+  loadData();
+</script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Fees Ledger | SMS Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --surface2:  #1c2128;
+      --border:    #30363d;
+      --accent:    #2563eb;
+      --text:      #e6edf3;
+      --muted:     #8b949e;
+      --success:   #3fb950;
+      --danger:    #f85149;
+      --warning:   #e3b341;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+
+    .header-bar {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .back-arrow {
+      font-size: 1.5rem;
+      color: var(--text);
+      text-decoration: none;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .page-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    /* Status Banner */
+    .status-banner {
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 1.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .status-banner.paid { background: rgba(63,185,80,0.15); border: 1px solid var(--success); color: var(--success); }
+    .status-banner.pending { background: rgba(227,179,65,0.15); border: 1px solid var(--warning); color: var(--warning); }
+
+    /* Summary Layout Row Grid */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 1rem;
+      border-radius: 10px;
+    }
+
+    .stat-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; }
+    .stat-val { font-size: 1.2rem; font-weight: 700; margin-top: 0.25rem; }
+    .stat-val.due { color: var(--danger); }
+
+    .due-date-notice {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: -0.75rem;
+      margin-bottom: 1.5rem;
+      background: rgba(255,255,255,0.02);
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    /* Transaction Ledger Table */
+    h3 { font-size: 0.95rem; margin-bottom: 0.75rem; color: var(--text); font-weight: 600; }
+    
+    .table-wrap {
+      overflow-x: auto;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
+    th, td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); }
+    th { background: rgba(255,255,255,0.01); font-weight: 600; color: var(--muted); }
+    tr:last-child td { border-bottom: none; }
+
+    .pill { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 999px; font-size: 0.7rem; font-weight: 600; }
+    .pill.success { background: rgba(63,185,80,0.15); color: var(--success); }
+
+    .footer-nav { text-align: center; margin-top: 1.5rem; }
+    .back-dashboard-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      width: 100%; padding: 0.7rem; background: transparent; border: 1px solid var(--border);
+      border-radius: 8px; color: var(--muted); text-decoration: none; font-size: 0.875rem;
+      font-weight: 600; transition: all 0.2s ease;
+    }
+    .back-dashboard-btn:hover { border-color: var(--accent); color: var(--text); background: rgba(37,99,235,0.05); }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header-bar">
+    <a href="index.html" class="back-arrow">‹</a>
+    <span class="page-title">Fee Management</span>
+  </div>
+
+  <div id="statusBanner" class="status-banner pending">Pending</div>
+
+  <div class="summary-grid">
+    <div class="stat-box">
+      <div class="stat-label">Total Course Fee</div>
+      <div class="stat-value stat-val" id="totalFee">₹0</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Paid Amount</div>
+      <div class="stat-value stat-val" style="color: var(--success);" id="paidFee">₹0</div>
+    </div>
+    <div class="stat-box" style="grid-column: 1 / -1;">
+      <div class="stat-label">Outstanding Balance (Due)</div>
+      <div class="stat-value stat-val due" id="dueFee">₹0</div>
+    </div>
+  </div>
+
+  <div class="due-date-notice" id="dueDateContainer" style="display: none;">
+    ⚠️ Next Payment Deadline: <span id="dueDateText" style="font-weight: 600; color: var(--text);">—</span>
+  </div>
+
+  <h3>Payment History</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>TXN ID</th>
+          <th>Date</th>
+          <th>Amount</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="transactionBody">
+        <tr><td colspan="4" style="text-align:center; color: var(--muted);">Loading financial statements...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer-nav">
+    <a href="index.html" class="back-dashboard-btn">← Back to Dashboard</a>
+  </div>
+</div>
+
+<script>
+  const API_BASE = 'http://localhost:5000';
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+  if (!token) window.location.href = 'login.html';
+
+  async function fetchMyFees() {
+    try {
+      const res = await fetch(`${API_BASE}/api/fees/me`, {
+        method: 'GET',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'user-id': user.id || user._id || ''
+        }
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        // 1. Dynamic Status Banner Styling
+        const banner = document.getElementById('statusBanner');
+        const currentStatus = data.status || 'pending';
+        banner.textContent = currentStatus;
+        banner.className = `status-banner ${currentStatus}`;
+
+        // 2. Numerical Values Assignments
+        document.getElementById('totalFee').textContent = `₹${(data.totalAmount || 0).toLocaleString('en-IN')}`;
+        document.getElementById('paidFee').textContent  = `₹${(data.paidAmount || 0).toLocaleString('en-IN')}`;
+        document.getElementById('dueFee').textContent   = `₹${(data.due || 0).toLocaleString('en-IN')}`;
+
+        // Deadline visibility check block
+        if (data.due > 0 && data.dueDate) {
+          document.getElementById('dueDateContainer').style.display = 'block';
+          document.getElementById('dueDateText').textContent = new Date(data.dueDate).toLocaleDateString('en-IN', {
+            day: 'numeric', month: 'long', year: 'numeric'
+          });
+        }
+
+        // 3. Transactions List Renders
+        const body = document.getElementById('transactionBody');
+        if (!data.transactions || data.transactions.length === 0) {
+          body.innerHTML = `<tr><td colspan="4" style="text-align:center; color: var(--muted);">No invoices tracked yet.</td></tr>`;
+          return;
+        }
+
+        body.innerHTML = data.transactions.map(t => `
+          <tr>
+            <td style="font-family: monospace; font-weight: 500; color: var(--accent);">${t.id}</td>
+            <td style="color: var(--muted); font-size: 0.8rem;">${new Date(t.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</td>
+            <td style="font-weight: 600;">₹${t.amount.toLocaleString('en-IN')}</td>
+            <td><span class="pill success">${t.status}</span></td>
+          </tr>
+        `).join('');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  fetchMyFees();
+</script>
+</body>
+</html>

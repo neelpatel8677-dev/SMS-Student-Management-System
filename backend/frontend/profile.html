@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Profile | SMS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #0d1117;
+      font-family: 'Inter', sans-serif;
+      color: #e6edf3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .form-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      padding: 2rem;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h2 {
+      margin-bottom: 1.5rem;
+      font-size: 1.25rem;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: #8b949e;
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+    }
+
+    input,
+    select {
+      width: 100%;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 0.65rem;
+      color: #e6edf3;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #2563eb;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 0.7rem;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+
+    .btn:hover {
+      background: #1d4ed8;
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 1rem;
+      color: #8b949e;
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+
+    .back-link:hover {
+      color: #e6edf3;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="form-card">
+    <h2>Edit My Profile 👤</h2>
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" id="pName">
+    </div>
+    <div class="form-group">
+      <label>Roll Number</label>
+      <input type="text" id="pRollNo">
+    </div>
+    <div class="form-group">
+      <label>Course</label>
+      <input type="text" id="pCourse" placeholder="e.g. B.Tech, BCA">
+    </div>
+    <div class="form-group">
+      <label>Branch</label>
+      <input type="text" id="pBranch" placeholder="e.g. CSE">
+    </div>
+    <div class="form-group">
+      <label>Year</label>
+      <select id="pYear">
+        <option value="1">1st Year</option>
+        <option value="2">2nd Year</option>
+        <option value="3">3rd Year</option>
+        <option value="4">4th Year</option>
+      </select>
+    </div>
+    <button class="btn" id="saveProfileBtn">Save Changes</button>
+    <a href="index.html" class="back-link">← Back to Dashboard</a>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:5000'; // Target local backend server
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    // Safety check: Agar user login nahi hai ya student nahi hai, redirect to login
+    if (!token) window.location.href = 'login.html';
+
+    // Dynamic user key handling for both formats (id or _id)
+    const currentUserId = user.id || user._id || '';
+
+    // 📥 1. Load current database data into inputs when page opens
+    async function loadCurrentProfile() {
+      try {
+        // 🛠️ FIX: Standard user profiling route fetch mechanism mapped properly
+        const res = await fetch(`${API_BASE}/api/students/me`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'user-id': currentUserId
+          }
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          document.getElementById('pName').value = data.name || '';
+          document.getElementById('pRollNo').value = data.rollNo || '';
+          document.getElementById('pCourse').value = data.course || '';
+          document.getElementById('pBranch').value = data.branch || '';
+          document.getElementById('pYear').value = data.year || '1';
+        } else {
+          console.error('Failed to load profile data:', data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching initial profile:', error);
+      }
+    }
+
+    // 💾 2. Save updated data and direct jump to dashboard
+    document.getElementById('saveProfileBtn').addEventListener('click', async () => {
+      const saveBtn = document.getElementById('saveProfileBtn');
+
+      const payload = {
+        name: document.getElementById('pName').value.trim(),
+        rollNo: document.getElementById('pRollNo').value.trim(),
+        course: document.getElementById('pCourse').value.trim(),
+        branch: document.getElementById('pBranch').value.trim(),
+        year: parseInt(document.getElementById('pYear').value)
+      };
+
+      if (!payload.name) {
+        alert("Name field cannot be left blank.");
+        return;
+      }
+
+      // UI Loading state
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving Changes...';
+
+      try {
+        // 🛠️ FIX: Hit endpoint changed slightly if routing matches standard POST updates or custom PUT mapping
+        const res = await fetch(`${API_BASE}/api/students/me`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'user-id': currentUserId // Core verification header
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          // 🛠️ FIX: Localstorage sync includes rollNo and course fields update dynamically 
+          // taaki student calendar instantly unhe read kar sake!
+          const updatedUserSession = { 
+            ...user, 
+            name: payload.name,
+            rollNo: payload.rollNo,
+            course: payload.course
+          };
+          localStorage.setItem('user', JSON.stringify(updatedUserSession));
+
+          alert('Profile updated successfully! 🎉');
+
+          // Instant dynamic jump to main landing page
+          window.location.href = 'index.html';
+        } else {
+          alert('Server Refusal: ' + (data.message || 'Failed to update profile data.'));
+        }
+      } catch (error) {
+        console.error('Error during profile save operation:', error);
+        alert('Network Error: Cannot connect to the registration server.');
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save Changes';
+      }
+    });
+
+    // Execute on load
+    loadCurrentProfile();
+</script>
+</body>
+
+</html>

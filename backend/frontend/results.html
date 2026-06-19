@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Results | Student Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117; --surface: #161b22; --surface2: #1c2128;
+      --border: #30363d; --accent: #2563eb; --accent-h: #1d4ed8;
+      --text: #e6edf3; --muted: #8b949e;
+      --success: #3fb950; --warning: #e3b341; --danger: #f85149;
+      --purple: #7c3aed; --cyan: #22d3ee;
+    }
+
+    body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text); min-height: 100vh; display: flex; }
+
+    .sidebar { width: 240px; min-height: 100vh; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; transition: transform 0.3s; }
+    .sidebar-brand { display: flex; align-items: center; gap: 0.6rem; padding: 1.25rem 1rem; border-bottom: 1px solid var(--border); }
+    .brand-icon { width: 34px; height: 34px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+    .brand-text { font-size: 0.9rem; font-weight: 700; }
+    .brand-sub  { font-size: 0.68rem; color: var(--muted); }
+    .nav-section { padding: 1rem 0.75rem 0.25rem; font-size: 0.68rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .nav-item { display: flex; align-items: center; gap: 0.65rem; padding: 0.55rem 0.875rem; margin: 0.1rem 0.5rem; border-radius: 8px; font-size: 0.875rem; font-weight: 500; color: var(--muted); text-decoration: none; transition: background 0.15s, color 0.15s; }
+    .nav-item:hover { background: var(--surface2); color: var(--text); }
+    .nav-item.active { background: rgba(37,99,235,0.15); color: #93c5fd; }
+    .nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+    .sidebar-footer { margin-top: auto; padding: 1rem; border-top: 1px solid var(--border); }
+    .user-card { display: flex; align-items: center; gap: 0.65rem; padding: 0.5rem; }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+    .user-name { font-size: 0.85rem; font-weight: 600; }
+    .user-role { font-size: 0.72rem; color: var(--muted); }
+    .logout-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.875rem; margin: 0.5rem; border-radius: 8px; font-size: 0.85rem; color: var(--danger); cursor: pointer; background: none; border: none; font-family: inherit; width: calc(100% - 1rem); transition: background 0.15s; }
+    .logout-btn:hover { background: rgba(248,81,73,0.1); }
+
+    .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; gap: 0.75rem; flex-wrap: wrap; }
+    .topbar-left { display: flex; align-items: center; gap: 0.75rem; }
+    .hamburger { display: none; background: none; border: none; color: var(--text); font-size: 1.25rem; cursor: pointer; }
+    .page-title { font-size: 1.1rem; font-weight: 700; }
+    .page-sub   { font-size: 0.78rem; color: var(--muted); margin-top: 0.1rem; }
+    .content { padding: 1.5rem; flex: 1; }
+
+    /* Stats */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.1rem; position: relative; overflow: hidden; transition: transform 0.2s; }
+    .stat-card:hover { transform: translateY(-2px); }
+    .stat-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+    .stat-card.blue::after   { background: var(--accent); }
+    .stat-card.green::after  { background: var(--success); }
+    .stat-card.yellow::after { background: var(--warning); }
+    .stat-card.red::after    { background: var(--danger); }
+    .stat-card.purple::after { background: var(--purple); }
+    .stat-label { font-size: 0.72rem; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.3rem; }
+    .stat-value { font-size: 1.5rem; font-weight: 700; }
+    .stat-sub   { font-size: 0.72rem; color: var(--muted); margin-top: 0.2rem; }
+
+    /* Panel */
+    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 0.75rem; }
+    .panel-title { font-size: 0.95rem; font-weight: 600; }
+
+    .toolbar { display: flex; gap: 0.75rem; padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; align-items: center; }
+    .search-box { display: flex; align-items: center; gap: 0.5rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 0.875rem; flex: 1; min-width: 180px; }
+    .search-box input { background: none; border: none; outline: none; color: var(--text); font-family: inherit; font-size: 0.875rem; width: 100%; }
+    .search-box input::placeholder { color: var(--muted); }
+    select.filter-sel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 0.875rem; color: var(--text); font-family: inherit; font-size: 0.85rem; outline: none; cursor: pointer; }
+    select.filter-sel:focus { border-color: var(--accent); }
+    select.filter-sel option { background: var(--surface2); }
+
+    .btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 1rem; border-radius: 8px; font-size: 0.875rem; font-weight: 600; font-family: inherit; cursor: pointer; border: none; transition: background 0.2s; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-h); }
+    .btn-ghost { background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+    .btn-ghost:hover { background: var(--surface2); }
+    .btn-sm { padding: 0.28rem 0.6rem; font-size: 0.75rem; border-radius: 6px; }
+    .btn-edit-sm { background: rgba(37,99,235,0.1); color: #93c5fd; border: 1px solid rgba(37,99,235,0.25); }
+    .btn-edit-sm:hover { background: rgba(37,99,235,0.2); }
+    .btn-del-sm  { background: rgba(248,81,73,0.1);  color: var(--danger);  border: 1px solid rgba(248,81,73,0.25); }
+    .btn-del-sm:hover  { background: rgba(248,81,73,0.2); }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    th { padding: 0.65rem 1rem; text-align: left; font-size: 0.72rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; background: var(--surface2); border-bottom: 1px solid var(--border); white-space: nowrap; }
+    td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface2); }
+
+    .avatar-sm { width: 30px; height: 30px; border-radius: 50%; background: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.72rem; flex-shrink: 0; }
+    .name-cell { display: flex; align-items: center; gap: 0.5rem; }
+    .st-name { font-weight: 500; }
+    .st-sub  { font-size: 0.75rem; color: var(--muted); }
+
+    /* Grade badge */
+    .grade { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; }
+    .grade-O  { background: rgba(63,185,80,0.2);  color: var(--success); }
+    .grade-A  { background: rgba(34,211,238,0.15); color: var(--cyan); }
+    .grade-B  { background: rgba(37,99,235,0.15);  color: #93c5fd; }
+    .grade-C  { background: rgba(227,179,65,0.15); color: var(--warning); }
+    .grade-D  { background: rgba(248,81,73,0.12);  color: var(--danger); }
+    .grade-F  { background: rgba(248,81,73,0.2);   color: var(--danger); }
+
+    .pill { display: inline-block; padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.72rem; font-weight: 500; }
+    .pill.pass { background: rgba(63,185,80,0.15); color: var(--success); }
+    .pill.fail { background: rgba(248,81,73,0.15); color: var(--danger); }
+
+    /* Marks display */
+    .marks-display { display: flex; flex-direction: column; gap: 0.15rem; }
+    .marks-fraction { font-weight: 600; font-size: 0.9rem; }
+    .marks-out { font-size: 0.72rem; color: var(--muted); }
+
+    /* Percentage bar */
+    .pct-cell { min-width: 130px; }
+    .pct-bar { display: flex; align-items: center; gap: 0.5rem; }
+    .bar-bg { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+    .pct-text { font-size: 0.82rem; font-weight: 700; min-width: 38px; text-align: right; }
+
+    .actions-cell { display: flex; gap: 0.4rem; }
+
+    /* Modal */
+    .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-backdrop.show { display: flex; }
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; position: relative; }
+    .modal::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--purple), var(--accent)); border-radius: 12px 12px 0 0; }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem 0; }
+    .modal-title { font-size: 1rem; font-weight: 700; }
+    .modal-close { background: none; border: none; color: var(--muted); font-size: 1.25rem; cursor: pointer; }
+    .modal-close:hover { color: var(--text); }
+    .modal-body { padding: 1.25rem 1.5rem; }
+    .modal-footer { display: flex; gap: 0.75rem; justify-content: flex-end; padding: 0 1.5rem 1.5rem; }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem; }
+    label { display: block; font-size: 0.78rem; font-weight: 500; color: var(--muted); margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    input.form-input, select.form-sel2 { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 0.875rem; color: var(--text); font-size: 0.9rem; font-family: inherit; outline: none; transition: border-color 0.2s; }
+    input.form-input:focus, select.form-sel2:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+    input.form-input::placeholder { color: var(--muted); }
+    select.form-sel2 option { background: var(--surface2); }
+
+    .result-preview { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; margin-bottom: 1rem; display: none; }
+    .preview-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; padding: 0.2rem 0; }
+    .preview-key { color: var(--muted); }
+    .preview-val { font-weight: 600; }
+
+    .subjects-section { margin-bottom: 1rem; }
+    .subjects-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+    .subjects-label { font-size: 0.78rem; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .subject-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center; }
+    .subject-row input { padding: 0.45rem 0.6rem; font-size: 0.85rem; }
+    .remove-subj { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 1rem; padding: 0.2rem; opacity: 0.7; }
+    .remove-subj:hover { opacity: 1; }
+
+    .spinner-sm { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .alert { display: none; align-items: center; gap: 0.5rem; padding: 0.65rem 0.875rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1rem; }
+    .alert.error   { background: rgba(248,81,73,0.1);  border: 1px solid rgba(248,81,73,0.3);  color: var(--danger); }
+    .alert.success { background: rgba(63,185,80,0.1);  border: 1px solid rgba(63,185,80,0.3);  color: var(--success); }
+    .alert.show    { display: flex; }
+
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+    .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .overlay.show { display: block; }
+      .main { margin-left: 0; }
+      .hamburger { display: block; }
+      .form-row { grid-template-columns: 1fr; }
+      .subject-row { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="overlay" id="overlay"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">🎓</div>
+    <div><div class="brand-text">SMS Portal</div><div class="brand-sub">Student Management</div></div>
+  </div>
+  <div class="nav-section">Main</div>
+  <a class="nav-item" href="index.html"><span class="nav-icon">🏠</span> Dashboard</a>
+  <div class="nav-section">Management</div>
+  <a class="nav-item" href="students.html"><span class="nav-icon">👨‍🎓</span> Students</a>
+  <a class="nav-item" href="attendance.html"><span class="nav-icon">📋</span> Attendance</a>
+  <a class="nav-item" href="fees.html"><span class="nav-icon">💰</span> Fees</a>
+  <a class="nav-item active" href="results.html"><span class="nav-icon">📊</span> Results</a>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="avatar" id="sidebarAvatar">?</div>
+      <div><div class="user-name" id="sidebarName">—</div><div class="user-role" id="sidebarRole">—</div></div>
+    </div>
+    <button class="logout-btn" id="logoutBtn">🚪 Sign out</button>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" id="hamburger">☰</button>
+      <div><div class="page-title">Results</div><div class="page-sub">Marks, percentage & grades</div></div>
+    </div>
+    <button class="btn btn-primary" id="addResultBtn">➕ Add Result</button>
+  </header>
+
+  <div class="content">
+    <div class="alert success" id="successAlert"><span>✅</span><span id="successMsg">Done!</span></div>
+    <div class="alert error"   id="errorAlert">  <span>⚠️</span><span id="errorMsg">Error.</span></div>
+
+    <div class="stats-grid">
+      <div class="stat-card blue">  <div class="stat-label">Total Results</div><div class="stat-value" id="statTotal">—</div><div class="stat-sub">records</div></div>
+      <div class="stat-card green"> <div class="stat-label">Passed</div><div class="stat-value" id="statPassed">—</div><div class="stat-sub" id="statPassPct">—</div></div>
+      <div class="stat-card red">   <div class="stat-label">Failed</div><div class="stat-value" id="statFailed">—</div></div>
+      <div class="stat-card purple"><div class="stat-label">Avg Percentage</div><div class="stat-value" id="statAvg">—</div></div>
+      <div class="stat-card yellow"><div class="stat-label">Highest Score</div><div class="stat-value" id="statTop">—</div></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">All Results</span></div>
+      <div class="toolbar">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" id="searchInput" placeholder="Search by name, roll no, exam..." />
+        </div>
+        <select class="filter-sel" id="courseFilter"><option value="">All Courses</option></select>
+        <select class="filter-sel" id="examFilter"><option value="">All Exams</option></select>
+        <select class="filter-sel" id="resultFilter">
+          <option value="">All Results</option>
+          <option value="pass">Pass</option>
+          <option value="fail">Fail</option>
+        </select>
+        <button class="btn btn-ghost" id="resetBtn">↺ Reset</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Course / Year</th>
+              <th>Exam</th>
+              <th>Marks Obtained</th>
+              <th>Out Of</th>
+              <th>Percentage</th>
+              <th>Grade</th>
+              <th>Result</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="9"><div class="empty-state"><div class="empty-icon">⏳</div><p>Loading results...</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="resultModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">Add Result</span>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert error" id="modalError"><span>⚠️</span><span id="modalErrorMsg">—</span></div>
+      <input type="hidden" id="editResultId" />
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Student</label>
+          <select class="form-sel2" id="fStudent"><option value="">Select student</option></select>
+        </div>
+        <div class="form-group">
+          <label>Exam / Term</label>
+          <input class="form-input" type="text" id="fExam" placeholder="e.g. Semester 1, Mid Term" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Exam Date</label>
+          <input class="form-input" type="date" id="fDate" />
+        </div>
+        <div class="form-group">
+          <label>Pass Marks</label>
+          <input class="form-input" type="number" id="fPassMarks" placeholder="e.g. 35" min="0" />
+        </div>
+      </div>
+
+      <div class="subjects-section">
+        <div class="subjects-header">
+          <span class="subjects-label">Subjects</span>
+          <button class="btn btn-ghost btn-sm" id="addSubjectBtn">+ Add Subject</button>
+        </div>
+        <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:0.5rem;margin-bottom:0.4rem;">
+          <span style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Subject</span>
+          <span style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Obtained</span>
+          <span style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Out Of</span>
+        </div>
+        <div id="subjectsContainer"></div>
+      </div>
+
+      <div class="result-preview" id="resultPreview">
+        <div class="preview-row"><span class="preview-key">Total Obtained</span><span class="preview-val" id="prevObtained">—</span></div>
+        <div class="preview-row"><span class="preview-key">Total Out Of</span><span class="preview-val" id="prevOutOf">—</span></div>
+        <div class="preview-row"><span class="preview-key">Percentage</span><span class="preview-val" id="prevPct" style="color:var(--accent)">—</span></div>
+        <div class="preview-row"><span class="preview-key">Grade</span><span class="preview-val" id="prevGrade">—</span></div>
+        <div class="preview-row"><span class="preview-key">Result</span><span class="preview-val" id="prevResult">—</span></div>
+      </div>
+
+      <div class="form-group">
+        <label>Remarks</label>
+        <input class="form-input" type="text" id="fRemarks" placeholder="Optional remarks" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="cancelBtn">Cancel</button>
+      <button class="btn btn-primary" id="saveBtn">
+        <div class="spinner-sm" id="saveSpinner"></div>
+        <span id="saveBtnText">Add Result</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_BASE = 'http://localhost:5000';
+  const token = localStorage.getItem('token');
+  const user  = JSON.parse(localStorage.getItem('user') || '{}');
+  if (!token) window.location.href = 'login.html';
+
+  const name = user.name || 'User';
+  document.getElementById('sidebarAvatar').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('sidebarName').textContent   = name;
+  document.getElementById('sidebarRole').textContent   = user.role || '—';
+  document.getElementById('logoutBtn').addEventListener('click', () => { localStorage.clear(); window.location.href = 'login.html'; });
+
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  document.getElementById('hamburger').addEventListener('click', () => { sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
+  overlay.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('show'); });
+
+  async function api(endpoint, method = 'GET', body = null) {
+    const opts = { method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(`${API_BASE}${endpoint}`, opts);
+    if (res.status === 401) { localStorage.clear(); window.location.href = 'login.html'; }
+    return res.json();
+  }
+
+  let allResults = [];
+  let students   = [];
+
+  async function loadData() {
+    try {
+      const [resultsData, studentsData] = await Promise.all([
+        api('/api/results'),
+        api('/api/students')
+      ]);
+      allResults = Array.isArray(resultsData) ? resultsData : (resultsData.results ?? []);
+      students   = Array.isArray(studentsData) ? studentsData : (studentsData.students ?? []);
+
+      populateFilters();
+      populateStudentSelect();
+      calcSummary();
+      applyFilters();
+    } catch (err) {
+      document.getElementById('tableBody').innerHTML =
+        `<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">⚠️</div><p>Cannot connect to backend.</p></div></td></tr>`;
+    }
+  }
+
+  function populateFilters() {
+    const courses = [...new Set(allResults.map(r => r.course).filter(Boolean))].sort();
+    const exams   = [...new Set(allResults.map(r => r.exam).filter(Boolean))].sort();
+    const cSel = document.getElementById('courseFilter');
+    const eSel = document.getElementById('examFilter');
+    cSel.innerHTML = '<option value="">All Courses</option>';
+    eSel.innerHTML = '<option value="">All Exams</option>';
+    courses.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; cSel.appendChild(o); });
+    exams.forEach(e   => { const o = document.createElement('option'); o.value = e; o.textContent = e; eSel.appendChild(o); });
+  }
+
+  function populateStudentSelect() {
+    const sel = document.getElementById('fStudent');
+    sel.innerHTML = '<option value="">Select student</option>';
+    students.forEach(s => {
+      const o = document.createElement('option');
+      o.value = s._id; o.textContent = `${s.name} — ${s.rollNo ?? ''}`;
+      sel.appendChild(o);
+    });
+  }
+
+  function calcSummary() {
+    const total  = allResults.length;
+    const passed = allResults.filter(r => r.result === 'pass').length;
+    const failed = allResults.filter(r => r.result === 'fail').length;
+    const pcts   = allResults.map(r => r.percentage ?? 0);
+    const avg    = total ? (pcts.reduce((a, b) => a + b, 0) / total).toFixed(1) : 0;
+    const top    = total ? Math.max(...pcts).toFixed(1) : 0;
+
+    document.getElementById('statTotal').textContent   = total;
+    document.getElementById('statPassed').textContent  = passed;
+    document.getElementById('statPassPct').textContent = total ? `${Math.round(passed/total*100)}% pass rate` : '—';
+    document.getElementById('statFailed').textContent  = failed;
+    document.getElementById('statAvg').textContent     = `${avg}%`;
+    document.getElementById('statTop').textContent     = `${top}%`;
+  }
+
+  function getGrade(pct) {
+    if (pct >= 90) return 'O';
+    if (pct >= 80) return 'A';
+    if (pct >= 70) return 'B';
+    if (pct >= 60) return 'C';
+    if (pct >= 50) return 'D';
+    return 'F';
+  }
+
+  function getPctColor(pct) {
+    if (pct >= 75) return 'var(--success)';
+    if (pct >= 50) return 'var(--warning)';
+    return 'var(--danger)';
+  }
+
+  function applyFilters() {
+    const q       = document.getElementById('searchInput').value.toLowerCase();
+    const course  = document.getElementById('courseFilter').value;
+    const exam    = document.getElementById('examFilter').value;
+    const result  = document.getElementById('resultFilter').value;
+
+    const filtered = allResults.filter(r => {
+      const matchQ = !q      || r.studentName?.toLowerCase().includes(q) || r.rollNo?.toLowerCase().includes(q) || r.exam?.toLowerCase().includes(q);
+      const matchC = !course || r.course === course;
+      const matchE = !exam   || r.exam === exam;
+      const matchR = !result || r.result === result;
+      return matchQ && matchC && matchE && matchR;
+    });
+
+    renderTable(filtered);
+  }
+
+  function renderTable(data) {
+    const tbody = document.getElementById('tableBody');
+    if (data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">🔍</div><p>No results found.</p></div></td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.map(r => {
+      const pct      = r.percentage ?? 0;
+      const grade    = r.grade ?? getGrade(pct);
+      const color    = getPctColor(pct);
+      const obtained = r.marksObtained ?? 0;
+      const outOf    = r.totalMarks    ?? 0;
+      const initials = (r.studentName ?? '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+
+      return `
+        <tr>
+          <td>
+            <div class="name-cell">
+              <div class="avatar-sm">${initials}</div>
+              <div><div class="st-name">${r.studentName ?? '—'}</div><div class="st-sub">${r.rollNo ?? ''}</div></div>
+            </div>
+          </td>
+          <td>${r.course ?? '—'} / Yr ${r.year ?? '—'}</td>
+          <td style="font-weight:500">${r.exam ?? '—'}</td>
+          <td>
+            <div class="marks-display">
+              <span class="marks-fraction" style="color:${color}">${obtained}</span>
+              <span class="marks-out">Obtained</span>
+            </div>
+          </td>
+          <td>
+            <div class="marks-display">
+              <span class="marks-fraction">${outOf}</span>
+              <span class="marks-out">Total</span>
+            </div>
+          </td>
+          <td class="pct-cell">
+            <div class="pct-bar">
+              <div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+              <span class="pct-text" style="color:${color}">${pct}%</span>
+            </div>
+          </td>
+          <td><span class="grade grade-${grade}">${grade}</span></td>
+          <td><span class="pill ${r.result === 'pass' ? 'pass' : 'fail'}">${r.result === 'pass' ? '✅ Pass' : '❌ Fail'}</span></td>
+          <td>
+            <div class="actions-cell">
+              <button class="btn btn-sm btn-edit-sm" onclick="openEdit('${r._id}')">✏️</button>
+              <button class="btn btn-sm btn-del-sm"  onclick="window.deleteResultTrigger('${r._id}', '${(r.studentName ?? '').replace(/'/g,"\\'")}')">🗑</button>
+            </div>
+          </td>
+        </tr>`;
+    }).join('');
+  }
+
+  ['searchInput','courseFilter','examFilter','resultFilter'].forEach(id => {
+    document.getElementById(id).addEventListener('input',  applyFilters);
+    document.getElementById(id).addEventListener('change', applyFilters);
+  });
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    ['searchInput','courseFilter','examFilter','resultFilter'].forEach(id => document.getElementById(id).value = '');
+    applyFilters();
+  });
+
+  let subjectCount = 0;
+  window.addSubjectRow = function(name = '', obtained = '', outOf = '') {
+    subjectCount++;
+    const id = subjectCount;
+    const div = document.createElement('div');
+    div.className = 'subject-row';
+    div.id = `subj-${id}`;
+    div.innerHTML = `
+      <input class="form-input subj-name"     placeholder="e.g. Mathematics" value="${name}"     oninput="calcPreview()" />
+      <input class="form-input subj-obtained" placeholder="e.g. 78"          value="${obtained}" type="number" min="0" oninput="calcPreview()" />
+      <input class="form-input subj-outof"    placeholder="e.g. 100"         value="${outOf}"    type="number" min="0" oninput="calcPreview()" />
+      <button class="remove-subj" onclick="removeSubject(${id})" title="Remove">✕</button>`;
+    document.getElementById('subjectsContainer').appendChild(div);
+    calcPreview();
+  };
+
+  window.removeSubject = function(id) {
+    document.getElementById(`subj-${id}`)?.remove();
+    calcPreview();
+  };
+
+  document.getElementById('addSubjectBtn').addEventListener('click', () => addSubjectRow());
+
+  function getSubjects() {
+    return [...document.querySelectorAll('.subject-row')].map(row => ({
+      name:     row.querySelector('.subj-name').value.trim(),
+      obtained: parseFloat(row.querySelector('.subj-obtained').value) || 0,
+      total:    parseFloat(row.querySelector('.subj-outof').value)    || 100,
+    }));
+  }
+
+  window.calcPreview = function() {
+    const subjects  = getSubjects();
+    const passMarks = parseFloat(document.getElementById('fPassMarks').value) || 0;
+    if (subjects.length === 0) { document.getElementById('resultPreview').style.display = 'none'; return; }
+
+    const totalObtained = subjects.reduce((s, x) => s + x.obtained, 0);
+    const totalOutOf    = subjects.reduce((s, x) => s + x.total,    0);
+    const pct           = totalOutOf > 0 ? parseFloat((totalObtained / totalOutOf * 100).toFixed(2)) : 0;
+    const grade         = getGrade(pct);
+    const pass          = passMarks > 0 ? totalObtained >= passMarks : pct >= 35;
+    const color         = getPctColor(pct);
+
+    document.getElementById('resultPreview').style.display = 'block';
+    document.getElementById('prevObtained').textContent = totalObtained;
+    document.getElementById('prevOutOf').textContent    = totalOutOf;
+    document.getElementById('prevPct').textContent      = `${pct}%`;
+    document.getElementById('prevPct').style.color      = color;
+    document.getElementById('prevGrade').textContent    = grade;
+    document.getElementById('prevResult').textContent   = pass ? '✅ Pass' : '❌ Fail';
+    document.getElementById('prevResult').style.color   = pass ? 'var(--success)' : 'var(--danger)';
+  };
+
+  document.getElementById('fPassMarks').addEventListener('input', calcPreview);
+
+  window.openAdd = function() {
+    document.getElementById('modalTitle').textContent  = 'Add Result';
+    document.getElementById('saveBtnText').textContent = 'Add Result';
+    document.getElementById('editResultId').value = '';
+    document.getElementById('fStudent').value = '';
+    document.getElementById('fStudent').disabled = false;
+    document.getElementById('fExam').value = '';
+    document.getElementById('fDate').value = '';
+    document.getElementById('fPassMarks').value = '';
+    document.getElementById('fRemarks').value = '';
+    document.getElementById('subjectsContainer').innerHTML = '';
+    subjectCount = 0;
+    addSubjectRow();
+    document.getElementById('resultPreview').style.display = 'none';
+    hideModalError();
+    document.getElementById('resultModal').classList.add('show');
+  };
+
+  window.openEdit = function(id) {
+    const r = allResults.find(r => r._id === id);
+    if (!r) return;
+    document.getElementById('modalTitle').textContent  = 'Edit Result';
+    document.getElementById('saveBtnText').textContent = 'Save Changes';
+    document.getElementById('editResultId').value = id;
+    document.getElementById('fStudent').value = r.studentId ?? '';
+    document.getElementById('fStudent').disabled = true;
+    document.getElementById('fExam').value      = r.exam      ?? '';
+    document.getElementById('fDate').value      = r.date ? r.date.split('T')[0] : '';
+    document.getElementById('fPassMarks').value = r.passMarks ?? '';
+    document.getElementById('fRemarks').value   = r.remarks   ?? '';
+
+    document.getElementById('subjectsContainer').innerHTML = '';
+    subjectCount = 0;
+    const subList = r.subjects ?? [];
+    subList.forEach(s => addSubjectRow(s.name, s.obtained, s.total));
+
+    calcPreview();
+    hideModalError();
+    document.getElementById('resultModal').classList.add('show');
+  };
+
+  window.closeModal = function() {
+    document.getElementById('resultModal').classList.remove('show');
+    document.getElementById('fStudent').disabled = false;
+  };
+
+  document.getElementById('addResultBtn').addEventListener('click', openAdd);
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  document.getElementById('cancelBtn').addEventListener('click', closeModal);
+
+  document.getElementById('saveBtn').addEventListener('click', async () => {
+    hideModalError();
+    const id        = document.getElementById('editResultId').value;
+    const studentId = document.getElementById('fStudent').value;
+    const exam      = document.getElementById('fExam').value.trim();
+    const date      = document.getElementById('fDate').value;
+    const passMarks = parseFloat(document.getElementById('fPassMarks').value) || 0;
+    const remarks   = document.getElementById('fRemarks').value.trim();
+    const subjects  = getSubjects();
+
+    if (!id && !studentId)      { showModalError('Please select a student.');    return; }
+    if (!exam)                  { showModalError('Exam name is required.');      return; }
+    if (subjects.length === 0)  { showModalError('Add at least one subject.');   return; }
+    if (subjects.some(s => !s.name)) { showModalError('All subject names required.'); return; }
+    if (subjects.some(s => s.total <= 0)) { showModalError('Out Of marks must be > 0.'); return; }
+    if (subjects.some(s => s.obtained > s.total)) { showModalError('Obtained marks cannot exceed Out Of.'); return; }
+
+    const totalObtained = subjects.reduce((s, x) => s + x.obtained, 0);
+    const totalOutOf    = subjects.reduce((s, x) => s + x.total,    0);
+    const percentage    = parseFloat((totalObtained / totalOutOf * 100).toFixed(2));
+    const grade         = getGrade(percentage);
+    const result        = passMarks > 0 ? (totalObtained >= passMarks ? 'pass' : 'fail') : (percentage >= 35 ? 'pass' : 'fail');
+
+    const payload = { studentId, exam, date, passMarks, remarks, subjects, marksObtained: totalObtained, totalMarks: totalOutOf, percentage, grade, result };
+
+    setSaveLoading(true);
+    try {
+      const endpoint = id ? `/api/results/${id}` : '/api/results';
+      const method   = id ? 'PUT' : 'POST';
+      const res = await api(endpoint, method, payload);
+      if (res.error) { showModalError(res.message || 'Failed to save.'); return; }
+      closeModal();
+      showAlert('success', id ? 'Result updated successfully! 🎉' : 'Result added successfully! 🚀');
+      await loadData();
+    } catch (err) {
+      showModalError('Server error. Please try again.');
+    } finally {
+      setSaveLoading(false);
+    }
+  });
+
+  window.deleteResultTrigger = async function(id, name) {
+    if (!confirm(`Delete result for "${name}"? This cannot be undone.`)) return;
+    try {
+      const res = await api(`/api/results/${id}`, 'DELETE');
+      if(res.error) { showAlert('error', 'Could not delete result.'); }
+      else {
+         showAlert('success', 'Result deleted successfully! 🎉');
+         await loadData();
+      }
+    } catch (err) {
+      showAlert('error', 'Could not delete result.');
+    }
+  };
+
+  function setSaveLoading(on) {
+    document.getElementById('saveBtn').disabled = on;
+    document.getElementById('saveSpinner').style.display = on ? 'block' : 'none';
+  }
+
+  function showModalError(msg) {
+    document.getElementById('modalErrorMsg').textContent = msg;
+    document.getElementById('modalError').classList.add('show');
+  }
+  function hideModalError() { document.getElementById('modalError').classList.remove('show'); }
+
+  function showAlert(type, msg) {
+    const el    = document.getElementById(type === 'success' ? 'successAlert' : 'errorAlert');
+    const msgEl = document.getElementById(type === 'success' ? 'successMsg'  : 'errorMsg');
+    msgEl.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 3500);
+  }
+
+  loadData();
+</script>
+</body>
+</html>

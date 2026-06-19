@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register | Student Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --accent: #2563eb;
+      --accent-h: #1d4ed8;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --error: #f85149;
+      --success: #3fb950;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      padding: 1.5rem 1rem;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(37, 99, 235, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37, 99, 235, 0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #7c3aed, var(--accent));
+      border-radius: 12px 12px 0 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 2rem;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .brand-name {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .brand-sub {
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.875rem;
+      margin-bottom: 1.75rem;
+    }
+
+    /* Role Selector */
+    .role-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .role-group label.section-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .role-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+    }
+
+    .role-card {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .role-card input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .role-card .role-label {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.65rem 0.875rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      font-size: 0.9rem;
+      font-weight: 500;
+      user-select: none;
+    }
+
+    .role-card input:checked+.role-label {
+      border-color: var(--accent);
+      background: rgba(37, 99, 235, 0.1);
+      color: #93c5fd;
+    }
+
+    .role-icon {
+      font-size: 1.2rem;
+    }
+
+    /* Form fields */
+    .form-group {
+      margin-bottom: 1.1rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1.1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    input,
+    select {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.65rem 0.875rem;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    input::placeholder {
+      color: var(--muted);
+    }
+
+    select option {
+      background: var(--surface);
+    }
+
+    /* Password strength */
+    .password-wrapper {
+      position: relative;
+    }
+
+    .toggle-pw {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0.2rem;
+      line-height: 1;
+    }
+
+    .toggle-pw:hover {
+      color: var(--text);
+    }
+
+    .strength-bar {
+      margin-top: 0.4rem;
+      height: 3px;
+      border-radius: 2px;
+      background: var(--border);
+      overflow: hidden;
+    }
+
+    .strength-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 2px;
+      transition: width 0.3s, background 0.3s;
+    }
+
+    .strength-text {
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      color: var(--muted);
+    }
+
+    /* Alerts */
+    .alert {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 0.875rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    .alert.error {
+      background: rgba(248, 81, 73, 0.1);
+      border: 1px solid rgba(248, 81, 73, 0.3);
+      color: var(--error);
+    }
+
+    .alert.success {
+      background: rgba(63, 185, 80, 0.1);
+      border: 1px solid rgba(63, 185, 80, 0.3);
+      color: var(--success);
+    }
+
+    .alert.show {
+      display: flex;
+    }
+
+    /* Button */
+    .btn {
+      width: 100%;
+      padding: 0.7rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: background 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: var(--accent-h);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: scale(0.99);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .footer-links {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .footer-links a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+
+    /* Student-only fields */
+    #studentFields {
+      display: none;
+    }
+
+    @media (max-width: 440px) {
+      .card {
+        padding: 2rem 1.25rem;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+    <div class="brand">
+      <div class="brand-icon">🎓</div>
+      <div>
+        <div class="brand-name">SMS Portal</div>
+        <div class="brand-sub">Student Management System</div>
+      </div>
+    </div>
+
+    <h1>Create account</h1>
+    <p class="subtitle">Fill in your details to get started</p>
+
+    <div class="alert error" id="errorAlert">
+      <span>⚠️</span>
+      <span id="errorMsg">Something went wrong.</span>
+    </div>
+    <div class="alert success" id="successAlert">
+      <span>✅</span>
+      <span id="successMsg">Account created! Redirecting to login...</span>
+    </div>
+
+    <div class="role-group">
+      <label class="section-label">I am a</label>
+      <div class="role-options">
+        <label class="role-card">
+          <input type="radio" name="role" value="student" id="roleStudent" checked />
+          <span class="role-label">
+            <span class="role-icon">🎒</span> Student
+          </span>
+        </label>
+        <label class="role-card">
+          <input type="radio" name="role" value="admin" id="roleAdmin" />
+          <span class="role-label">
+            <span class="role-icon">🛡️</span> Admin
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="firstName">First Name</label>
+        <input type="text" id="firstName" placeholder="John" autocomplete="given-name" />
+      </div>
+      <div class="form-group">
+        <label for="lastName">Last Name</label>
+        <input type="text" id="lastName" placeholder="Doe" autocomplete="family-name" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="you@example.com" autocomplete="email" />
+    </div>
+
+    <div id="studentFields">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="rollNo">Roll Number</label>
+          <input type="text" id="rollNo" placeholder="e.g. 2024001" />
+        </div>
+        <div class="form-group">
+          <label for="course">Course</label>
+          <input type="text" id="course" placeholder="e.g. B.Tech" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="branch">Branch</label>
+        <input type="text" id="branch" placeholder="e.g. Computer Science" />
+      </div>
+      <div class="form-group">
+        <label for="year">Year</label>
+        <select id="year">
+          <option value="">Select year</option>
+          <option value="1">1st Year</option>
+          <option value="2">2nd Year</option>
+          <option value="3">3rd Year</option>
+          <option value="4">4th Year</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="adminFields" style="display: none;">
+      <div class="form-group">
+        <label for="adminSecretKey" style="color: var(--warning);">Admin Secret Key 🛡️</label>
+        <input type="password" id="adminSecretKey" placeholder="Enter system admin verification code" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <div class="password-wrapper">
+        <input type="password" id="password" placeholder="Min. 6 characters" autocomplete="new-password" />
+        <button class="toggle-pw" type="button" id="togglePw">👁</button>
+      </div>
+      <div class="strength-bar">
+        <div class="strength-fill" id="strengthFill"></div>
+      </div>
+      <div class="strength-text" id="strengthText"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="confirmPassword">Confirm Password</label>
+      <div class="password-wrapper">
+        <input type="password" id="confirmPassword" placeholder="Re-enter your password" autocomplete="new-password" />
+        <button class="toggle-pw" type="button" id="toggleConfirmPw">👁</button>
+      </div>
+    </div>
+
+    <button class="btn" id="registerBtn" type="button">
+      <div class="spinner" id="spinner"></div>
+      <span id="btnText">Create Account</span>
+    </button>
+
+    <div class="footer-links">
+      Already have an account? <a href="login.html">Sign in</a>
+    </div>
+  </div>
+
+  <script>
+    // ─── Config ──────────────────────────────────────────
+    const API_BASE = 'http://localhost:5000';   // ← Change to your backend URL
+    const REGISTER_URL = `${API_BASE}/api/auth/register`;
+    const REDIRECT = 'login.html';
+    // ─────────────────────────────────────────────────────
+
+    const firstNameEl = document.getElementById('firstName');
+    const lastNameEl = document.getElementById('lastName');
+    const emailEl = document.getElementById('email');
+    const rollNoEl = document.getElementById('rollNo');
+    const courseEl = document.getElementById('course');
+    const branchEl = document.getElementById('branch');
+    const yearEl = document.getElementById('year');
+    const passwordEl = document.getElementById('password');
+    const confirmPasswordEl = document.getElementById('confirmPassword');
+    const registerBtn = document.getElementById('registerBtn');
+    const spinner = document.getElementById('spinner');
+    const btnText = document.getElementById('btnText');
+    const errorAlert = document.getElementById('errorAlert');
+    const errorMsg = document.getElementById('errorMsg');
+    const successAlert = document.getElementById('successAlert');
+    const successMsg = document.getElementById('successMsg');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+    const studentFields = document.getElementById('studentFields');
+
+    // 2) Role toggle → show/hide student or admin fields
+    document.querySelectorAll('input[name="role"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (radio.value === 'admin') {
+          document.getElementById('adminFields').style.display = 'block';
+          document.getElementById('studentFields').style.display = 'none';
+        } else {
+          document.getElementById('adminFields').style.display = 'none';
+          document.getElementById('studentFields').style.display = 'block';
+        }
+      });
+    });
+
+    // Show student fields by default (student is pre-selected)
+    studentFields.style.display = 'block';
+
+    // Password toggle
+    function makeToggle(inputEl, btn) {
+      btn.addEventListener('click', () => {
+        const isPassword = inputEl.type === 'password';
+        inputEl.type = isPassword ? 'text' : 'password';
+        btn.textContent = isPassword ? '🙈' : '👁';
+      });
+    }
+    makeToggle(passwordEl, document.getElementById('togglePw'));
+    makeToggle(confirmPasswordEl, document.getElementById('toggleConfirmPw'));
+
+    // Password strength checker
+    passwordEl.addEventListener('input', () => {
+      const val = passwordEl.value;
+      let score = 0;
+      if (val.length >= 6) score++;
+      if (val.length >= 10) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      const levels = [
+        { pct: '0%', color: '', label: '' },
+        { pct: '25%', color: '#f85149', label: 'Weak' },
+        { pct: '50%', color: '#e3b341', label: 'Fair' },
+        { pct: '75%', color: '#58a6ff', label: 'Good' },
+        { pct: '100%', color: '#3fb950', label: 'Strong' },
+      ];
+
+      const level = levels[Math.min(score, 4)];
+      strengthFill.style.width = val ? level.pct : '0%';
+      strengthFill.style.background = level.color;
+      strengthText.textContent = val ? level.label : '';
+      strengthText.style.color = level.color;
+    });
+
+    // Enter key support
+    [firstNameEl, lastNameEl, emailEl, rollNoEl, courseEl, branchEl, yearEl, passwordEl, confirmPasswordEl].forEach(el => {
+      if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') handleRegister(); });
+    });
+
+    registerBtn.addEventListener('click', handleRegister);
+
+    function showError(msg) {
+      errorMsg.textContent = msg;
+      errorAlert.classList.add('show');
+      successAlert.classList.remove('show');
+    }
+
+    function hideAlerts() {
+      errorAlert.classList.remove('show');
+      successAlert.classList.remove('show');
+    }
+
+    function setLoading(loading) {
+      registerBtn.disabled = loading;
+      spinner.style.display = loading ? 'block' : 'none';
+      btnText.textContent = loading ? 'Creating account...' : 'Create Account';
+    }
+
+    function getRole() {
+      return document.querySelector('input[name="role"]:checked').value;
+    }
+
+    // 3) Validation check integration
+    function validate() {
+      const role = getRole();
+      const adminSecretKeyEl = document.getElementById('adminSecretKey');
+
+      if (!firstNameEl.value.trim()) { showError('First name is required.'); firstNameEl.focus(); return false; }
+      if (!lastNameEl.value.trim()) { showError('Last name is required.'); lastNameEl.focus(); return false; }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailEl.value.trim()) { showError('Email is required.'); emailEl.focus(); return false; }
+      if (!emailRegex.test(emailEl.value.trim())) { showError('Enter a valid email address.'); emailEl.focus(); return false; }
+
+      if (role === 'student') {
+        if (!rollNoEl.value.trim()) { showError('Roll number is required.'); rollNoEl.focus(); return false; }
+        if (!courseEl.value.trim()) { showError('Course is required.'); courseEl.focus(); return false; }
+        if (!branchEl.value.trim()) { showError('Branch is required.'); branchEl.focus(); return false; }
+        if (!yearEl.value) { showError('Please select your year.'); yearEl.focus(); return false; }
+      }
+
+      if (role === 'admin' && !adminSecretKeyEl.value.trim()) {
+        showError('Admin Secret Key is required to create an admin account.');
+        adminSecretKeyEl.focus();
+        return false;
+      }
+
+      if (!passwordEl.value) { showError('Password is required.'); passwordEl.focus(); return false; }
+      if (passwordEl.value.length < 6) { showError('Password must be at least 6 characters.'); passwordEl.focus(); return false; }
+
+      if (!confirmPasswordEl.value) { showError('Please confirm your password.'); confirmPasswordEl.focus(); return false; }
+      if (passwordEl.value !== confirmPasswordEl.value) { showError('Passwords do not match.'); confirmPasswordEl.focus(); return false; }
+
+      return true;
+    }
+
+    async function handleRegister() {
+      hideAlerts();
+      if (!validate()) return;
+
+      const role = getRole();
+
+      // Payload configuration
+      const payload = {
+        name: `${firstNameEl.value.trim()} ${lastNameEl.value.trim()}`,
+        email: emailEl.value.trim(),
+        password: passwordEl.value,
+        role,
+      };
+
+      if (role === 'student') {
+        payload.rollNo = rollNoEl.value.trim();
+        payload.course = courseEl.value.trim();
+        payload.branch = branchEl.value.trim();
+        payload.year = parseInt(yearEl.value);
+      } else if (role === 'admin') {
+        payload.adminSecretKey = document.getElementById('adminSecretKey').value.trim(); // Send secret key to backend
+      }
+
+      setLoading(true);
+
+      try {
+        const res = await fetch(REGISTER_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showError(data.message || 'Registration failed. Please try again.');
+          return;
+        }
+
+        successMsg.textContent = 'Account created successfully! Redirecting to login...';
+        successAlert.classList.add('show');
+        setTimeout(() => { window.location.href = REDIRECT; }, 1500);
+
+      } catch (err) {
+        console.error('Register error:', err);
+        showError('Cannot connect to server. Make sure the backend is running.');
+      } finally {
+        setLoading(false);
+      }
+    }
+  </script>
+
+</body>
+
+</html>

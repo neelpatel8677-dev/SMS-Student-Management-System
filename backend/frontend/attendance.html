@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance | Student Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117; --surface: #161b22; --surface2: #1c2128;
+      --border: #30363d; --accent: #2563eb; --accent-h: #1d4ed8;
+      --text: #e6edf3; --muted: #8b949e;
+      --success: #3fb950; --warning: #e3b341; --danger: #f85149; --purple: #7c3aed;
+    }
+
+    body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text); min-height: 100vh; display: flex; }
+
+    /* Sidebar (same pattern) */
+    .sidebar { width: 240px; min-height: 100vh; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; transition: transform 0.3s; }
+    .sidebar-brand { display: flex; align-items: center; gap: 0.6rem; padding: 1.25rem 1rem; border-bottom: 1px solid var(--border); }
+    .brand-icon { width: 34px; height: 34px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+    .brand-text { font-size: 0.9rem; font-weight: 700; }
+    .brand-sub  { font-size: 0.68rem; color: var(--muted); }
+    .nav-section { padding: 1rem 0.75rem 0.25rem; font-size: 0.68rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .nav-item { display: flex; align-items: center; gap: 0.65rem; padding: 0.55rem 0.875rem; margin: 0.1rem 0.5rem; border-radius: 8px; font-size: 0.875rem; font-weight: 500; color: var(--muted); cursor: pointer; transition: background 0.15s, color 0.15s; text-decoration: none; }
+    .nav-item:hover { background: var(--surface2); color: var(--text); }
+    .nav-item.active { background: rgba(37,99,235,0.15); color: #93c5fd; }
+    .nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+    .sidebar-footer { margin-top: auto; padding: 1rem; border-top: 1px solid var(--border); }
+    .user-card { display: flex; align-items: center; gap: 0.65rem; padding: 0.5rem; }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+    .user-name { font-size: 0.85rem; font-weight: 600; }
+    .user-role { font-size: 0.72rem; color: var(--muted); }
+    .logout-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.875rem; margin: 0.5rem; border-radius: 8px; font-size: 0.85rem; color: var(--danger); cursor: pointer; background: none; border: none; font-family: inherit; width: calc(100% - 1rem); transition: background 0.15s; }
+    .logout-btn:hover { background: rgba(248,81,73,0.1); }
+
+    .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; gap: 0.75rem; flex-wrap: wrap; }
+    .topbar-left { display: flex; align-items: center; gap: 0.75rem; }
+    .hamburger { display: none; background: none; border: none; color: var(--text); font-size: 1.25rem; cursor: pointer; }
+    .page-title { font-size: 1.1rem; font-weight: 700; }
+    .page-sub   { font-size: 0.78rem; color: var(--muted); margin-top: 0.1rem; }
+
+    .content { padding: 1.5rem; flex: 1; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 0.25rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.3rem; margin-bottom: 1.5rem; width: fit-content; }
+    .tab { padding: 0.5rem 1.1rem; border-radius: 7px; font-size: 0.875rem; font-weight: 500; cursor: pointer; color: var(--muted); border: none; background: none; font-family: inherit; transition: background 0.15s, color 0.15s; }
+    .tab.active { background: var(--accent); color: #fff; }
+    .tab:not(.active):hover { background: var(--surface2); color: var(--text); }
+
+    .tab-content { display: none; }
+    .tab-content.show { display: block; }
+
+    /* Stat cards */
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.1rem; position: relative; overflow: hidden; }
+    .stat-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+    .stat-card.green::after  { background: var(--success); }
+    .stat-card.red::after    { background: var(--danger); }
+    .stat-card.yellow::after { background: var(--warning); }
+    .stat-card.blue::after   { background: var(--accent); }
+    .stat-label { font-size: 0.75rem; color: var(--muted); font-weight: 500; margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .stat-value { font-size: 1.6rem; font-weight: 700; }
+    .stat-sub   { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; }
+
+    /* Mark Attendance panel */
+    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1.25rem; }
+    .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 0.75rem; }
+    .panel-title { font-size: 0.95rem; font-weight: 600; }
+
+    .mark-controls { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+    input[type="date"], select.form-sel {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+      padding: 0.5rem 0.875rem; color: var(--text); font-family: inherit;
+      font-size: 0.875rem; outline: none; transition: border-color 0.2s;
+    }
+    input[type="date"]:focus, select.form-sel:focus { border-color: var(--accent); }
+    select.form-sel option { background: var(--surface2); }
+
+    /* Attendance marking list */
+    .att-list { padding: 0; }
+    .att-list-header { display: grid; grid-template-columns: 1fr 120px 180px; gap: 1rem; padding: 0.6rem 1.25rem; background: var(--surface2); border-bottom: 1px solid var(--border); font-size: 0.72rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .att-row { display: grid; grid-template-columns: 1fr 120px 180px; gap: 1rem; padding: 0.8rem 1.25rem; border-bottom: 1px solid var(--border); align-items: center; font-size: 0.875rem; }
+    .att-row:last-child { border-bottom: none; }
+    .att-row:hover { background: var(--surface2); }
+
+    .student-info { display: flex; align-items: center; gap: 0.5rem; }
+    .avatar-sm { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7rem; flex-shrink: 0; }
+    .st-name  { font-weight: 500; font-size: 0.875rem; }
+    .st-roll  { font-size: 0.75rem; color: var(--muted); }
+
+    /* Toggle switch */
+    .toggle-group { display: flex; gap: 0.4rem; }
+    .att-btn { padding: 0.3rem 0.75rem; border-radius: 6px; font-size: 0.78rem; font-weight: 600; font-family: inherit; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; }
+    .att-btn.present { background: rgba(63,185,80,0.15); color: var(--success); border-color: rgba(63,185,80,0.3); }
+    .att-btn.absent  { background: rgba(248,81,73,0.15); color: var(--danger);  border-color: rgba(248,81,73,0.3); }
+    .att-btn.inactive { background: var(--surface2); color: var(--muted); border-color: var(--border); }
+    .att-btn.inactive:hover { border-color: var(--muted); }
+
+    .remarks-input { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 0.3rem 0.6rem; color: var(--text); font-family: inherit; font-size: 0.8rem; width: 100%; outline: none; }
+    .remarks-input:focus { border-color: var(--accent); }
+
+    /* Bulk actions */
+    .bulk-bar { display: flex; gap: 0.5rem; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; align-items: center; }
+    .bulk-label { font-size: 0.8rem; color: var(--muted); margin-right: 0.25rem; }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 1rem; border-radius: 8px; font-size: 0.875rem; font-weight: 600; font-family: inherit; cursor: pointer; border: none; transition: background 0.2s; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-h); }
+    .btn-ghost { background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+    .btn-ghost:hover { background: var(--surface2); }
+    .btn-success { background: rgba(63,185,80,0.15); color: var(--success); border: 1px solid rgba(63,185,80,0.3); }
+    .btn-danger  { background: rgba(248,81,73,0.15);  color: var(--danger);  border: 1px solid rgba(248,81,73,0.3); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .spinner-sm { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Records table */
+    .toolbar { display: flex; gap: 0.75rem; padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; align-items: center; }
+    .search-box { display: flex; align-items: center; gap: 0.5rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 0.875rem; flex: 1; min-width: 180px; }
+    .search-box input { background: none; border: none; outline: none; color: var(--text); font-family: inherit; font-size: 0.875rem; width: 100%; }
+    .search-box input::placeholder { color: var(--muted); }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    th { padding: 0.65rem 1rem; text-align: left; font-size: 0.72rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; background: var(--surface2); border-bottom: 1px solid var(--border); white-space: nowrap; }
+    td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface2); }
+
+    .pill { display: inline-block; padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.72rem; font-weight: 500; }
+    .pill.present { background: rgba(63,185,80,0.15); color: var(--success); }
+    .pill.absent  { background: rgba(248,81,73,0.15); color: var(--danger); }
+    .pill.leave   { background: rgba(227,179,65,0.15); color: var(--warning); }
+    .pill.holiday { background: rgba(34,211,238,0.15); color: var(--info); }
+
+    /* Progress bar */
+    .pct-bar { display: flex; align-items: center; gap: 0.5rem; }
+    .bar-bg { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; min-width: 60px; }
+    .bar-fill { height: 100%; border-radius: 3px; }
+    .pct-text { font-size: 0.78rem; font-weight: 600; min-width: 36px; text-align: right; }
+
+    .alert { display: none; align-items: center; gap: 0.5rem; padding: 0.65rem 0.875rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1rem; }
+    .alert.error   { background: rgba(248,81,73,0.1);  border: 1px solid rgba(248,81,73,0.3);  color: var(--danger); }
+    .alert.success { background: rgba(63,185,80,0.1);  border: 1px solid rgba(63,185,80,0.3);  color: var(--success); }
+    .alert.show    { display: flex; }
+
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+    .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .overlay.show { display: block; }
+      .main { margin-left: 0; }
+      .hamburger { display: block; }
+      .att-list-header, .att-row { grid-template-columns: 1fr 100px; }
+      .att-row .remarks-col { display: none; }
+      .att-list-header .remarks-col { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="overlay" id="overlay"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">🎓</div>
+    <div><div class="brand-text">SMS Portal</div><div class="brand-sub">Student Management</div></div>
+  </div>
+  <div class="nav-section">Main</div>
+  <a class="nav-item" href="index.html"><span class="nav-icon">🏠</span> Dashboard</a>
+  <div class="nav-section">Management</div>
+  <a class="nav-item" href="students.html"><span class="nav-icon">👨‍🎓</span> Students</a>
+  <a class="nav-item active" href="attendance.html"><span class="nav-icon">📋</span> Attendance</a>
+  <a class="nav-item" href="fees.html"><span class="nav-icon">💰</span> Fees</a>
+  <a class="nav-item" href="results.html"><span class="nav-icon">📊</span> Results</a>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="avatar" id="sidebarAvatar">?</div>
+      <div><div class="user-name" id="sidebarName">—</div><div class="user-role" id="sidebarRole">—</div></div>
+    </div>
+    <button class="logout-btn" id="logoutBtn">🚪 Sign out</button>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" id="hamburger">☰</button>
+      <div><div class="page-title">Attendance</div><div class="page-sub">Track & manage student attendance</div></div>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <div class="alert success" id="successAlert"><span>✅</span><span id="successMsg">Done!</span></div>
+    <div class="alert error"   id="errorAlert">  <span>⚠️</span><span id="errorMsg">Error.</span></div>
+
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card blue">  <div class="stat-label">Total Students</div><div class="stat-value" id="statTotal">—</div></div>
+      <div class="stat-card green"> <div class="stat-label">Present Today</div><div class="stat-value" id="statPresent">—</div></div>
+      <div class="stat-card red">   <div class="stat-label">Absent Today</div><div class="stat-value" id="statAbsent">—</div></div>
+      <div class="stat-card yellow"><div class="stat-label">Avg Attendance</div><div class="stat-value" id="statAvg">—</div><div class="stat-sub">overall</div></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="mark">📋 Mark Attendance</button>
+      <button class="tab" data-tab="records">📊 Records</button>
+    </div>
+
+    <div class="tab-content show" id="tab-mark">
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Mark Attendance</span>
+          <div class="mark-controls">
+            <input type="date" id="attDate" />
+            <select class="form-sel" id="attCourse"><option value="">All Courses</option></select>
+            <button class="btn btn-primary" id="submitAttBtn">
+              <div class="spinner-sm" id="submitSpinner"></div>
+              <span id="submitBtnText">Save Attendance</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="bulk-bar">
+          <span class="bulk-label">Mark all as:</span>
+          <button class="btn btn-success" onclick="markAll('present')">✅ Present</button>
+          <button class="btn btn-danger"  onclick="markAll('absent')">❌ Absent</button>
+        </div>
+
+        <div class="att-list">
+          <div class="att-list-header">
+            <span>Student</span>
+            <span>Status</span>
+            <span class="remarks-col">Remarks</span>
+          </div>
+          <div id="attStudentList">
+            <div class="empty-state"><div class="empty-icon">⏳</div><p>Loading students...</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-records">
+      <div class="panel">
+        <div class="toolbar">
+          <div class="search-box">
+            <span>🔍</span>
+            <input type="text" id="recSearch" placeholder="Search student name or roll no..." />
+          </div>
+          <input type="date" id="recDate" />
+          <select class="form-sel" id="recCourse"><option value="">All Courses</option></select>
+          <select class="form-sel" id="recStatus">
+            <option value="">All Status</option>
+            <option value="present">Present</option>
+            <option value="absent">Absent</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Roll No</th>
+                <th>Course</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Remarks</th>
+              </tr>
+            </thead>
+            <tbody id="recordsBody">
+              <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⏳</div><p>Loading records...</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const API_BASE = 'http://localhost:5000';
+
+  const token = localStorage.getItem('token');
+  const user  = JSON.parse(localStorage.getItem('user') || '{}');
+  if (!token || user.role !== 'admin') window.location.href = 'login.html';
+
+  const name = user.name || 'User';
+  document.getElementById('sidebarAvatar').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('sidebarName').textContent   = name;
+  document.getElementById('sidebarRole').textContent   = user.role || '—';
+  document.getElementById('logoutBtn').addEventListener('click', () => { localStorage.clear(); window.location.href = 'login.html'; });
+
+  const sidebar   = document.getElementById('sidebar');
+  const overlay   = document.getElementById('overlay');
+  document.getElementById('hamburger').addEventListener('click', () => { sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
+  overlay.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('show'); });
+
+  // Today's Date Initialization
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('attDate').value = today;
+  document.getElementById('recDate').value = today;
+
+  // Tabs Toggle Control Engine
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('show'));
+      tab.classList.add('active');
+      document.getElementById(`tab-${tab.dataset.tab}`).classList.add('show');
+      if (tab.dataset.tab === 'records') loadRecords();
+    });
+  });
+
+  // 🛠️ Secure API Session Fetch Helper
+  async function api(endpoint, method = 'GET', body = null) {
+    const opts = { method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(`${API_BASE}${endpoint}`, opts);
+    if (res.status === 401) { localStorage.clear(); window.location.href = 'login.html'; }
+    return res.json();
+  }
+
+  let students = [];
+  let attendance = {}; // { studentRollNo: { status, remarks } }
+  let allRecords = [];
+
+  // 🛠️ Bullet-Proof Student Grid List Loader
+  async function loadStudents() {
+    try {
+      const data = await api('/api/students');
+      students = Array.isArray(data) ? data : (data.students ?? []);
+
+      if (students.length === 0) {
+        document.getElementById('attStudentList').innerHTML =
+          `<div class="empty-state"><div class="empty-icon">👨‍🎓</div><p>No students found inside the database yet.</p></div>`;
+        return;
+      }
+
+      const attCourseSelect = document.getElementById('attCourse');
+      const recCourseSelect = document.getElementById('recCourse');
+      
+      if (attCourseSelect && recCourseSelect) {
+        attCourseSelect.innerHTML = '<option value="">All Courses</option>';
+        recCourseSelect.innerHTML = '<option value="">All Courses</option>';
+
+        const courses = [...new Set(students.map(s => s.course).filter(Boolean))].sort();
+        courses.forEach(c => {
+          const opt1 = document.createElement('option'); opt1.value = c; opt1.textContent = c; attCourseSelect.appendChild(opt1);
+          const opt2 = document.createElement('option'); opt2.value = c; opt2.textContent = c; recCourseSelect.appendChild(opt2);
+        });
+      }
+
+      initAttendance();
+      renderAttList();
+      
+      try {
+        await loadSummaryStats();
+      } catch (e) { console.warn("Counters payload empty yet:", e); }
+
+    } catch (err) {
+      console.error("Interface Sync Failure Log:", err);
+      document.getElementById('attStudentList').innerHTML =
+        `<div class="empty-state"><div class="empty-icon">⚠️</div><p>Cannot connect to backend server logs.</p></div>`;
+    }
+  }
+
+  function initAttendance() {
+    attendance = {};
+    students.forEach(s => { if(s.rollNo) attendance[s.rollNo] = { status: 'present', remarks: '' }; });
+  }
+
+  function renderAttList() {
+    const courseFilter = document.getElementById('attCourse').value;
+    const filtered = courseFilter ? students.filter(s => s.course === courseFilter) : students;
+
+    if (filtered.length === 0) {
+      document.getElementById('attStudentList').innerHTML =
+        `<div class="empty-state"><div class="empty-icon">👨‍🎓</div><p>No students found.</p></div>`;
+      return;
+    }
+
+    document.getElementById('attStudentList').innerHTML = filtered.map(s => {
+      if(!s.rollNo) return '';
+      const initials = (s.name ?? '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+      const st = attendance[s.rollNo] ?? { status: 'present', remarks: '' };
+      return `
+        <div class="att-row" id="row-${s.rollNo}">
+          <div class="student-info">
+            <div class="avatar-sm">${initials}</div>
+            <div><div class="st-name">${s.name}</div><div class="st-roll">${s.rollNo}</div></div>
+          </div>
+          <div class="toggle-group">
+            <button class="att-btn ${st.status === 'present' ? 'present' : 'inactive'}" onclick="setStatus('${s.rollNo}','present')">✅</button>
+            <button class="att-btn ${st.status === 'absent'  ? 'absent'  : 'inactive'}" onclick="setStatus('${s.rollNo}','absent')">❌</button>
+          </div>
+          <div class="remarks-col">
+            <input class="remarks-input" placeholder="Remarks (optional)" value="${st.remarks}"
+              oninput="setRemarks('${s.rollNo}', this.value)" />
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  window.setStatus = function(rollNo, status) {
+    if (!attendance[rollNo]) attendance[rollNo] = { status: 'present', remarks: '' };
+    attendance[rollNo].status = status;
+    const row = document.getElementById(`row-${rollNo}`);
+    if(row) {
+      const btns = row.querySelectorAll('.att-btn');
+      btns[0].className = `att-btn ${status === 'present' ? 'present' : 'inactive'}`;
+      btns[1].className = `att-btn ${status === 'absent'  ? 'absent'  : 'inactive'}`;
+    }
+  };
+
+  window.setRemarks = function(rollNo, val) {
+    if (!attendance[rollNo]) attendance[rollNo] = { status: 'present', remarks: '' };
+    attendance[rollNo].remarks = val;
+  };
+
+  window.markAll = function(status) {
+    const courseFilter = document.getElementById('attCourse').value;
+    const filtered = courseFilter ? students.filter(s => s.course === courseFilter) : students;
+    filtered.forEach(s => { if(s.rollNo) attendance[s.rollNo].status = status; });
+    renderAttList();
+  };
+
+  document.getElementById('attCourse').addEventListener('change', renderAttList);
+
+  document.getElementById('submitAttBtn').addEventListener('click', async () => {
+    const date = document.getElementById('attDate').value;
+    if (!date) { showAlert('error', 'Please select a date.'); return; }
+
+    setSubmitLoading(true);
+    try {
+      const rollKeys = Object.keys(attendance);
+
+      for (const rollNo of rollKeys) {
+        const entry = attendance[rollNo];
+        await api('/api/attendance/mark', 'POST', {
+          rollNo,
+          date,
+          status: entry.status,
+          remarks: entry.remarks
+        });
+      }
+
+      showAlert('success', `Attendance sync complete! Updated records safely in database.`);
+      loadSummaryStats();
+    } catch (err) {
+      showAlert('error', 'Network communication timeout saving elements.');
+    } finally {
+      setSubmitLoading(false);
+    }
+  });
+
+  function setSubmitLoading(on) {
+    document.getElementById('submitAttBtn').disabled = on;
+    document.getElementById('submitSpinner').style.display = on ? 'block' : 'none';
+    document.getElementById('submitBtnText').textContent = on ? 'Saving...' : 'Save Attendance';
+  }
+
+  async function loadSummaryStats() {
+    try {
+      const data = await api('/api/attendance/summary');
+      document.getElementById('statTotal').textContent   = data.totalStudents ?? students.length;
+      document.getElementById('statPresent').textContent = data.presentToday   ?? 0;
+      document.getElementById('statAbsent').textContent  = data.absentToday    ?? 0;
+      document.getElementById('statAvg').textContent     = `${data.avgPercent ?? 0}%`;
+    } catch(_) {}
+  }
+
+  // 📊 Records historical tab database binding
+  async function loadRecords() {
+    const tbody = document.getElementById('recordsBody');
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⏳</div><p>Loading registry details...</p></div></td></tr>`;
+    try {
+      const data = await api('/api/attendance/summary');
+      allRecords = Array.isArray(data.history) ? data.history : [];
+      renderRecords();
+    } catch(_) {
+      tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⚠️</div><p>Cannot load system entries.</p></div></td></tr>`;
+    }
+  }
+
+  function renderRecords() {
+    const q      = document.getElementById('recSearch').value.toLowerCase();
+    const date   = document.getElementById('recDate').value;
+    const course = document.getElementById('recCourse').value.toLowerCase();
+    const status = document.getElementById('recStatus').value;
+
+    let filtered = allRecords.filter(r => {
+      const nameMatch = !q || (r.studentName && r.studentName.toLowerCase().includes(q)) || (r.rollNo && r.rollNo.toLowerCase().includes(q));
+      const dateMatch = !date || (r.date && r.date.split('T')[0] === date);
+      const courseMatch = !course || (r.course && r.course.toLowerCase().includes(course));
+      const statusMatch = !status || r.status === status;
+      return nameMatch && dateMatch && courseMatch && statusMatch;
+    });
+
+    const tbody = document.getElementById('recordsBody');
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">🔍</div><p>No historical records matching filters found.</p></div></td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = filtered.map(r => {
+      let formattedDate = '—';
+      if (r.date) {
+        const dObj = new Date(r.date);
+        const day = String(dObj.getDate()).padStart(2, '0');
+        const month = String(dObj.getMonth() + 1).padStart(2, '0');
+        const year = dObj.getFullYear();
+        formattedDate = `${day}/${month}/${year}`;
+      }
+
+      return `
+        <tr>
+          <td>${r.studentName ?? '—'}</td>
+          <td>${r.rollNo ?? '—'}</td>
+          <td>${r.course ?? '—'}</td>
+          <td>${formattedDate}</td>
+          <td><span class="pill ${r.status === 'present' ? 'present' : 'absent'}">${r.status ?? '—'}</span></td>
+          <td style="color:var(--muted);font-size:0.8rem;">${r.remarks || '—'}</td>
+        </tr>`;
+    }).join('');
+  }
+
+  ['recSearch','recDate','recCourse','recStatus'].forEach(id => {
+    document.getElementById(id).addEventListener('input',  renderRecords);
+    document.getElementById(id).addEventListener('change', renderRecords);
+  });
+
+  let alertTimer;
+  function showAlert(type, msg) {
+    const el    = document.getElementById(type === 'success' ? 'successAlert' : 'errorAlert');
+    const msgEl = document.getElementById(type === 'success' ? 'successMsg' : 'errorMsg');
+    msgEl.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(alertTimer);
+    alertTimer = setTimeout(() => el.classList.remove('show'), 3500);
+  }
+
+  loadStudents();
+</script>
+</body>
+</html>

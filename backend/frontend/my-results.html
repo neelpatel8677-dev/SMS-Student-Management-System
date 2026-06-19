@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Academic Results | SMS Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --surface2:  #1c2128;
+      --border:    #30363d;
+      --accent:    #2563eb;
+      --text:      #e6edf3;
+      --muted:     #8b949e;
+      --success:   #3fb950;
+      --warning:   #e3b341;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+
+    .header-bar {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .back-arrow {
+      font-size: 1.5rem;
+      color: var(--text);
+      text-decoration: none;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .page-title { font-size: 1.3rem; font-weight: 700; }
+
+    /* Performance Tracker Card Header */
+    .overall-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      border-radius: 12px;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .score-circle-text { font-size: 2.2rem; font-weight: 800; color: var(--accent); margin: 0.25rem 0; }
+    .score-sub { font-size: 0.8rem; color: var(--muted); }
+
+    /* Exam Cards Wrapper Group */
+    .exam-section-title { font-size: 0.95rem; color: var(--muted); text-transform: uppercase; margin-bottom: 0.75rem; letter-spacing: 0.05em; }
+    
+    .exam-panel {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .exam-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .exam-percentage { color: var(--success); font-weight: 700; }
+
+    .subject-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+    .subject-row:last-child { margin-bottom: 0; }
+    .subject-marks { font-weight: 500; color: var(--muted); }
+    .subject-marks span { color: var(--text); font-weight: 600; }
+
+    .footer-nav { text-align: center; margin-top: 1.5rem; }
+    .back-dashboard-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      width: 100%; padding: 0.7rem; background: transparent; border: 1px solid var(--border);
+      border-radius: 8px; color: var(--muted); text-decoration: none; font-size: 0.875rem;
+      font-weight: 600; transition: all 0.2s ease;
+    }
+    .back-dashboard-btn:hover { border-color: var(--accent); color: var(--text); background: rgba(37,99,235,0.05); }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header-bar">
+    <a href="index.html" class="back-arrow">‹</a>
+    <span class="page-title">Examination Results</span>
+  </div>
+
+  <div class="overall-card">
+    <div class="score-sub">Latest Semester Average Score</div>
+    <div class="score-circle-text" id="latestScoreLabel">0%</div>
+    <div class="score-sub" id="latestExamLabel">Loading evaluation data...</div>
+  </div>
+
+  <div class="exam-section-title">Academic Semester Breakdown</div>
+  <div id="examsListContainer">
+     </div>
+
+  <div class="footer-nav">
+    <a href="index.html" class="back-dashboard-btn">← Back to Dashboard</a>
+  </div>
+</div>
+
+<script>
+  const API_BASE = 'http://localhost:5000';
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+  if (!token) window.location.href = 'login.html';
+
+  async function loadMyResults() {
+    try {
+      const res = await fetch(`${API_BASE}/api/results/me`, {
+        method: 'GET',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'user-id': user.id || user._id || ''
+        }
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        document.getElementById('latestScoreLabel').textContent = `${data.latestScore}%`;
+        document.getElementById('latestExamLabel').textContent = data.latestExam;
+
+        const container = document.getElementById('examsListContainer');
+        if (!data.examsList || data.examsList.length === 0) {
+          container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--muted); font-size:0.85rem;">No academic reports found in the server log databases.</div>`;
+          return;
+        }
+
+        // Loop cards blocks builder framework
+        container.innerHTML = data.examsList.map(exam => `
+          <div class="exam-panel">
+            <div class="exam-header">
+              <span>${exam.examName}</span>
+              <span class="exam-percentage">${exam.percentage}%</span>
+            </div>
+            ${exam.subjects.map(sub => `
+              <div class="subject-row">
+                <span>${sub.name}</span>
+                <span class="subject-marks"><span>${sub.obtained}</span> / ${sub.total}</span>
+              </div>
+            `).join('')}
+          </div>
+        `).join('');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  loadMyResults();
+</script>
+</body>
+</html>

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login | Student Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --border:    #30363d;
+      --accent:    #2563eb;
+      --accent-h:  #1d4ed8;
+      --text:      #e6edf3;
+      --muted:     #8b949e;
+      --error:     #f85149;
+      --success:   #3fb950;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      padding: 1rem;
+    }
+
+    /* Subtle grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(37,99,235,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37,99,235,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    /* Top accent line */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), #7c3aed);
+      border-radius: 12px 12px 0 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 2rem;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .brand-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .brand-sub {
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.875rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.65rem 0.875rem;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+    }
+
+    input::placeholder { color: var(--muted); }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .toggle-pw {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0.2rem;
+      line-height: 1;
+    }
+
+    .toggle-pw:hover { color: var(--text); }
+
+    .alert {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 0.875rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    .alert.error  { background: rgba(248,81,73,0.1);  border: 1px solid rgba(248,81,73,0.3);  color: var(--error); }
+    .alert.success{ background: rgba(63,185,80,0.1);  border: 1px solid rgba(63,185,80,0.3);  color: var(--success); }
+    .alert.show   { display: flex; }
+
+    .btn {
+      width: 100%;
+      padding: 0.7rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: background 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn:hover:not(:disabled) { background: var(--accent-h); }
+    .btn:active:not(:disabled) { transform: scale(0.99); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .footer-links {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .footer-links a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover { text-decoration: underline; }
+
+    @media (max-width: 440px) {
+      .card { padding: 2rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="brand">
+    <div class="brand-icon">🎓</div>
+    <div>
+      <div class="brand-name">SMS Portal</div>
+      <div class="brand-sub">Student Management System</div>
+    </div>
+  </div>
+
+  <h1>Welcome back</h1>
+  <p class="subtitle">Sign in to access your dashboard</p>
+
+  <div class="alert error" id="errorAlert">
+    <span>⚠️</span>
+    <span id="errorMsg">Invalid email or password.</span>
+  </div>
+
+  <div class="alert success" id="successAlert">
+    <span>✅</span>
+    <span>Login successful! Redirecting...</span>
+  </div>
+
+  <div class="form-group">
+    <label for="email">Email</label>
+    <input
+      type="email"
+      id="email"
+      placeholder="you@example.com"
+      autocomplete="email"
+      required
+    />
+  </div>
+
+  <div class="form-group">
+    <label for="password">Password</label>
+    <div class="password-wrapper">
+      <input
+        type="password"
+        id="password"
+        placeholder="Enter your password"
+        autocomplete="current-password"
+        required
+      />
+      <button class="toggle-pw" type="button" id="togglePw" title="Show/hide password">👁</button>
+    </div>
+  </div>
+
+  <button class="btn" id="loginBtn" type="button" onclick="signin()"> 
+    <span id="btnText">Sign In</span> 
+</button>
+
+  <div class="footer-links">
+    Don't have an account? <a href="register.html">Register here</a>
+  </div>
+</div>
+
+<!-- your full HTML above stays SAME -->
+
+<script>
+  const API_BASE = 'http://127.0.0.1:5000'; // Ensure this matches your server port[cite: 2, 6]
+
+  // Password toggle utility[cite: 6]
+  const passwordEl = document.getElementById('password');
+  const togglePwBtn = document.getElementById('togglePw');
+  if (togglePwBtn && passwordEl) {
+    togglePwBtn.addEventListener('click', () => {
+      const isPassword = passwordEl.type === 'password';
+      passwordEl.type = isPassword ? 'text' : 'password';
+      togglePwBtn.textContent = isPassword ? '🙈' : '👁';
+    });
+  }
+
+  // Live Login Action
+  async function handleLogin() {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const errorAlert = document.getElementById("errorAlert");
+    const successAlert = document.getElementById("successAlert");
+    const loginBtn = document.getElementById("loginBtn");
+    const spinner = document.getElementById("spinner");
+    const btnText = document.getElementById("btnText");
+
+    // Clear previous errors[cite: 6]
+    if (errorAlert) errorAlert.classList.remove("show");
+    if (successAlert) successAlert.classList.remove("show");
+
+    if (!email || !password) {
+        alert("Please fill in both Email and Password.");
+        return;
+    }
+
+    // UI Loading On[cite: 6]
+    if (loginBtn) loginBtn.disabled = true;
+    if (spinner) spinner.style.display = "block";
+    if (btnText) btnText.textContent = "Signing In...";
+
+    try {
+        console.log("Sending login request to backend..."); // Debugging log
+        
+        const res = await fetch(`${API_BASE}/api/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+        console.log("Backend Response Data:", data); // Isse console mein pura data dikhega
+
+        // Status 200-299 yaani login kamyab raha!
+        if (res.ok) {
+            console.log("Login Success! Saving token...");
+            
+            // 1. Save critical auth state
+            localStorage.setItem("token", data.token || "dummy-token");
+            localStorage.setItem("user", JSON.stringify(data.user || { name: "User", role: "admin" }));
+
+            // 2. Show Success Alert[cite: 6]
+            if (successAlert) successAlert.classList.add("show");
+            
+            // 3. Page jump redirect
+            setTimeout(() => {
+                console.log("Redirecting to dashboard...");
+                window.location.href = "index.html"; 
+            }, 1000);
+
+        } else {
+            // Backend handle rejection (e.g., Wrong Password)
+            console.warn("Login failed according to server:", data.message);
+            if (errorAlert) {
+                document.getElementById("errorMsg").textContent = data.message || "Invalid email or password.";
+                errorAlert.classList.add("show");
+            }
+        }
+    } catch (error) {
+        console.error("Network or Client Error:", error);
+        if (errorAlert) {
+            document.getElementById("errorMsg").textContent = "Connection refused. Please check if backend is running.";
+            errorAlert.classList.add("show");
+        }
+    } finally {
+        // UI Loading Off[cite: 6]
+        if (loginBtn) loginBtn.disabled = false;
+        if (spinner) spinner.style.display = "none";
+        if (btnText) btnText.textContent = "Sign In";
+    }
+  }
+
+  // Core Click Event Attachment
+  const mainSubmitBtn = document.getElementById("loginBtn");
+  if (mainSubmitBtn) {
+      mainSubmitBtn.addEventListener("click", handleLogin);
+      console.log("✅ Login button listener successfully attached.");
+  } else {
+      console.error("❌ Error: Element with id 'loginBtn' was not found in HTML!");
+  }
+
+  // Optional: Enter key handler for smooth experience
+  if (passwordEl) {
+      passwordEl.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") handleLogin();
+      });
+  }
+</script>
+
+</body>
+</html>
+
+

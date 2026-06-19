@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Calendar | SMS Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --surface2:  #1c2128;
+      --border:    #30363d;
+      --accent:    #2563eb;
+      --text:      #e6edf3;
+      --muted:     #8b949e;
+      --success:   #3fb950;
+      --danger:    #f85149;
+      --warning:   #e3b341;
+      --info:      #22d3ee;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 450px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+
+    .header-bar {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .back-arrow {
+      font-size: 1.5rem;
+      color: var(--text);
+      text-decoration: none;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .page-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    /* ── 100% Plain Donut Chart Section ── */
+    .chart-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .circular-progress {
+      position: relative;
+      height: 160px;
+      width: 160px;
+      border-radius: 50%;
+      background: conic-gradient(var(--border) 0deg 360deg) !important; /* Forces 100% Plain Gray Circle */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.4s ease;
+    }
+
+    .circular-progress::before {
+      content: "";
+      position: absolute;
+      height: 70px;
+      width: 70px;
+      border-radius: 50%;
+      background: var(--surface);
+    }
+
+    .segment-label {
+      position: absolute;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      z-index: 5;
+      pointer-events: none;
+      display: none !important; /* Hide labels completely in plain mode */
+    }
+
+    /* Status Legends Indicators */
+    .legend-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.75rem;
+      flex-wrap: wrap;
+      background: var(--surface2);
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      font-weight: 500;
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.present { background: var(--success); }
+    .dot.absent  { background: var(--danger); }
+    .dot.leave   { background: var(--warning); }
+    .dot.holiday { background: var(--info); }
+
+    /* ── Clean Calendar Card Layout ── */
+    .calendar-wrapper {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+    }
+
+    .cal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding: 0 0.25rem;
+    }
+
+    .month-label { font-weight: 600; font-size: 1rem; }
+
+    .cal-nav-btn {
+      background: none; border: none; color: var(--text);
+      font-size: 1.1rem; cursor: pointer; padding: 0.25rem 0.5rem;
+      border-radius: 4px; line-height: 1;
+    }
+    .cal-nav-btn:hover { background: rgba(255,255,255,0.05); }
+
+    .weekdays-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      text-align: center; font-size: 0.75rem; font-weight: 600;
+      color: var(--muted); margin-bottom: 0.5rem;
+    }
+
+    .days-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      row-gap: 0.6rem; column-gap: 0.4rem;
+    }
+
+    .day-cell {
+      aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 500; border-radius: 8px;
+      cursor: default; color: var(--text); transition: all 0.2s ease;
+      border: 1px solid var(--border); background: rgba(255,255,255,0.02); /* Clean normal design */
+    }
+
+    /* Active states loaded ONLY if saved in Database */
+    .day-cell.is-present { background: var(--success) !important; color: #fff !important; font-weight: 700; border-color: var(--success) !important; }
+    .day-cell.is-absent  { background: var(--danger) !important; color: #fff !important; font-weight: 700; border-color: var(--danger) !important; }
+    .day-cell.is-leave   { background: var(--warning) !important; color: #fff !important; font-weight: 700; border-color: var(--warning) !important; }
+    .day-cell.is-holiday { background: var(--info) !important; color: #fff !important; font-weight: 700; border-color: var(--info) !important; }
+
+    .day-cell.empty-day { opacity: 0.15; border: none; background: none; }
+    .day-cell.is-today   { border: 2px solid var(--accent); }
+
+    .footer-nav { text-align: center; margin-top: 1.5rem; }
+    .back-dashboard-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      width: 100%; padding: 0.7rem; background: transparent; border: 1px solid var(--border);
+      border-radius: 8px; color: var(--muted); text-decoration: none; font-size: 0.875rem;
+      font-weight: 600; transition: all 0.2s ease;
+    }
+    .back-dashboard-btn:hover { border-color: var(--accent); color: var(--text); background: rgba(37,99,235,0.05); }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header-bar">
+    <a href="index.html" class="back-arrow">‹</a>
+    <span class="page-title">Attendance</span>
+  </div>
+
+  <div class="chart-container">
+    <div class="circular-progress" id="circularProgress">
+      <span id="labelPresent" class="segment-label">0</span>
+      <span id="labelAbsent" class="segment-label">0</span>
+      <span id="labelNormal" class="segment-label">0</span>
+    </div>
+  </div>
+
+  <div class="legend-row">
+    <div class="legend-item"><span class="dot present"></span>Present</div>
+    <div class="legend-item"><span class="dot absent"></span>Absent</div>
+    <div class="legend-item"><span class="dot leave"></span>Leave</div>
+    <div class="legend-item"><span class="dot holiday"></span>Holiday</div>
+  </div>
+
+  <div class="calendar-wrapper">
+    <div class="cal-header">
+      <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+      <span class="month-label" id="monthYearLabel">—</span>
+      <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+    </div>
+    
+    <div class="weekdays-grid">
+      <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+    </div>
+    
+    <div class="days-grid" id="daysGridContainer"></div>
+  </div>
+
+  <div class="footer-nav">
+    <a href="index.html" class="back-dashboard-btn">← Back to Dashboard</a>
+  </div>
+</div>
+
+<script>
+  const API_BASE = 'http://localhost:5000';
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+  if (!token) window.location.href = 'login.html';
+
+  let currentCalendarDate = new Date();
+  let databaseAttendanceRecords = [];
+
+  async function loadTrackingData() {
+    try {
+      const res = await fetch(`${API_BASE}/api/attendance/me`, {
+        method: 'GET',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'user-id': user.id || user._id || ''
+        }
+      });
+      const data = await res.json();
+
+      if (res.ok && data && Array.isArray(data.history)) {
+        databaseAttendanceRecords = data.history;
+      } else {
+        databaseAttendanceRecords = [];
+      }
+      
+      refreshDashboardMetrics();
+    } catch (err) {
+      console.error("Database connection empty, staying plain:", err);
+      databaseAttendanceRecords = [];
+      refreshDashboardMetrics();
+    }
+  }
+
+  function refreshDashboardMetrics() {
+    const year = currentCalendarDate.getFullYear();
+    const month = currentCalendarDate.getMonth();
+    const totalDaysInCurrentMonth = new Date(year, month + 1, 0).getDate();
+
+    const monthlyLogs = databaseAttendanceRecords.filter(record => {
+      const d = new Date(record.date);
+      return d.getFullYear() === year && d.getMonth() === month;
+    });
+
+    const presentCount = monthlyLogs.filter(r => r.status === 'present').length;
+    const absentCount  = monthlyLogs.filter(r => r.status === 'absent').length;
+    const leaveCount   = monthlyLogs.filter(r => r.status === 'leave').length;
+    const holidayCount = monthlyLogs.filter(r => r.status === 'holiday').length;
+
+    const markedTotal = presentCount + absentCount + leaveCount + holidayCount;
+    const progressCircle = document.getElementById('circularProgress');
+
+    if (markedTotal > 0) {
+      const presentDeg = (presentCount / totalDaysInCurrentMonth) * 360;
+      const absentDeg  = (absentCount / totalDaysInCurrentMonth) * 360;
+      const leaveDeg   = (leaveCount / totalDaysInCurrentMonth) * 360;
+      const holidayDeg = (holidayCount / totalDaysInCurrentMonth) * 360;
+
+      progressCircle.style.background = `conic-gradient(
+        var(--success) 0deg ${presentDeg}deg,
+        var(--danger) ${presentDeg}deg ${presentDeg + absentDeg}deg,
+        var(--warning) ${presentDeg + absentDeg}deg ${presentDeg + absentDeg + leaveDeg}deg,
+        var(--info) ${presentDeg + absentDeg + leaveDeg}deg ${presentDeg + absentDeg + leaveDeg + holidayDeg}deg,
+        var(--border) ${presentDeg + absentDeg + leaveDeg + holidayDeg}deg 360deg
+      )`;
+
+      setupLabel('labelPresent', presentCount, presentDeg / 2, true);
+      setupLabel('labelAbsent', absentCount, presentDeg + (absentDeg / 2), true);
+    } else {
+      progressCircle.style.background = `conic-gradient(var(--border) 0deg 360deg)`;
+      setupLabel('labelPresent', 0, 0, false);
+      setupLabel('labelAbsent', 0, 0, false);
+    }
+
+    renderCalendarEngine(totalDaysInCurrentMonth);
+  }
+
+  function setupLabel(elementId, value, midAngle, show) {
+    const el = document.getElementById(elementId);
+    if (!show || value <= 0) { 
+      el.style.setProperty('display', 'none', 'important'); 
+      return; 
+    }
+    el.style.setProperty('display', 'block', 'important');
+    el.textContent = value;
+    const radiusOffset = 54;
+    const angleRadians = (midAngle - 90) * (Math.PI / 180);
+    const x = Math.round(radiusOffset * Math.cos(angleRadians));
+    const y = Math.round(radiusOffset * Math.sin(angleRadians));
+    el.style.transform = `translate(${x}px, ${y}px)`;
+  }
+
+  function renderCalendarEngine(totalDaysInMonth) {
+    const container = document.getElementById('daysGridContainer');
+    container.innerHTML = '';
+
+    const year = currentCalendarDate.getFullYear();
+    const month = currentCalendarDate.getMonth();
+
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    document.getElementById('monthYearLabel').textContent = `${monthNames[month]} ${year}`;
+
+    const firstDayIndex = new Date(year, month, 1).getDay();
+    const paddingLeftDays = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
+
+    for (let i = 0; i < paddingLeftDays; i++) {
+      const emptyCell = document.createElement('div');
+      emptyCell.className = 'day-cell empty-day';
+      container.appendChild(emptyCell);
+    }
+
+    const todayLocal = new Date();
+    const todayStr = `${todayLocal.getFullYear()}-${String(todayLocal.getMonth() + 1).padStart(2, '0')}-${String(todayLocal.getDate()).padStart(2, '0')}`;
+
+    for (let day = 1; day <= totalDaysInMonth; day++) {
+      const cell = document.createElement('div');
+      cell.className = 'day-cell';
+      cell.textContent = day;
+
+      const dateStringKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+      if (dateStringKey === todayStr) {
+        cell.classList.add('is-today');
+      }
+
+      if (databaseAttendanceRecords.length > 0) {
+        const matchedLog = databaseAttendanceRecords.find(record => {
+           const rDate = new Date(record.date);
+           const recordDateStr = `${rDate.getFullYear()}-${String(rDate.getMonth() + 1).padStart(2, '0')}-${String(rDate.getDate()).padStart(2, '0')}`;
+           return recordDateStr === dateStringKey;
+        });
+
+        if (matchedLog) {
+          if (matchedLog.status === 'present') cell.classList.add('is-present');
+          if (matchedLog.status === 'absent')  cell.classList.add('is-absent');
+          if (matchedLog.status === 'leave')   cell.classList.add('is-leave');
+          if (matchedLog.status === 'holiday') cell.classList.add('is-holiday');
+        }
+      }
+
+      container.appendChild(cell);
+    }
+  }
+
+  window.changeMonth = function(direction) {
+    currentCalendarDate.setMonth(currentCalendarDate.getMonth() + direction);
+    refreshDashboardMetrics();
+  };
+
+  loadTrackingData();
+</script>
+</body>
+</html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Settings | Student Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117; --surface: #161b22; --surface2: #1c2128;
+      --border: #30363d; --accent: #2563eb; --accent-h: #1d4ed8;
+      --text: #e6edf3; --muted: #8b949e;
+      --success: #3fb950; --warning: #e3b341; --danger: #f85149;
+    }
+
+    body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text); min-height: 100vh; display: flex; }
+
+    .sidebar { width: 240px; min-height: 100vh; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; transition: transform 0.3s; }
+    .sidebar-brand { display: flex; align-items: center; gap: 0.6rem; padding: 1.25rem 1rem; border-bottom: 1px solid var(--border); }
+    .brand-icon { width: 34px; height: 34px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+    .brand-text { font-size: 0.9rem; font-weight: 700; }
+    .brand-sub  { font-size: 0.68rem; color: var(--muted); }
+    .nav-section { padding: 1rem 0.75rem 0.25rem; font-size: 0.68rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .nav-item { display: flex; align-items: center; gap: 0.65rem; padding: 0.55rem 0.875rem; margin: 0.1rem 0.5rem; border-radius: 8px; font-size: 0.875rem; font-weight: 500; color: var(--muted); text-decoration: none; transition: background 0.15s, color 0.15s; }
+    .nav-item:hover { background: var(--surface2); color: var(--text); }
+    .nav-item.active { background: rgba(37,99,235,0.15); color: #93c5fd; }
+    .nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+    .sidebar-footer { margin-top: auto; padding: 1rem; border-top: 1px solid var(--border); }
+    .user-card { display: flex; align-items: center; gap: 0.65rem; padding: 0.5rem; }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+    .user-name { font-size: 0.85rem; font-weight: 600; }
+    .user-role { font-size: 0.72rem; color: var(--muted); }
+    .logout-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.875rem; margin: 0.5rem; border-radius: 8px; font-size: 0.85rem; color: var(--danger); cursor: pointer; background: none; border: none; font-family: inherit; width: calc(100% - 1rem); transition: background 0.15s; }
+    .logout-btn:hover { background: rgba(248,81,73,0.1); }
+
+    .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
+    .topbar-left { display: flex; align-items: center; gap: 0.75rem; }
+    .hamburger { display: none; background: none; border: none; color: var(--text); font-size: 1.25rem; cursor: pointer; }
+    .page-title { font-size: 1.1rem; font-weight: 700; }
+    .page-sub   { font-size: 0.78rem; color: var(--muted); margin-top: 0.1rem; }
+    .content { padding: 1.5rem; flex: 1; max-width: 650px; width: 100%; margin: 0 auto; }
+
+    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .panel-title { font-size: 1rem; font-weight: 600; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; color: #fff; }
+
+    .form-group { margin-bottom: 1.25rem; }
+    label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--muted); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    input.form-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.65rem 0.875rem; color: var(--text); font-size: 0.9rem; font-family: inherit; outline: none; transition: border-color 0.2s; }
+    input.form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.6rem 1.25rem; border-radius: 8px; font-size: 0.875rem; font-weight: 600; font-family: inherit; cursor: pointer; border: none; transition: background 0.2s; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-h); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .spinner-sm { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; margin-right: 0.25rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .alert { display: none; align-items: center; gap: 0.5rem; padding: 0.65rem 0.875rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1.25rem; }
+    .alert.error   { background: rgba(248,81,73,0.1); border: 1px solid rgba(248,81,73,0.3); color: var(--danger); }
+    .alert.success { background: rgba(63,185,80,0.1); border: 1px solid rgba(63,185,80,0.3); color: var(--success); }
+    .alert.show    { display: flex; }
+
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .hamburger { display: block; }
+    }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">🎓</div>
+    <div><div class="brand-text">SMS Portal</div><div class="brand-sub">Student Management</div></div>
+  </div>
+  <div class="nav-section">Main</div>
+  <a class="nav-item" href="index.html"><span class="nav-icon">🏠</span> Dashboard</a>
+  <div class="nav-section">Management</div>
+  <a class="nav-item" href="students.html"><span class="nav-icon">👨‍🎓</span> Students</a>
+  <a class="nav-item" href="attendance.html"><span class="nav-icon">📋</span> Attendance</a>
+  <a class="nav-item" href="fees.html"><span class="nav-icon">💰</span> Fees</a>
+  <a class="nav-item" href="results.html"><span class="nav-icon">📊</span> Results</a>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="avatar" id="sidebarAvatar">?</div>
+      <div><div class="user-name" id="sidebarName">—</div><div class="user-role" id="sidebarRole">—</div></div>
+    </div>
+    <button class="logout-btn" id="logoutBtn">🚪 Sign out</button>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" id="hamburger">☰</button>
+      <div><div class="page-title">System Settings</div><div class="page-sub">Manage profile credentials & security</div></div>
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="alert success" id="globalSuccess"><span>✅</span><span id="successMsg">Settings updated successfully!</span></div>
+    <div class="alert error" id="globalError"><span>⚠️</span><span id="errorMsg">Error updating configurations.</span></div>
+
+    <div class="panel">
+      <div class="panel-title">Admin Profile Info</div>
+      <form id="profileForm">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" class="form-input" id="adminName" required placeholder="Enter full name"/>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" class="form-input" id="adminEmail" required placeholder="Enter email address"/>
+        </div>
+        <button type="submit" class="btn btn-primary" id="saveProfileBtn">
+          <div class="spinner-sm" id="profileSpinner"></div>
+          <span>Save Profile</span>
+        </button>
+      </form>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Security & Password</div>
+      <form id="passwordForm">
+        <div class="form-group">
+          <label>Current Password</label>
+          <input type="password" class="form-input" id="currPassword" required placeholder="••••••••"/>
+        </div>
+        <div class="form-group">
+          <label>New Password</label>
+          <input type="password" class="form-input" id="newPassword" required placeholder="Minimum 6 characters"/>
+        </div>
+        <div class="form-group">
+          <label>Confirm New Password</label>
+          <input type="password" class="form-input" id="confPassword" required placeholder="Re-enter new password"/>
+        </div>
+        <button type="submit" class="btn btn-primary" id="savePassBtn">
+          <div class="spinner-sm" id="passSpinner"></div>
+          <span>Update Password</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_BASE = 'http://localhost:5000';
+  const token = localStorage.getItem('token');
+  const user  = JSON.parse(localStorage.getItem('user') || '{}');
+
+  // Route protection guard
+  if (!token || user.role !== 'admin') window.location.href = 'login.html';
+
+  // Render Sidebar identities
+  const initialName = user.name || 'Admin';
+  document.getElementById('sidebarAvatar').textContent = initialName.charAt(0).toUpperCase();
+  document.getElementById('sidebarName').textContent   = initialName;
+  document.getElementById('sidebarRole').textContent   = user.role || '—';
+  document.getElementById('logoutBtn').addEventListener('click', () => { localStorage.clear(); window.location.href = 'login.html'; });
+
+  // Load current values inside form inputs on init execution
+  document.getElementById('adminName').value = user.name || '';
+  document.getElementById('adminEmail').value = user.email || '';
+
+  // API Call helper
+  async function api(endpoint, method = 'GET', body = null) {
+    const opts = {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'user-id': user.id || user._id || ''
+      }
+    };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(`${API_BASE}${endpoint}`, opts);
+    if (res.status === 401) { localStorage.clear(); window.location.href = 'login.html'; }
+    return res.json();
+  }
+
+  // 📋 Profile Submit Actions
+  document.getElementById('profileForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideAlerts();
+    
+    const name = document.getElementById('adminName').value.trim();
+    const email = document.getElementById('adminEmail').value.trim();
+    
+    setLoading('profileSpinner', 'saveProfileBtn', true);
+    try {
+      const res = await api('/api/auth/update-profile', 'PUT', { name, email });
+      if (res.error) {
+        showAlert('error', res.message || 'Profile save operational refusal.');
+      } else {
+        // Sync local cache values
+        user.name = name;
+        user.email = email;
+        localStorage.setItem('user', JSON.stringify(user));
+        document.getElementById('sidebarAvatar').textContent = name.charAt(0).toUpperCase();
+        document.getElementById('sidebarName').textContent = name;
+        showAlert('success', 'Profile logs modified successfully! 🎉');
+      }
+    } catch (err) {
+      showAlert('error', 'Network communication error during transaction.');
+    } finally {
+      setLoading('profileSpinner', 'saveProfileBtn', false);
+    }
+  });
+
+  // 📋 Password Switch Security Submit Actions
+  document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideAlerts();
+
+    const currentPassword = document.getElementById('currPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confPassword').value;
+
+    if (newPassword.length < 6) { showAlert('error', 'New password must be at least 6 characters.'); return; }
+    if (newPassword !== confirmPassword) { showAlert('error', 'Confirm match confirmation failed.'); return; }
+
+    setLoading('passSpinner', 'savePassBtn', true);
+    try {
+      const res = await api('/api/auth/change-password', 'PUT', { currentPassword, newPassword });
+      if (res.error) {
+        showAlert('error', res.message || 'Security switch update failed.');
+      } else {
+        showAlert('success', 'Password logs rotated securely inside database! 🔒');
+        document.getElementById('passwordForm').reset();
+      }
+    } catch (err) {
+      showAlert('error', 'Network communication error updating password logs.');
+    } finally {
+      setLoading('passSpinner', 'savePassBtn', false);
+    }
+  });
+
+  // Sidebar controls
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  document.getElementById('hamburger')?.addEventListener('click', () => { sidebar.classList.toggle('open'); });
+
+  function setLoading(spinnerId, btnId, active) {
+    document.getElementById(spinnerId).style.display = active ? 'block' : 'none';
+    document.getElementById(btnId).disabled = active;
+  }
+
+  function showAlert(type, msg) {
+    const el = document.getElementById(type === 'success' ? 'globalSuccess' : 'globalError');
+    const msgEl = document.getElementById(type === 'success' ? 'successMsg' : 'errorMsg');
+    msgEl.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 4000);
+  }
+
+  function hideAlerts() {
+    document.getElementById('globalSuccess').classList.remove('show');
+    document.getElementById('globalError').classList.remove('show');
+  }
+</script>
+</body>
+</html>
