@@ -278,20 +278,19 @@
     </div>
   </div>
 
-  <button class="btn" id="loginBtn" type="button" onclick="signin()"> 
+  <button class="btn" id="loginBtn" type="button"> 
     <span id="btnText">Sign In</span> 
-</button>
+  </button>
 
   <div class="footer-links">
     Don't have an account? <a href="register.html">Register here</a>
   </div>
 </div>
 
-<!-- your full HTML above stays SAME -->
-
 <script>
- const API_URL = "https://sms-student-management-system-1.onrender.com/api"; //  Aapka Live Render URL
-  // Password toggle utility[cite: 6]
+  const API_URL = "https://sms-student-management-system-1.onrender.com/api"; // Aapka Live Render URL
+
+  // Password toggle utility
   const passwordEl = document.getElementById('password');
   const togglePwBtn = document.getElementById('togglePw');
   if (togglePwBtn && passwordEl) {
@@ -312,7 +311,7 @@
     const spinner = document.getElementById("spinner");
     const btnText = document.getElementById("btnText");
 
-    // Clear previous errors[cite: 6]
+    // Clear previous errors
     if (errorAlert) errorAlert.classList.remove("show");
     if (successAlert) successAlert.classList.remove("show");
 
@@ -321,7 +320,7 @@
         return;
     }
 
-    // UI Loading On[cite: 6]
+    // UI Loading On
     if (loginBtn) loginBtn.disabled = true;
     if (spinner) spinner.style.display = "block";
     if (btnText) btnText.textContent = "Signing In...";
@@ -329,7 +328,8 @@
     try {
         console.log("Sending login request to backend..."); // Debugging log
         
-        const res = await fetch(`${API_URL}/sauth/login`, {
+        // Mapped dynamic secure route configuration properly
+        const res = await fetch(`${API_URL}/auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password })
@@ -346,7 +346,7 @@
             localStorage.setItem("token", data.token || "dummy-token");
             localStorage.setItem("user", JSON.stringify(data.user || { name: "User", role: "admin" }));
 
-            // 2. Show Success Alert[cite: 6]
+            // 2. Show Success Alert
             if (successAlert) successAlert.classList.add("show");
             
             // 3. Page jump redirect
@@ -370,7 +370,7 @@
             errorAlert.classList.add("show");
         }
     } finally {
-        // UI Loading Off[cite: 6]
+        // UI Loading Off
         if (loginBtn) loginBtn.disabled = false;
         if (spinner) spinner.style.display = "none";
         if (btnText) btnText.textContent = "Sign In";
@@ -396,5 +396,3 @@
 
 </body>
 </html>
-
-
