@@ -121,7 +121,11 @@
     .btn-pay-sm:hover { background: rgba(63,185,80,0.25); }
     .btn-pay-sm:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    /* ─── 🌟 100% RESPONSIVE MODAL FIXES ─── */
+    /* Spinner CSS (Added) */
+    .spinner-sm { display: none; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Modal Backdrop */
     .modal-backdrop { 
       display: none; 
       position: fixed; 
@@ -141,7 +145,7 @@
       width: 100%; 
       max-width: 480px; 
       position: relative; 
-      max-height: 90vh; /* Prevents overflow from viewport */
+      max-height: 90vh; 
       display: flex;
       flex-direction: column;
       box-shadow: 0 20px 40px rgba(0,0,0,0.6);
@@ -153,7 +157,6 @@
     .modal-close { background: none; border: none; color: var(--muted); font-size: 1.25rem; cursor: pointer; }
     .modal-close:hover { color: var(--text); }
     
-    /* Dedicated internal scroll track prevent window crops */
     .modal-body { 
       padding: 1rem 1.5rem; 
       overflow-y: auto; 
@@ -383,7 +386,7 @@
 </div>
 
 <script>
-  const API_URL = "https://sms-student-management-system-1.onrender.com"; //  Aapka Live Render URL
+  const API_URL = "https://sms-student-management-system-1.onrender.com/api"; 
   const token = localStorage.getItem('token');
   const user  = JSON.parse(localStorage.getItem('user') || '{}');
   if (!token) window.location.href = 'login.html';
@@ -399,7 +402,6 @@
   document.getElementById('hamburger').addEventListener('click', () => { sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
   overlay.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('show'); });
 
-  // Navigation tab selections handlers
   let activeTab = 'all';
   document.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', () => {
@@ -410,6 +412,7 @@
     });
   });
 
+  // ✅ Fixed Endpoint String concatenation logic 
   async function api(endpoint, method = 'GET', body = null) {
     const opts = { method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } };
     if (body) opts.body = JSON.stringify(body);
@@ -421,11 +424,12 @@
   let allFees = [];
   let students = [];
 
+  // ✅ Removed "/api" prefixes inside functions to prevent double strings mismatch
   async function loadData() {
     try {
       const [feesData, studentsData] = await Promise.all([
-        api('/api/fees'),
-        api('/api/students')
+        api('/fees'),
+        api('/students')
       ]);
 
       allFees  = Array.isArray(feesData)    ? feesData    : (feesData.fees      ?? []);
@@ -548,7 +552,6 @@
     }).join('');
   }
 
-  // Filter Event Listeners
   ['searchInput','courseFilter','yearFilter'].forEach(id => {
     document.getElementById(id).addEventListener('input',  applyFilters);
     document.getElementById(id).addEventListener('change', applyFilters);
@@ -560,7 +563,6 @@
     applyFilters();
   });
 
-  // Dynamic live calculations assignment triggers
   ['fTotal','fPaid'].forEach(id => {
     document.getElementById(id).addEventListener('input', updatePendingPreview);
   });
@@ -571,7 +573,6 @@
     document.getElementById('pendingPreview').textContent = `₹${fmt(Math.max(0, total - paid))}`;
   }
 
-  // Dropdown student selection metadata lookups triggers
   document.getElementById('fStudent').addEventListener('change', function() {
     const s = students.find(s => s._id === this.value);
     if (s) {
@@ -584,7 +585,6 @@
     }
   });
 
-  // Modal Open Actions - Fresh Assignation Mode
   window.openAdd = function() {
     document.getElementById('modalTitle').textContent  = 'Assign Fee';
     document.getElementById('saveBtnText').textContent = 'Assign Fee';
@@ -602,7 +602,6 @@
     document.getElementById('feeModal').classList.add('show');
   };
 
-  // Modal Open Actions - Update Balance Mode
   window.openEdit = function(id) {
     const f = allFees.find(f => f._id === id);
     if (!f) return;
@@ -636,13 +635,11 @@
   document.getElementById('modalClose').addEventListener('click', closeModal);
   document.getElementById('cancelBtn').addEventListener('click', closeModal);
 
-  // Core Submit Handler with Dynamic Validation Guard
   document.getElementById('saveBtn').addEventListener('click', async () => {
     hideModalError();
     const id        = document.getElementById('editFeeId').value;
     const studentId = document.getElementById('fStudent').value;
     
-    // Strict numeric translation resolves validation drops
     const totalFee  = Number(document.getElementById('fTotal').value);
     const paidAmount= Number(document.getElementById('fPaid').value) || 0;
     
@@ -659,7 +656,8 @@
 
     setSaveLoading(true);
     try {
-      const endpoint = id ? `/api/fees/${id}` : '/api/fees';
+      // ✅ Removed internal "/api" prefixes to align perfectly with backend URLs structure mapping
+      const endpoint = id ? `/fees/${id}` : '/fees';
       const method   = id ? 'PUT' : 'POST';
       const res = await api(endpoint, method, payload);
       if (res.error) { showModalError(res.message || 'Failed to save.'); return; }
