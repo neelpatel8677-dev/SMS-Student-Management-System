@@ -373,7 +373,7 @@
 
 <script>
   // ─── Config ─────────────────────────────────────────
-  const API_BASE = 'http://localhost:5000';
+  const API_URL = "https://sms-student-management-system-1.onrender.com/api"; //  Aapka Live Render URL
   // ────────────────────────────────────────────────────
 
   const token = localStorage.getItem('token');
@@ -406,7 +406,7 @@
   async function api(endpoint, method = 'GET', body = null) {
     const opts = { method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } };
     if (body) opts.body = JSON.stringify(body);
-    const res = await fetch(`${API_BASE}${endpoint}`, opts);
+    const res = await fetch(`${API_URL}${endpoint}`, opts);
     if (res.status === 401) { localStorage.clear(); window.location.href = 'login.html'; }
     return res.json();
   }

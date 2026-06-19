@@ -237,7 +237,7 @@
 </div>
 
 <script>
-  const API_BASE = 'http://localhost:5000';
+  const API_URL = "https://sms-student-management-system-1.onrender.com/api"; //  Aapka Live Render URL
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
@@ -248,7 +248,7 @@
 
   async function loadTrackingData() {
     try {
-      const res = await fetch(`${API_BASE}/api/attendance/me`, {
+      const res = await fetch(`${API_URL}/api/attendance/me`, {
         method: 'GET',
         headers: { 
           'Authorization': `Bearer ${token}`,

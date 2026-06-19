@@ -1,0 +1,22 @@
+
+# Dependencies (Faltu ki 2000+ files ko rokne ke liye)
+node_modules/
+/node_modules
+
+# Security & Secrets (Aapke passwords aur keys ko chupaney ke liye)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+*.log
+
+# Operating System Files
+.DS_Store
+Thumbs.db

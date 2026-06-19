@@ -162,4 +162,3 @@ router.put('/change-password', async (req, res) => {
 
 module.exports = router;
 
-//const ACTUAL_SECRET_KEY = "SUPER_SECRET_ADMIN_KEY_123";

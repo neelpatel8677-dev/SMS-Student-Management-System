@@ -290,8 +290,7 @@
 <!-- your full HTML above stays SAME -->
 
 <script>
-  const API_BASE = 'http://127.0.0.1:5000'; // Ensure this matches your server port[cite: 2, 6]
-
+ const API_URL = "https://sms-student-management-system-1.onrender.com/api"; //  Aapka Live Render URL
   // Password toggle utility[cite: 6]
   const passwordEl = document.getElementById('password');
   const togglePwBtn = document.getElementById('togglePw');
@@ -330,7 +329,7 @@
     try {
         console.log("Sending login request to backend..."); // Debugging log
         
-        const res = await fetch(`${API_BASE}/api/auth/login`, {
+        const res = await fetch(`${API_URL}/sauth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password })
