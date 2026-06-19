@@ -56,7 +56,7 @@
     .btn-primary:hover { background: var(--accent-h); }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    .spinner-sm { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; margin-right: 0.25rem; }
+    .spinner-sm { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .alert { display: none; align-items: center; gap: 0.5rem; padding: 0.65rem 0.875rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1.25rem; }
@@ -64,15 +64,20 @@
     .alert.success { background: rgba(63,185,80,0.1); border: 1px solid rgba(63,185,80,0.3); color: var(--success); }
     .alert.show    { display: flex; }
 
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+
     @media (max-width: 768px) {
       .sidebar { transform: translateX(-100%); }
       .sidebar.open { transform: translateX(0); }
+      .overlay.show { display: block; }
       .main { margin-left: 0; }
       .hamburger { display: block; }
     }
   </style>
 </head>
 <body>
+
+<div class="overlay" id="overlay"></div>
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-brand">
@@ -150,25 +155,22 @@
 </div>
 
 <script>
-  const API_URL = "https://sms-student-management-system-1.onrender.com"; //  Aapka Live Render URL
+  // ✅ Base URL structure sync check with global files mapping
+  const API_URL = "https://sms-student-management-system-1.onrender.com/api"; 
   const token = localStorage.getItem('token');
   const user  = JSON.parse(localStorage.getItem('user') || '{}');
 
-  // Route protection guard
   if (!token || user.role !== 'admin') window.location.href = 'login.html';
 
-  // Render Sidebar identities
   const initialName = user.name || 'Admin';
   document.getElementById('sidebarAvatar').textContent = initialName.charAt(0).toUpperCase();
   document.getElementById('sidebarName').textContent   = initialName;
   document.getElementById('sidebarRole').textContent   = user.role || '—';
   document.getElementById('logoutBtn').addEventListener('click', () => { localStorage.clear(); window.location.href = 'login.html'; });
 
-  // Load current values inside form inputs on init execution
   document.getElementById('adminName').value = user.name || '';
   document.getElementById('adminEmail').value = user.email || '';
 
-  // API Call helper
   async function api(endpoint, method = 'GET', body = null) {
     const opts = {
       method,
@@ -194,11 +196,11 @@
     
     setLoading('profileSpinner', 'saveProfileBtn', true);
     try {
-      const res = await api('/api/auth/update-profile', 'PUT', { name, email });
+      // ✅ Removed internal folder prefixes mismatch constraints safely
+      const res = await api('/auth/update-profile', 'PUT', { name, email });
       if (res.error) {
         showAlert('error', res.message || 'Profile save operational refusal.');
       } else {
-        // Sync local cache values
         user.name = name;
         user.email = email;
         localStorage.setItem('user', JSON.stringify(user));
@@ -227,7 +229,8 @@
 
     setLoading('passSpinner', 'savePassBtn', true);
     try {
-      const res = await api('/api/auth/change-password', 'PUT', { currentPassword, newPassword });
+      // ✅ Synchronized change-password endpoint layout mapping
+      const res = await api('/auth/change-password', 'PUT', { currentPassword, newPassword });
       if (res.error) {
         showAlert('error', res.message || 'Security switch update failed.');
       } else {
@@ -241,10 +244,17 @@
     }
   });
 
-  // Sidebar controls
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('overlay');
-  document.getElementById('hamburger')?.addEventListener('click', () => { sidebar.classList.toggle('open'); });
+  
+  document.getElementById('hamburger')?.addEventListener('click', () => { 
+    sidebar.classList.add('open'); 
+    overlay.classList.add('show'); 
+  });
+  overlay.addEventListener('click', () => { 
+    sidebar.classList.remove('open'); 
+    overlay.classList.remove('show'); 
+  });
 
   function setLoading(spinnerId, btnId, active) {
     document.getElementById(spinnerId).style.display = active ? 'block' : 'none';
