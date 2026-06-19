@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Results | Student Management System</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
@@ -155,6 +155,7 @@
     .remove-subj { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 1rem; padding: 0.2rem; opacity: 0.7; }
     .remove-subj:hover { opacity: 1; }
 
+    /* Spinner Loader CSS Adjustment */
     .spinner-sm { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -334,7 +335,8 @@
 </div>
 
 <script>
-  const API_URL = "https://sms-student-management-system-1.onrender.com"; //  Aapka Live Render URL
+  // ✅ Aligned API base configuration to ensure consistency with standard file structures
+  const API_URL = "https://sms-student-management-system-1.onrender.com/api"; 
   const token = localStorage.getItem('token');
   const user  = JSON.parse(localStorage.getItem('user') || '{}');
   if (!token) window.location.href = 'login.html';
@@ -361,11 +363,12 @@
   let allResults = [];
   let students   = [];
 
+  // ✅ Adjusted endpoints inside hooks to remove redundant inner prefixes 
   async function loadData() {
     try {
       const [resultsData, studentsData] = await Promise.all([
-        api('/api/results'),
-        api('/api/students')
+        api('/results'),
+        api('/students')
       ]);
       allResults = Array.isArray(resultsData) ? resultsData : (resultsData.results ?? []);
       students   = Array.isArray(studentsData) ? studentsData : (studentsData.students ?? []);
@@ -461,7 +464,7 @@
       const grade    = r.grade ?? getGrade(pct);
       const color    = getPctColor(pct);
       const obtained = r.marksObtained ?? 0;
-      const outOf    = r.totalMarks    ?? 0;
+      const outOf    = r.totalMarks     ?? 0;
       const initials = (r.studentName ?? '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
 
       return `
@@ -645,7 +648,8 @@
 
     setSaveLoading(true);
     try {
-      const endpoint = id ? `/api/results/${id}` : '/api/results';
+      // ✅ Removed nested folder router prefix mismatches to support clean state submissions
+      const endpoint = id ? `/results/${id}` : '/results';
       const method   = id ? 'PUT' : 'POST';
       const res = await api(endpoint, method, payload);
       if (res.error) { showModalError(res.message || 'Failed to save.'); return; }
@@ -662,11 +666,12 @@
   window.deleteResultTrigger = async function(id, name) {
     if (!confirm(`Delete result for "${name}"? This cannot be undone.`)) return;
     try {
-      const res = await api(`/api/results/${id}`, 'DELETE');
+      // ✅ Removed nested "/api" prefix for standard verification alignment
+      const res = await api(`/results/${id}`, 'DELETE');
       if(res.error) { showAlert('error', 'Could not delete result.'); }
       else {
          showAlert('success', 'Result deleted successfully! 🎉');
-         await loadData();
+         loadData();
       }
     } catch (err) {
       showAlert('error', 'Could not delete result.');
