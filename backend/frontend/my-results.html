@@ -130,7 +130,8 @@
 
   <div class="exam-section-title">Academic Semester Breakdown</div>
   <div id="examsListContainer">
-     </div>
+    <div style="text-align:center; padding:2rem; color:var(--muted); font-size:0.85rem;">Loading academic reports...</div>
+  </div>
 
   <div class="footer-nav">
     <a href="index.html" class="back-dashboard-btn">← Back to Dashboard</a>
@@ -138,7 +139,7 @@
 </div>
 
 <script>
-  const API_URL = "https://sms-student-management-system-1.onrender.com"; //  Aapka Live Render URL
+  const API_URL = "https://sms-student-management-system-1.onrender.com"; 
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
@@ -155,34 +156,41 @@
       });
       const data = await res.json();
 
-      if (res.ok) {
-        document.getElementById('latestScoreLabel').textContent = `${data.latestScore}%`;
-        document.getElementById('latestExamLabel').textContent = data.latestExam;
+      if (res.ok && data) {
+        // ✅ Added strict fallback guards to prevent NaN/Undefined rendering drops
+        const scoreValue = data.latestScore !== undefined && data.latestScore !== null ? data.latestScore : '—';
+        document.getElementById('latestScoreLabel').textContent = scoreValue !== '—' ? `${scoreValue}%` : '—';
+        document.getElementById('latestExamLabel').textContent = data.latestExam || "No evaluations recorded yet";
 
         const container = document.getElementById('examsListContainer');
-        if (!data.examsList || data.examsList.length === 0) {
+        
+        // Dynamic Array normalization guard
+        const reportsList = data.examsList || data.exams || [];
+        if (reportsList.length === 0) {
           container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--muted); font-size:0.85rem;">No academic reports found in the server log databases.</div>`;
           return;
         }
 
-        // Loop cards blocks builder framework
-        container.innerHTML = data.examsList.map(exam => `
+        container.innerHTML = reportsList.map(exam => `
           <div class="exam-panel">
             <div class="exam-header">
-              <span>${exam.examName}</span>
-              <span class="exam-percentage">${exam.percentage}%</span>
+              <span>${exam.examName || exam.name || 'Examination'}</span>
+              <span class="exam-percentage">${exam.percentage ?? 0}%</span>
             </div>
-            ${exam.subjects.map(sub => `
+            ${(exam.subjects || []).map(sub => `
               <div class="subject-row">
-                <span>${sub.name}</span>
-                <span class="subject-marks"><span>${sub.obtained}</span> / ${sub.total}</span>
+                <span>${sub.name || 'Subject'}</span>
+                <span class="subject-marks"><span>${sub.obtained ?? 0}</span> / ${sub.total ?? 100}</span>
               </div>
             `).join('')}
           </div>
         `).join('');
+      } else {
+        document.getElementById('examsListContainer').innerHTML = `<div style="text-align:center; padding:2rem; color:var(--muted); font-size:0.85rem;">Failed to fetch academic scores.</div>`;
       }
     } catch (err) {
       console.error(err);
+      document.getElementById('examsListContainer').innerHTML = `<div style="text-align:center; padding:2rem; color:var(--muted); font-size:0.85rem;">Server connection timed out. Check backend logs.</div>`;
     }
   }
 
