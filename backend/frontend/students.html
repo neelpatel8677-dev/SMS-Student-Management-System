@@ -157,7 +157,7 @@
     input, select.form-sel {
       width: 100%; background: var(--bg); border: 1px solid var(--border);
       border-radius: 8px; padding: 0.6rem 0.875rem;
-      color: var(--text); font-size: 0.9rem; font-family: inherit; outline: none;
+      color: var(--text); font-size: 0.95rem; font-family: inherit; outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
     input:focus, select.form-sel:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
@@ -195,7 +195,6 @@
 
 <div class="overlay" id="overlay"></div>
 
-<!-- Sidebar -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-brand">
     <div class="brand-icon">🎓</div>
@@ -217,7 +216,6 @@
   </div>
 </aside>
 
-<!-- Main -->
 <div class="main">
   <header class="topbar">
     <div class="topbar-left">
@@ -229,11 +227,9 @@
 
   <div class="content">
 
-    <!-- Alerts -->
     <div class="alert success" id="successAlert"><span>✅</span><span id="successMsg">Done!</span></div>
     <div class="alert error"   id="errorAlert">  <span>⚠️</span><span id="errorMsg">Error.</span></div>
 
-    <!-- Toolbar -->
     <div class="toolbar">
       <div class="search-box">
         <span>🔍</span>
@@ -255,7 +251,6 @@
       <button class="btn btn-ghost" id="resetBtn">↺ Reset</button>
     </div>
 
-    <!-- Table -->
     <div class="table-panel">
       <div class="table-info">
         <span id="tableInfo">—</span>
@@ -283,7 +278,6 @@
   </div>
 </div>
 
-<!-- Add / Edit Modal -->
 <div class="modal-backdrop" id="studentModal">
   <div class="modal">
     <div class="modal-header">
@@ -351,7 +345,6 @@
   </div>
 </div>
 
-<!-- Confirm Delete Modal -->
 <div class="modal-backdrop" id="confirmModal">
   <div class="modal confirm-modal">
     <div class="modal-header">
@@ -373,14 +366,14 @@
 
 <script>
   // ─── Config ─────────────────────────────────────────
-  const API_URL = "https://sms-student-management-system-1.onrender.com"; //  Aapka Live Render URL
+  // ✅ Synchronized base URL endpoints configurations to remove redundant strings 
+  const API_URL = "https://sms-student-management-system-1.onrender.com/api"; 
   // ────────────────────────────────────────────────────
 
   const token = localStorage.getItem('token');
   const user  = JSON.parse(localStorage.getItem('user') || '{}');
   if (!token) window.location.href = 'login.html';
 
-  // Sidebar Identity Sync
   const name = user.name || 'User';
   document.getElementById('sidebarAvatar').textContent = name.charAt(0).toUpperCase();
   document.getElementById('sidebarName').textContent   = name;
@@ -393,7 +386,6 @@
   hamburger.addEventListener('click', () => { sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
   overlay.addEventListener('click',   () => { sidebar.classList.remove('open'); overlay.classList.remove('show'); });
 
-  // ── State Engine ──
   let allStudents   = [];
   let filtered      = [];
   let currentPage   = 1;
@@ -402,7 +394,6 @@
   let sortDir       = 1;
   let deleteId      = null;
 
-  // ── API Custom Fetch Integration ──
   async function api(endpoint, method = 'GET', body = null) {
     const opts = { method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } };
     if (body) opts.body = JSON.stringify(body);
@@ -411,10 +402,10 @@
     return res.json();
   }
 
-  // ── Load students ──
   async function loadStudents() {
     try {
-      const data = await api('/api/students');
+      // ✅ Removed internal folder prefix mismatch constraint
+      const data = await api('/students');
       allStudents = Array.isArray(data) ? data : (data.students ?? []);
       populateCourseFilter();
       applyFilters();
@@ -437,7 +428,6 @@
     }
   }
 
-  // ── Filter + Sort + Paginate ──
   function applyFilters() {
     const q       = document.getElementById('searchInput').value.toLowerCase();
     const course  = document.getElementById('courseFilter').value;
@@ -522,7 +512,6 @@
     renderPagination();
   };
 
-  // Sorting
   document.querySelectorAll('th[data-col]').forEach(th => {
     th.addEventListener('click', () => {
       const col = th.dataset.col;
@@ -531,7 +520,6 @@
     });
   });
 
-  // Filter events
   ['searchInput', 'courseFilter', 'yearFilter', 'feeFilter'].forEach(id => {
     document.getElementById(id).addEventListener('input', applyFilters);
     document.getElementById(id).addEventListener('change', applyFilters);
@@ -550,7 +538,6 @@
       `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">⚠️</div><p>${msg}</p></div></td></tr>`;
   }
 
-  // ── Add/Edit Modal Controllers ──
   window.openAdd = function() {
     document.getElementById('modalTitle').textContent  = 'Add Student';
     document.getElementById('saveBtnText').textContent = 'Add Student';
@@ -574,8 +561,8 @@
     document.getElementById('fLastName').value   = ln.join(' ') ?? '';
     document.getElementById('fEmail').value      = s.email ?? '';
     document.getElementById('fRollNo').value     = s.rollNo ?? '';
-    document.getElementById('fCourse').value     = s.course ?? '';
-    document.getElementById('fYear').value       = s.year ?? '';
+    document.getElementById('fCourse').value      = s.course ?? '';
+    document.getElementById('fYear').value        = s.year ?? '';
     document.getElementById('fFeeStatus').value  = s.feeStatus ?? 'pending';
 
     hideModalError();
@@ -588,10 +575,9 @@
   document.getElementById('modalClose').addEventListener('click',   closeModal);
   document.getElementById('cancelBtn').addEventListener('click',   closeModal);
 
-  // Transaction Save Trigger
   document.getElementById('saveBtn').addEventListener('click', async () => {
     hideModalError();
-    const id       = document.getElementById('editId').value;
+    const id        = document.getElementById('editId').value;
     const firstName = document.getElementById('fFirstName').value.trim();
     const lastName  = document.getElementById('fLastName').value.trim();
     const email     = document.getElementById('fEmail').value.trim();
@@ -614,7 +600,8 @@
 
     setSaveLoading(true);
     try {
-      const endpoint = id ? `/api/students/${id}` : '/api/students';
+      // ✅ Dynamic structural path normalization
+      const endpoint = id ? `/students/${id}` : '/students';
       const method   = id ? 'PUT' : 'POST';
       const res = await api(endpoint, method, payload);
 
@@ -633,7 +620,6 @@
     }
   });
 
-  // ── Delete Engine Modal Execution ──
   window.openDelete = function(id, name) {
     deleteId = id;
     document.getElementById('deleteStudentName').textContent = name;
@@ -649,7 +635,8 @@
     if (!deleteId) return;
     document.getElementById('deleteSpinner').style.display = 'block';
     try {
-      const res = await api(`/api/students/${deleteId}`, 'DELETE');
+      // ✅ Removed internal folder prefix mismatch constraint
+      const res = await api(`/students/${deleteId}`, 'DELETE');
       closeConfirm();
       if (res.error) {
         showAlert('error', res.message || 'Could not delete student. Try again.');
@@ -664,7 +651,6 @@
     }
   });
 
-  // ── Helpers ──
   function clearForm() {
     ['fFirstName','fLastName','fEmail','fRollNo','fCourse','fPassword'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('fYear').value = '';
@@ -692,10 +678,8 @@
     }
   }
 
-  // Initial Boot
   loadStudents();
 
-  // Auto-open add form if redirected from dashboard
   if (new URLSearchParams(window.location.search).get('action') === 'add') openAdd();
 </script>
 </body>
