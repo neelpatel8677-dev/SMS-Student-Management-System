@@ -45,7 +45,7 @@ router.post('/register', async (req, res) => {
         await user.save();
 
         if (role === 'student') {
-            const Fee = require('../models/Fee');
+            const Fee = require('../models/fee');
             const defaultFee = new Fee({
                 studentId: user._id,
                 totalAmount: 60000, // Fixed college saal ki fees
