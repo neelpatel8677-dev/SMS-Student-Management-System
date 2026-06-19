@@ -31,7 +31,6 @@
       padding: 1rem;
     }
 
-    /* Subtle grid background */
     body::before {
       content: '';
       position: fixed;
@@ -56,7 +55,6 @@
       box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     }
 
-    /* Top accent line */
     .card::before {
       content: '';
       position: absolute;
@@ -199,6 +197,7 @@
     .btn:active:not(:disabled) { transform: scale(0.99); }
     .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
+    /* Spinner Loader CSS Fix */
     .spinner {
       width: 16px; height: 16px;
       border: 2px solid rgba(255,255,255,0.3);
@@ -279,6 +278,7 @@
   </div>
 
   <button class="btn" id="loginBtn" type="button"> 
+    <div class="spinner" id="spinner"></div>
     <span id="btnText">Sign In</span> 
   </button>
 
@@ -288,7 +288,7 @@
 </div>
 
 <script>
-  const API_URL = "https://sms-student-management-system-1.onrender.com"; // Aapka Live Render URL
+  const API_URL = "https://sms-student-management-system-1.onrender.com"; 
 
   // Password toggle utility
   const passwordEl = document.getElementById('password');
@@ -311,7 +311,6 @@
     const spinner = document.getElementById("spinner");
     const btnText = document.getElementById("btnText");
 
-    // Clear previous errors
     if (errorAlert) errorAlert.classList.remove("show");
     if (successAlert) successAlert.classList.remove("show");
 
@@ -320,43 +319,37 @@
         return;
     }
 
-    // UI Loading On
     if (loginBtn) loginBtn.disabled = true;
     if (spinner) spinner.style.display = "block";
     if (btnText) btnText.textContent = "Signing In...";
 
     try {
-        console.log("Sending login request to backend..."); // Debugging log
+        console.log("Sending login request to backend..."); 
         
-        // Mapped dynamic secure route configuration properly
-        const res = await fetch(`${API_URL}/auth/login`, {
+        // ✅ Added missing "/api" base router link configuration match
+        const res = await fetch(`${API_URL}/api/auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password })
         });
 
         const data = await res.json();
-        console.log("Backend Response Data:", data); // Isse console mein pura data dikhega
+        console.log("Backend Response Data:", data); 
 
-        // Status 200-299 yaani login kamyab raha!
         if (res.ok) {
             console.log("Login Success! Saving token...");
             
-            // 1. Save critical auth state
-            localStorage.setItem("token", data.token || "dummy-token");
+            localStorage.setItem("token", data.token);
             localStorage.setItem("user", JSON.stringify(data.user || { name: "User", role: "admin" }));
 
-            // 2. Show Success Alert
             if (successAlert) successAlert.classList.add("show");
             
-            // 3. Page jump redirect
             setTimeout(() => {
                 console.log("Redirecting to dashboard...");
                 window.location.href = "index.html"; 
             }, 1000);
 
         } else {
-            // Backend handle rejection (e.g., Wrong Password)
             console.warn("Login failed according to server:", data.message);
             if (errorAlert) {
                 document.getElementById("errorMsg").textContent = data.message || "Invalid email or password.";
@@ -370,14 +363,12 @@
             errorAlert.classList.add("show");
         }
     } finally {
-        // UI Loading Off
         if (loginBtn) loginBtn.disabled = false;
         if (spinner) spinner.style.display = "none";
         if (btnText) btnText.textContent = "Sign In";
     }
   }
 
-  // Core Click Event Attachment
   const mainSubmitBtn = document.getElementById("loginBtn");
   if (mainSubmitBtn) {
       mainSubmitBtn.addEventListener("click", handleLogin);
@@ -386,7 +377,6 @@
       console.error("❌ Error: Element with id 'loginBtn' was not found in HTML!");
   }
 
-  // Optional: Enter key handler for smooth experience
   if (passwordEl) {
       passwordEl.addEventListener("keydown", (e) => {
           if (e.key === "Enter") handleLogin();
