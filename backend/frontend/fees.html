@@ -349,43 +349,45 @@
       </div>
 
       <div class="form-row">
-        <div class="form-group">
-          <label>Due Date</label>
-          <input class="form-input" type="date" id="fDueDate" />
-        </div>
-        <div class="form-group">
-          <label>Status</label>
-          <select class="form-sel2" id="fStatus">
-            <option value="pending">Pending</option>
-            <option value="paid">Paid</option>
-            <option value="overdue">Overdue</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>Remarks</label>
-        <input class="form-input" type="text" id="fRemarks" placeholder="e.g. Semester 1 fee" />
-      </div>
-
-      <div class="info-box" style="margin-bottom:0;">
-        <div class="info-row">
-          <span class="info-key">Pending Amount</span>
-          <span class="info-val" id="pendingPreview" style="color:var(--warning);">₹0</span>
-        </div>
-      </div>
-    </div>
-    
-    <div class="modal-footer">
-      <button class="btn btn-ghost" id="cancelBtn">Cancel</button>
-      <button class="btn btn-primary" id="saveBtn">
-        <div class="spinner-sm" id="saveSpinner"></div>
-        <span id="saveBtnText">Assign Fee</span>
-      </button>
-    </div>
+  <div class="form-group">
+    <!-- 🌟 FIX 1: 'for="fDueDate"' joda -->
+    <label for="fDueDate">Due Date</label>
+    <input class="form-input" type="date" id="fDueDate" />
+  </div>
+  <div class="form-group">
+    <!-- 🌟 FIX 2: 'for="fStatus"' joda -->
+    <label for="fStatus">Status</label>
+    <select class="form-sel2" id="fStatus">
+      <option value="pending">Pending</option>
+      <option value="paid">Paid</option>
+      <option value="overdue">Overdue</option>
+    </select>
   </div>
 </div>
 
+<div class="form-group">
+  <!-- 🌟 FIX 3: 'for="fRemarks"' joda -->
+  <label for="fRemarks">Remarks</label>
+  <input class="form-input" type="text" id="fRemarks" placeholder="e.g. Semester 1 fee" />
+</div>
+
+<div class="info-box" style="margin-bottom:0;">
+  <div class="info-row">
+    <span class="info-key">Pending Amount</span>
+    <span class="info-val" id="pendingPreview" style="color:var(--warning);">₹0</span>
+  </div>
+</div>
+</div>
+
+<div class="modal-footer">
+<button class="btn btn-ghost" id="cancelBtn">Cancel</button>
+<button class="btn btn-primary" id="saveBtn">
+  <div class="spinner-sm" id="saveSpinner"></div>
+  <span id="saveBtnText">Assign Fee</span>
+</button>
+</div>
+</div>
+</div>
 <script>
   const API_URL = "https://sms-student-management-system-1.onrender.com/api"; 
   const token = localStorage.getItem('token');
