@@ -326,7 +326,7 @@
       <div class="alert error" id="modalError"><span>⚠️</span><span id="modalErrorMsg">—</span></div>
       <input type="hidden" id="editFeeId" />
 
-      <div class="form-group">
+     <div class="form-group">
         <label for="fStudent">Student</label>
         <select class="form-sel2" id="fStudent"><option value="">Select student</option></select>
       </div>
@@ -350,11 +350,11 @@
 
  <div class="form-row">
         <div class="form-group">
-          <label>Due Date</label>
+          <label for="fDueDate">Due Date</label>
           <input class="form-input" type="date" id="fDueDate" />
         </div>
         <div class="form-group">
-          <label>Status</label>
+          <label for="fStatus">Status</label>
           <select class="form-sel2" id="fStatus">
             <option value="pending">Pending</option>
             <option value="paid">Paid</option>
@@ -363,7 +363,7 @@
         </div>
       </div>
       <div class="form-group">
-        <label>Remarks</label>
+        <label for="fRemarks">Remarks</label>
         <input class="form-input" type="text" id="fRemarks" placeholder="e.g. Semester 1 fee" />
       </div>
       <div class="info-box" style="margin-bottom:0;">
@@ -381,7 +381,7 @@
       </button>
     </div>
   </div>
-</div> 
+</div>
 <script>
   const API_URL = "https://sms-student-management-system-1.onrender.com/api"; 
   const token = localStorage.getItem('token');
