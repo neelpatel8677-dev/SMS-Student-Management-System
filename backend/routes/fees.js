@@ -10,19 +10,21 @@ router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const feeRecords = await Fee.find({}).populate('studentId', 'name rollNo course branch year');
 
-        const formattedFees = feeRecords.map(f => ({
-            _id: f._id,
-            studentId: f.studentId ? f.studentId._id : null,
-            studentName: f.studentId ? f.studentId.name : '—',
-            rollNo: f.studentId ? f.studentId.rollNo : '—',
-            course: f.studentId ? f.studentId.course : '—',
-            year: f.studentId ? f.studentId.year : '—',
-            totalFee: f.totalAmount,
-            paidAmount: f.paidAmount,
-            dueDate: f.dueDate,
-            status: f.status,
-            remarks: f.remarks || ''
-        }));
+        const formattedFees = feeRecords
+            .filter(f => f.studentId) // ✅ Hide deleted students
+            .map(f => ({
+                _id: f._id,
+                studentId: f.studentId._id,
+                studentName: f.studentId.name,
+                rollNo: f.studentId.rollNo,
+                course: f.studentId.course,
+                year: f.studentId.year,
+                totalFee: f.totalAmount,
+                paidAmount: f.paidAmount,
+                dueDate: f.dueDate,
+                status: f.status,
+                remarks: f.remarks || ''
+            }));
 
         return res.status(200).json(formattedFees);
     } catch (err) {
