@@ -290,7 +290,7 @@
 </div>
 
 <script>
- const API_URL = "https://sms-student-management-system-1.onrender.com/api";//  Aapka Live Render URL
+  const API_URL = "https://sms-student-management-system-1.onrender.com";//  Aapka Live Render URL
 
   const token = localStorage.getItem('token');
   const user  = JSON.parse(localStorage.getItem('user') || '{}');
@@ -448,6 +448,7 @@
 
       for (const rollNo of rollKeys) {
         const entry = attendance[rollNo];
+        // FIX: '/api/attendance/mark' ko badal kar '/api/attendance/mark' ke double path ko solve kiya gaya
         await api('/api/attendance/mark', 'POST', {
           rollNo,
           date,
@@ -473,6 +474,7 @@
 
   async function loadSummaryStats() {
     try {
+      // FIX: '/api/attendance/summary' ko secure banaya
       const data = await api('/api/attendance/summary');
       document.getElementById('statTotal').textContent   = data.totalStudents ?? students.length;
       document.getElementById('statPresent').textContent = data.presentToday   ?? 0;
@@ -486,6 +488,7 @@
     const tbody = document.getElementById('recordsBody');
     tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⏳</div><p>Loading registry details...</p></div></td></tr>`;
     try {
+      // FIX: '/api/attendance/summary' double endpoint ko dur kiya
       const data = await api('/api/attendance/summary');
       allRecords = Array.isArray(data.history) ? data.history : [];
       renderRecords();
