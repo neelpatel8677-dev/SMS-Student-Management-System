@@ -1,40 +1,43 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User'); // Jo model banaya tha use import kiya
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+const { authMiddleware } = require('../middleware/auth');
 
-// 📝 1. SECURE REGISTER ROUTE (Naya Account Banane Ke Liye)
+// 📝 1. REGISTER ROUTE
 router.post('/register', async (req, res) => {
     try {
         const { name, email, password, role, rollNo, course, branch, year, adminSecretKey } = req.body;
 
-        // 1. Pehle check karein ki email pehle se register toh nahi hai
+        // Validation
+        if (!name || !email || !password || !role) {
+            return res.status(400).json({ message: "Please fill all required fields." });
+        }
+
+        // Email already exists check
         let user = await User.findOne({ email });
         if (user) {
             return res.status(400).json({ message: "User already exists with this email." });
         }
 
-        // ⭐ 2. SECURITY GUARD: Agar koi 'admin' banne ki koshish kare
+        // ✅ SECURITY: Admin secret key .env se check karo (hardcoded nahi)
         if (role === 'admin') {
-            // =========================================================================
-            // 🚨 🚨 DETECTED: ADMIN SECRET KEY DEFINITION 🚨 🚨
-            const ACTUAL_SECRET_KEY = "SUPER_SECRET_ADMIN_KEY_123"; // <-- YEH HAI AAPKI KEY!
-            // =========================================================================
-
-            // =========================================================================
-            // 🚨 🚨 DETECTED: SECRET KEY VERIFICATION & CHECK 🚨 🚨
-            if (!adminSecretKey || adminSecretKey !== ACTUAL_SECRET_KEY) {
+            if (!adminSecretKey || adminSecretKey !== process.env.ADMIN_SECRET_KEY) {
                 return res.status(403).json({
-                    message: "Unauthorized! Incorrect or missing Admin Secret Key. You cannot register as an admin."
+                    message: "Unauthorized! Incorrect or missing Admin Secret Key."
                 });
             }
-            // =========================================================================
         }
 
-        // 3. Naya user create karein
+        // ✅ SECURITY: Password bcrypt se hash karo (plain text nahi)
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Naya user banao
         user = new User({
             name,
             email,
-            password, // Plain-text matching sequence as requested in layout template
+            password: hashedPassword,
             role,
             rollNo: role === 'student' ? rollNo : undefined,
             course: role === 'student' ? course : undefined,
@@ -44,11 +47,12 @@ router.post('/register', async (req, res) => {
 
         await user.save();
 
+        // Student register hone pe default fee record banao
         if (role === 'student') {
             const Fee = require('../models/fee');
             const defaultFee = new Fee({
                 studentId: user._id,
-                totalAmount: 60000, // Fixed college saal ki fees
+                totalAmount: 60000,
                 paidAmount: 0,
                 status: 'pending',
                 transactions: []
@@ -64,7 +68,7 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// 🔑 2. ASLI LOGIN ROUTE (Database Se Check Karne Ke Liye)
+// 🔑 2. LOGIN ROUTE
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -78,11 +82,18 @@ router.post('/login', async (req, res) => {
             return res.status(400).json({ message: "User does not exist. Please register first." });
         }
 
-        if (password !== user.password) {
-            return res.status(400).json({ message: "Invalid credentials. Wrong password." });
+        // ✅ SECURITY: bcrypt se password compare karo
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: "Invalid credentials. Wrong password." });
         }
 
-        const token = "real-database-session-token-" + user._id;
+        // ✅ SECURITY: Real JWT token banao
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '1d' }
+        );
 
         res.status(200).json({
             message: "Login success",
@@ -101,17 +112,11 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// ── 🛠️ NEW ADDITIONS FOR SETTINGS PANEL SYNC (LIFETIME SECURE) ──
-
-// ⚙️ 3. UPDATE PROFILE ROUTE (Admin & User Metadata Updates)
-router.put('/update-profile', async (req, res) => {
+// ⚙️ 3. UPDATE PROFILE ROUTE — Protected
+router.put('/update-profile', authMiddleware, async (req, res) => {
     try {
-        const userId = req.headers['user-id'];
+        const userId = req.user.id; // ✅ Header se nahi, JWT se lo
         const { name, email } = req.body;
-
-        if (!userId) {
-            return res.status(400).json({ error: true, message: "Session token verification missing." });
-        }
 
         const updatedUser = await User.findByIdAndUpdate(
             userId,
@@ -120,45 +125,46 @@ router.put('/update-profile', async (req, res) => {
         );
 
         if (!updatedUser) {
-            return res.status(404).json({ error: true, message: "Target account records missing." });
+            return res.status(404).json({ error: true, message: "User not found." });
         }
 
-        return res.status(200).json({ error: false, message: "Profile log successfully synchronized!" });
+        return res.status(200).json({ error: false, message: "Profile updated successfully!" });
     } catch (err) {
-        console.error("Update Profile Route Failure:", err);
-        return res.status(500).json({ error: true, message: "Internal update registry transaction failed." });
+        console.error("Update Profile Error:", err);
+        return res.status(500).json({ error: true, message: "Server error updating profile." });
     }
 });
 
-// ⚙️ 4. CHANGE PASSWORD ROUTE (Security Rotation Guard)
-router.put('/change-password', async (req, res) => {
+// ⚙️ 4. CHANGE PASSWORD ROUTE — Protected
+router.put('/change-password', authMiddleware, async (req, res) => {
     try {
-        const userId = req.headers['user-id'];
+        const userId = req.user.id; // ✅ JWT se lo
         const { currentPassword, newPassword } = req.body;
 
-        if (!userId) {
-            return res.status(400).json({ error: true, message: "Session identity parameters missing." });
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({ error: true, message: "Please provide both passwords." });
         }
 
         const user = await User.findById(userId);
         if (!user) {
-            return res.status(404).json({ error: true, message: "Target account not tracked." });
+            return res.status(404).json({ error: true, message: "User not found." });
         }
 
-        // Verifies against existing plain-text password mapping chain
-        if (currentPassword !== user.password) {
-            return res.status(400).json({ error: true, message: "Current password validation incorrect." });
+        // ✅ bcrypt se current password verify karo
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ error: true, message: "Current password is incorrect." });
         }
 
-        user.password = newPassword;
+        // ✅ Naya password bhi hash karo
+        user.password = await bcrypt.hash(newPassword, 10);
         await user.save();
 
-        return res.status(200).json({ error: false, message: "Password updated successfully inside database! 🔒" });
+        return res.status(200).json({ error: false, message: "Password updated successfully! 🔒" });
     } catch (err) {
-        console.error("Change Password Route Failure:", err);
-        return res.status(500).json({ error: true, message: "Internal system security rotation crashed." });
+        console.error("Change Password Error:", err);
+        return res.status(500).json({ error: true, message: "Server error changing password." });
     }
 });
 
 module.exports = router;
-

@@ -3,12 +3,13 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const Result = require('../models/Result');
 const User = require('../models/User');
+const { authMiddleware, adminMiddleware } = require('../middleware/auth');
 
-// 📊 1. ADMIN ROUTE: GET ALL STUDENTS ACADEMIC RECORDS WITH POPULATED METADATA
-router.get('/', async (req, res) => {
+// ✅ ADMIN ONLY: ALL RESULTS DEKHO
+router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const records = await Result.find({}).populate('studentId', 'name rollNo course branch year');
-        
+
         const formatted = records.map(r => ({
             _id: r._id,
             studentId: r.studentId ? r.studentId._id : null,
@@ -34,20 +35,19 @@ router.get('/', async (req, res) => {
 
         return res.status(200).json(formatted);
     } catch (err) {
-        console.error("Fetch Results Crash Log:", err);
-        return res.status(500).json({ error: true, message: "Internal server registry error." });
+        console.error("Fetch Results Error:", err);
+        return res.status(500).json({ error: true, message: "Server error." });
     }
 });
 
-// 📊 2. STUDENT ROUTE: GET OWN EVALUATION SHEETS FOR CALC CARD DISPLAY
-router.get('/me', async (req, res) => {
+// ✅ STUDENT: APNE RESULTS DEKHO
+router.get('/me', authMiddleware, async (req, res) => {
     try {
-        const studentId = req.headers['user-id'];
-        if (!studentId || !mongoose.Types.ObjectId.isValid(studentId)) {
-            return res.status(400).json({ message: "Invalid or missing User ID" });
-        }
+        const studentId = req.user.id; // ✅ JWT se lo
 
-        const results = await Result.find({ studentId: new mongoose.Types.ObjectId(studentId) }).sort({ createdAt: 1 });
+        const results = await Result.find({
+            studentId: new mongoose.Types.ObjectId(studentId)
+        }).sort({ createdAt: 1 });
 
         if (!results || results.length === 0) {
             return res.json({
@@ -58,10 +58,9 @@ router.get('/me', async (req, res) => {
         }
 
         const latestRecord = results[results.length - 1];
-        
-        let latestTotalObtained = latestRecord.marksObtained;
-        let latestTotalMax = latestRecord.totalMarks;
-        const latestPercentage = latestTotalMax > 0 ? Math.round((latestTotalObtained / latestTotalMax) * 100) : 0;
+        const latestPercentage = latestRecord.totalMarks > 0
+            ? Math.round((latestRecord.marksObtained / latestRecord.totalMarks) * 100)
+            : 0;
 
         const formattedExamsList = results.map(exam => ({
             examName: exam.examName,
@@ -78,20 +77,19 @@ router.get('/me', async (req, res) => {
             latestScore: latestPercentage,
             examsList: formattedExamsList
         });
-
     } catch (err) {
         console.error("Results Fetch Error:", err);
-        res.status(500).json({ message: "Server Error during performance evaluation check." });
+        res.status(500).json({ message: "Server error." });
     }
 });
 
-// 📊 3. ADMIN ROUTE: ASSIGN A NEW RESULT TRANSCRIPT SLIP (POST)
-router.post('/', async (req, res) => {
+// ✅ ADMIN ONLY: NEW RESULT BANAO
+router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const { studentId, exam, date, passMarks, remarks, subjects, marksObtained, totalMarks, percentage, grade, result } = req.body;
 
         if (!studentId || !exam || !subjects || subjects.length === 0) {
-            return res.status(400).json({ error: true, message: "Missing required compilation criteria." });
+            return res.status(400).json({ error: true, message: "Missing required fields." });
         }
 
         const newResult = new Result({
@@ -109,50 +107,39 @@ router.post('/', async (req, res) => {
         });
 
         await newResult.save();
-        return res.status(201).json({ error: false, message: "Academic report card created!" });
+        return res.status(201).json({ error: false, message: "Result created successfully!" });
     } catch (err) {
-        console.error("Create Result Crash:", err);
-        return res.status(500).json({ error: true, message: "Internal server payload tracking error." });
+        console.error("Create Result Error:", err);
+        return res.status(500).json({ error: true, message: "Server error." });
     }
 });
 
-// 📊 4. ADMIN ROUTE: UPDATE AN EXISTING EXAM RECORD TRANSCRIPT (PUT)
-router.put('/:id', async (req, res) => {
+// ✅ ADMIN ONLY: RESULT UPDATE KARO
+router.put('/:id', authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const { exam, date, passMarks, remarks, subjects, marksObtained, totalMarks, percentage, grade, result } = req.body;
 
         const updated = await Result.findByIdAndUpdate(
             req.params.id,
-            {
-                examName: exam,
-                date,
-                passMarks,
-                remarks,
-                subjects,
-                marksObtained,
-                totalMarks,
-                percentage,
-                grade,
-                result
-            },
+            { examName: exam, date, passMarks, remarks, subjects, marksObtained, totalMarks, percentage, grade, result },
             { new: true }
         );
 
-        if (!updated) return res.status(404).json({ error: true, message: "Target document mismatch data scope." });
-        return res.status(200).json({ error: false, message: "Report card modified successfully!" });
+        if (!updated) return res.status(404).json({ error: true, message: "Result not found." });
+        return res.status(200).json({ error: false, message: "Result updated successfully!" });
     } catch (err) {
-        return res.status(500).json({ error: true, message: "Database updating metrics crash." });
+        return res.status(500).json({ error: true, message: "Server error." });
     }
 });
 
-// 📊 5. ADMIN ROUTE: DELETE A PERMANENT TRANSCRIPT SHEET (DELETE)
-router.delete('/:id', async (req, res) => {
+// ✅ ADMIN ONLY: RESULT DELETE KARO
+router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const target = await Result.findByIdAndDelete(req.params.id);
-        if (!target) return res.status(404).json({ error: true, message: "Document not found." });
-        return res.status(200).json({ error: false, message: "Record cleared permanently." });
+        if (!target) return res.status(404).json({ error: true, message: "Result not found." });
+        return res.status(200).json({ error: false, message: "Result deleted successfully." });
     } catch (err) {
-        return res.status(500).json({ error: true, message: "Database drop parameter crashed." });
+        return res.status(500).json({ error: true, message: "Server error." });
     }
 });
 

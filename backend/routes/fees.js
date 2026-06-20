@@ -3,13 +3,13 @@ const router = express.Router();
 const Fee = require('../models/fee');
 const User = require('../models/User');
 const mongoose = require('mongoose');
+const { authMiddleware, adminMiddleware } = require('../middleware/auth');
 
-// 💰 1. ADMIN ROUTE: GET ALL REGISTERED FEES RECORDS FOR THE DATA GRID GRID TABLE
-router.get('/', async (req, res) => {
+// ✅ ADMIN ONLY: GET ALL FEE RECORDS
+router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
     try {
-        // Fetch fee structures populating student user relational elements securely
         const feeRecords = await Fee.find({}).populate('studentId', 'name rollNo course branch year');
-        
+
         const formattedFees = feeRecords.map(f => ({
             _id: f._id,
             studentId: f.studentId ? f.studentId._id : null,
@@ -26,16 +26,15 @@ router.get('/', async (req, res) => {
 
         return res.status(200).json(formattedFees);
     } catch (err) {
-        console.error("Fetch Fees Registry Crash:", err);
-        return res.status(500).json({ error: true, message: "Internal server billing error." });
+        console.error("Fetch Fees Error:", err);
+        return res.status(500).json({ error: true, message: "Server error." });
     }
 });
 
-// 💰 2. STUDENT ROUTE: VIEW OWN FEE SUMMARY LEDGER FROM SESSION WINDOW
-router.get('/me', async (req, res) => {
+// ✅ STUDENT: APNI FEES DEKHO
+router.get('/me', authMiddleware, async (req, res) => {
     try {
-        const studentId = req.headers['user-id'];
-        if (!studentId) return res.status(400).json({ message: "User ID missing" });
+        const studentId = req.user.id; // ✅ JWT se lo
 
         let feeRecord = await Fee.findOne({ studentId });
 
@@ -69,20 +68,19 @@ router.get('/me', async (req, res) => {
         });
     } catch (err) {
         console.error("Fees Fetch Error:", err);
-        res.status(500).json({ message: "Server Error during financial check." });
+        res.status(500).json({ message: "Server error." });
     }
 });
 
-// 💰 3. ADMIN ROUTE: ASSIGN A NEW INVOICE STRUCTURE TO STUDENT (POST)
-router.post('/', async (req, res) => {
+// ✅ ADMIN ONLY: NEW FEE ASSIGN KARO
+router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const { studentId, totalFee, paidAmount, dueDate, status, remarks } = req.body;
 
         if (!studentId || !totalFee || !dueDate) {
-            return res.status(400).json({ error: true, message: "Missing mandatory fee specifications parameters." });
+            return res.status(400).json({ error: true, message: "Missing required fields." });
         }
 
-        // Generate custom transaction reference code sequence on cash additions parameters
         const generatedTxnId = "TXN" + Math.floor(100000 + Math.random() * 900000);
         const transactionArray = paidAmount > 0 ? [{
             txnId: generatedTxnId,
@@ -95,7 +93,7 @@ router.post('/', async (req, res) => {
         const newFeeEntry = new Fee({
             studentId,
             status,
-            totalAmount: totalFee, // Mapped perfectly matching model fields
+            totalAmount: totalFee,
             paidAmount,
             dueDate,
             remarks,
@@ -103,23 +101,22 @@ router.post('/', async (req, res) => {
         });
 
         await newFeeEntry.save();
-        return res.status(201).json({ error: false, message: "Fee records assigned successfully!" });
+        return res.status(201).json({ error: false, message: "Fee record assigned successfully!" });
     } catch (err) {
-        console.error("Assign Fee Failure Trace:", err);
-        return res.status(500).json({ error: true, message: "Database write error assignation logic." });
+        console.error("Assign Fee Error:", err);
+        return res.status(500).json({ error: true, message: "Server error." });
     }
 });
 
-// 💰 4. ADMIN ROUTE: UPDATE AN EXISTING STATEMENT SLIP BALANCE (PUT)
-router.put('/:id', async (req, res) => {
+// ✅ ADMIN ONLY: FEE UPDATE KARO
+router.put('/:id', authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const feeRecordId = req.params.id;
         const { totalFee, paidAmount, dueDate, status, remarks } = req.body;
 
         const currentFee = await Fee.findById(feeRecordId);
-        if (!currentFee) return res.status(404).json({ error: true, message: "Billing statement document context mismatch window." });
+        if (!currentFee) return res.status(404).json({ error: true, message: "Fee record not found." });
 
-        // Add transaction entry block if amount payment received increments
         if (paidAmount > currentFee.paidAmount) {
             const addedDifference = paidAmount - currentFee.paidAmount;
             currentFee.transactions.push({
@@ -138,10 +135,10 @@ router.put('/:id', async (req, res) => {
         currentFee.remarks = remarks || '';
 
         await currentFee.save();
-        return res.status(200).json({ error: false, message: "Fee structure normalized successfully inside server database layers!" });
+        return res.status(200).json({ error: false, message: "Fee updated successfully!" });
     } catch (err) {
-        console.error("Update statement failed:", err);
-        return res.status(500).json({ error: true, message: "Database edit query crashed." });
+        console.error("Update Fee Error:", err);
+        return res.status(500).json({ error: true, message: "Server error." });
     }
 });
 

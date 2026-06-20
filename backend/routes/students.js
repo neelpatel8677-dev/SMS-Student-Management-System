@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const { authMiddleware, adminMiddleware } = require('../middleware/auth');
 
-// 📋 ADMIN ACTION: GET ALL REGISTERED STUDENTS WITH RECENT FILTERS
-router.get('/', async (req, res) => {
+// ✅ ADMIN ONLY: GET ALL STUDENTS
+router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
     try {
-        console.log("Admin listing engine triggered!");
         const recentStudents = await User.find({ role: 'student' }).sort({ createdAt: -1 });
-        
+
         const formattedStudents = recentStudents.map(s => ({
             _id: s._id,
             name: s.name || '—',
@@ -20,13 +20,13 @@ router.get('/', async (req, res) => {
 
         return res.status(200).json(formattedStudents);
     } catch (err) {
-        console.error("Critical Backend Students List Fetch Crash:", err);
-        return res.status(500).json({ error: true, message: "Internal server registry error." });
+        console.error("Students List Error:", err);
+        return res.status(500).json({ error: true, message: "Internal server error." });
     }
 });
 
-// 📊 ADMIN ACTION: TOTAL STUDENTS ANALYTICS COUNTER CARD
-router.get('/count', async (req, res) => {
+// ✅ ADMIN ONLY: TOTAL STUDENTS COUNT
+router.get('/count', authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const totalStudents = await User.countDocuments({ role: 'student' });
         const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
@@ -35,81 +35,80 @@ router.get('/count', async (req, res) => {
             createdAt: { $gte: startOfMonth }
         });
 
-        return res.status(200).json({ total: totalStudents, newThisMonth: newThisMonth });
+        return res.status(200).json({ total: totalStudents, newThisMonth });
     } catch (err) {
-        return res.status(500).json({ error: true, message: "Internal metrics crash." });
+        return res.status(500).json({ error: true, message: "Internal error." });
     }
 });
 
-// 📥 STUDENT ACTION: GET CURRENT LOGGED IN STUDENT DATA FOR PROFILE PANEL
-router.get('/me', async (req, res) => {
+// ✅ STUDENT: APNA PROFILE DEKHO
+router.get('/me', authMiddleware, async (req, res) => {
     try {
-        const studentId = req.headers['user-id'];
-        if (!studentId) return res.status(400).json({ message: "User session identification header is missing." });
+        const studentId = req.user.id; // ✅ JWT se lo, header se nahi
 
-        const student = await User.findById(studentId);
-        if (!student) return res.status(404).json({ message: "Student account records not found." });
+        const student = await User.findById(studentId).select('-password'); // ✅ Password hide karo
+        if (!student) return res.status(404).json({ message: "Student not found." });
 
         return res.status(200).json(student);
     } catch (err) {
-        return res.status(500).json({ message: "Internal server error reading profile data." });
+        return res.status(500).json({ message: "Server error." });
     }
 });
 
-// 💾 STUDENT ACTION: UPDATE SYSTEM PROFILE METADATA VIA INPUT FORMS
-router.put('/me', async (req, res) => {
+// ✅ STUDENT: APNA PROFILE UPDATE KARO
+router.put('/me', authMiddleware, async (req, res) => {
     try {
-        const studentId = req.headers['user-id'];
+        const studentId = req.user.id; // ✅ JWT se lo
         const { name, rollNo, course, branch, year } = req.body;
 
         const updatedStudent = await User.findByIdAndUpdate(
             studentId,
             { name, rollNo, course, branch, year },
             { new: true }
-        );
+        ).select('-password');
+
         return res.status(200).json(updatedStudent);
     } catch (err) {
-        return res.status(500).json({ message: "Internal server error modifying entry properties." });
+        return res.status(500).json({ message: "Server error." });
     }
 });
 
-// ── 🛠️ NEW: ADMIN DELETION ENGINE (Jad se student hatane ke liye) ──
-router.delete('/:id', async (req, res) => {
+// ✅ ADMIN ONLY: DELETE STUDENT
+router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const studentId = req.params.id;
-        console.log(`Attempting to delete student with ID: ${studentId}`);
-        
+
         const deletedUser = await User.findByIdAndDelete(studentId);
         if (!deletedUser) {
-            return res.status(404).json({ error: true, message: "Student record not found in MongoDB." });
+            return res.status(404).json({ error: true, message: "Student not found." });
         }
-        
-        return res.status(200).json({ error: false, message: "Student record permanently deleted! 🚀" });
+
+        return res.status(200).json({ error: false, message: "Student deleted successfully! 🚀" });
     } catch (err) {
-        console.error("Delete Endpoint Failure Log:", err);
-        return res.status(500).json({ error: true, message: "Database deletion query crashed." });
+        console.error("Delete Error:", err);
+        return res.status(500).json({ error: true, message: "Server error." });
     }
 });
 
-// ── 🛠️ NEW: ADMIN EDIT/UPDATE HANDLER (Direct grid modifications ke liye) ──
-router.put('/:id', async (req, res) => {
+// ✅ ADMIN ONLY: UPDATE STUDENT
+router.put('/:id', authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const studentId = req.params.id;
         const { name, rollNo, course, branch, year } = req.body;
-        
+
         const updatedUser = await User.findByIdAndUpdate(
             studentId,
             { name, rollNo, course, branch, year },
             { new: true }
         );
-        
+
         if (!updatedUser) {
             return res.status(404).json({ error: true, message: "Student not found." });
         }
-        
-        return res.status(200).json({ error: false, message: "Updated safely!", student: updatedUser });
+
+        return res.status(200).json({ error: false, message: "Updated successfully!", student: updatedUser });
     } catch (err) {
-        return res.status(500).json({ error: true, message: "Database edit query crashed." });
+        return res.status(500).json({ error: true, message: "Server error." });
     }
 });
 
