@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const Fee = require('../models/fee'); // ✅ Added
 const { authMiddleware, adminMiddleware } = require('../middleware/auth');
 
 // ✅ ADMIN ONLY: GET ALL STUDENTS
@@ -78,7 +79,11 @@ router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const studentId = req.params.id;
 
+        // ✅ Delete student's fee record first
+        await Fee.deleteOne({ studentId });
+
         const deletedUser = await User.findByIdAndDelete(studentId);
+
         if (!deletedUser) {
             return res.status(404).json({ error: true, message: "Student not found." });
         }
