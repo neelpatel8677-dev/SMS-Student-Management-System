@@ -550,8 +550,14 @@
   document.getElementById('sidebarRole').textContent   = role;
 
   const roleBadge = document.getElementById('roleBadge');
-  roleBadge.textContent = role;
-  roleBadge.className   = `badge ${role}`;
+
+  if (role === "admin") {
+    roleBadge.textContent = "FACULTY";
+    roleBadge.className = "badge admin";
+  } else {
+    roleBadge.textContent = role.toUpperCase();
+    roleBadge.className = `badge ${role}`;
+  }
 
   // Correct display mapping initialization fix
   if (role === 'admin') {
