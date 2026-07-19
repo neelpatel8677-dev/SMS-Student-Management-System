@@ -3,14 +3,14 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const { auth } = require('../middleware/auth'); // Updated to use the new middleware name
+const { auth } = require('../middleware/auth'); 
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // 📝 1. REGISTER ROUTE
 router.post('/register', async (req, res) => {
     try {
-        const { name, email, password, role, rollNo, course, branch, year, department } = req.body;
+        const { name, email, password, role, rollNo, course, branch, year, department, facultySecretKey } = req.body;
 
         // Validation
         if (!name || !email || !password || !role) {
@@ -20,6 +20,16 @@ router.post('/register', async (req, res) => {
         // STRICT SECURITY: Explicitly block anyone attempting to pass 'admin' or use the fixed admin email
         if (role === 'admin' || email.toLowerCase() === process.env.ADMIN_EMAIL.toLowerCase()) {
             return res.status(403).json({ message: "Unauthorized! Admin registration is prohibited." });
+        }
+
+        // 👨‍🏫 FACULTY VALIDATION LOGIC WITH SECRET KEY VERIFICATION
+        if (role === 'faculty') {
+            if (!department) {
+                return res.status(400).json({ message: "Department is required for faculty registration." });
+            }
+            if (!facultySecretKey || facultySecretKey !== process.env.FACULTY_SECRET_KEY) {
+                return res.status(403).json({ message: "Invalid Faculty Secret Key. Access Denied!" });
+            }
         }
 
         // Email already exists check in database
