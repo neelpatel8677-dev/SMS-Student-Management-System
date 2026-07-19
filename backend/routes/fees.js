@@ -3,15 +3,15 @@ const router = express.Router();
 const Fee = require('../models/fee');
 const User = require('../models/User');
 const mongoose = require('mongoose');
-const { authMiddleware, adminMiddleware } = require('../middleware/auth');
+const { auth, isFaculty } = require('../middleware/auth'); // Updated to use new middleware framework
 
-// ✅ ADMIN ONLY: GET ALL FEE RECORDS
-router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
+// 👥 FACULTY & ADMIN: GET ALL FEE RECORDS
+router.get('/', auth, isFaculty, async (req, res) => {
     try {
         const feeRecords = await Fee.find({}).populate('studentId', 'name rollNo course branch year');
 
         const formattedFees = feeRecords
-            .filter(f => f.studentId) // ✅ Hide deleted students
+            .filter(f => f.studentId) // Hide deleted students
             .map(f => ({
                 _id: f._id,
                 studentId: f.studentId._id,
@@ -33,10 +33,10 @@ router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
     }
 });
 
-// ✅ STUDENT: APNI FEES DEKHO
-router.get('/me', authMiddleware, async (req, res) => {
+// 🎓 STUDENT: APNI FEES DEKHO
+router.get('/me', auth, async (req, res) => {
     try {
-        const studentId = req.user.id; // ✅ JWT se lo
+        const studentId = req.user.id; 
 
         let feeRecord = await Fee.findOne({ studentId });
 
@@ -74,8 +74,8 @@ router.get('/me', authMiddleware, async (req, res) => {
     }
 });
 
-// ✅ ADMIN ONLY: NEW FEE ASSIGN KARO
-router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
+// 👥 FACULTY & ADMIN: NEW FEE ASSIGN KARO
+router.post('/', auth, isFaculty, async (req, res) => {
     try {
         const { studentId, totalFee, paidAmount, dueDate, status, remarks } = req.body;
 
@@ -110,8 +110,8 @@ router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
     }
 });
 
-// ✅ ADMIN ONLY: FEE UPDATE KARO
-router.put('/:id', authMiddleware, adminMiddleware, async (req, res) => {
+// 👥 FACULTY & ADMIN: FEE UPDATE KARO
+router.put('/:id', auth, isFaculty, async (req, res) => {
     try {
         const feeRecordId = req.params.id;
         const { totalFee, paidAmount, dueDate, status, remarks } = req.body;
