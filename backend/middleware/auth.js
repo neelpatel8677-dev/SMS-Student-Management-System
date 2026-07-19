@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET; // Yeh ab seedhe aapki .env file se secret key uthayega
 
 /**
  * Authentication Middleware
