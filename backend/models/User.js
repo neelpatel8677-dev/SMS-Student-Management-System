@@ -1,29 +1,53 @@
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true // Ek email se ek hi account ban sake
-    },
-    password: {
-        type: String,
-        required: true
-    },
-    role: {
-        type: String,
-        enum: ['admin', 'student'],
-        default: 'student' // Agar kuch na bheja jaye toh default student hoga
-    },
-    // Student-specific fields (Sirf tab bhari jayengi jab role 'student' hoga)
-    rollNo: { type: String },
-    course: { type: String },
-    branch: { type: String },
-    year: { type: Number }
-}, { timestamps: true }); // Isse automatic 'createdAt' aur 'updatedAt' ban jayega
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    lowercase: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  role: {
+    type: String,
+    enum: ['student', 'faculty'], // Removed 'admin' from the database roles
+    default: 'student'
+  },
+  // Student Specific Fields
+  rollNo: {
+    type: String,
+    required: function() { return this.role === 'student'; },
+    trim: true
+  },
+  course: {
+    type: String,
+    required: function() { return this.role === 'student'; },
+    trim: true
+  },
+  branch: {
+    type: String,
+    required: function() { return this.role === 'student'; },
+    trim: true
+  },
+  year: {
+    type: Number,
+    required: function() { return this.role === 'student'; }
+  },
+  // Faculty Specific Fields
+  department: {
+    type: String,
+    required: function() { return this.role === 'faculty'; },
+    trim: true
+  }
+}, { timestamps: true });
 
 module.exports = mongoose.model('User', UserSchema);
