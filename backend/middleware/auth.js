@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET || "YOUR_FALLBACK_JWT_SECRET_KEY";
+const JWT_SECRET = process.env.JWT_SECRET || "sms_super_secret_jwt_key_2024";
 
 /**
  * Authentication Middleware
