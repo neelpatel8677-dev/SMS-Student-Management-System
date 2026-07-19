@@ -3,37 +3,35 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const { authMiddleware } = require('../middleware/auth');
+const { auth } = require('../middleware/auth'); // Updated to use the new middleware name
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // 📝 1. REGISTER ROUTE
 router.post('/register', async (req, res) => {
     try {
-        const { name, email, password, role, rollNo, course, branch, year, adminSecretKey } = req.body;
+        const { name, email, password, role, rollNo, course, branch, year, department } = req.body;
 
         // Validation
         if (!name || !email || !password || !role) {
             return res.status(400).json({ message: "Please fill all required fields." });
         }
 
-        // Email already exists check
+        // STRICT SECURITY: Explicitly block anyone attempting to pass 'admin' or use the fixed admin email
+        if (role === 'admin' || email.toLowerCase() === process.env.ADMIN_EMAIL.toLowerCase()) {
+            return res.status(403).json({ message: "Unauthorized! Admin registration is prohibited." });
+        }
+
+        // Email already exists check in database
         let user = await User.findOne({ email });
         if (user) {
             return res.status(400).json({ message: "User already exists with this email." });
         }
 
-        // ✅ SECURITY: Admin secret key .env se check karo (hardcoded nahi)
-        if (role === 'admin') {
-            if (!adminSecretKey || adminSecretKey !== process.env.ADMIN_SECRET_KEY) {
-                return res.status(403).json({
-                    message: "Unauthorized! Incorrect or missing Admin Secret Key."
-                });
-            }
-        }
-
-        // ✅ SECURITY: Password bcrypt se hash karo (plain text nahi)
+        // SECURITY: Password bcrypt se hash karo
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Naya user banao
+        // Naya user banao (Only student or faculty allowed)
         user = new User({
             name,
             email,
@@ -42,7 +40,8 @@ router.post('/register', async (req, res) => {
             rollNo: role === 'student' ? rollNo : undefined,
             course: role === 'student' ? course : undefined,
             branch: role === 'student' ? branch : undefined,
-            year: role === 'student' ? year : undefined
+            year: role === 'student' ? year : undefined,
+            department: role === 'faculty' ? department : undefined
         });
 
         await user.save();
@@ -77,21 +76,45 @@ router.post('/login', async (req, res) => {
             return res.status(400).json({ message: "Please enter all fields." });
         }
 
+        // 1. Check against the fixed environmental Super Admin credentials first
+        if (email.toLowerCase() === process.env.ADMIN_EMAIL.toLowerCase()) {
+            if (password === process.env.ADMIN_PASSWORD) {
+                const token = jwt.sign(
+                    { id: "SUPER_ADMIN_ID", role: "admin" },
+                    JWT_SECRET,
+                    { expiresIn: '1d' }
+                );
+                return res.status(200).json({
+                    message: "Login success",
+                    token: token,
+                    user: {
+                        id: "SUPER_ADMIN_ID",
+                        name: "System Admin",
+                        email: process.env.ADMIN_EMAIL,
+                        role: "admin"
+                    }
+                });
+            } else {
+                return res.status(401).json({ message: "Invalid credentials. Wrong password." });
+            }
+        }
+
+        // 2. If it's not the Super Admin, look up the database for Faculty or Students
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(400).json({ message: "User does not exist. Please register first." });
         }
 
-        // ✅ SECURITY: bcrypt se password compare karo
+        // SECURITY: bcrypt se password compare karo
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).json({ message: "Invalid credentials. Wrong password." });
         }
 
-        // ✅ SECURITY: Real JWT token banao
+        // SECURITY: Real JWT token banao
         const token = jwt.sign(
             { id: user._id, role: user.role },
-            process.env.JWT_SECRET,
+            JWT_SECRET,
             { expiresIn: '1d' }
         );
 
@@ -113,10 +136,14 @@ router.post('/login', async (req, res) => {
 });
 
 // ⚙️ 3. UPDATE PROFILE ROUTE — Protected
-router.put('/update-profile', authMiddleware, async (req, res) => {
+router.put('/update-profile', auth, async (req, res) => {
     try {
-        const userId = req.user.id; // ✅ Header se nahi, JWT se lo
+        const userId = req.user.id;
         const { name, email } = req.body;
+
+        if (req.user.role === 'admin') {
+            return res.status(400).json({ error: true, message: "Fixed system admin profiles cannot be changed here." });
+        }
 
         const updatedUser = await User.findByIdAndUpdate(
             userId,
@@ -136,10 +163,14 @@ router.put('/update-profile', authMiddleware, async (req, res) => {
 });
 
 // ⚙️ 4. CHANGE PASSWORD ROUTE — Protected
-router.put('/change-password', authMiddleware, async (req, res) => {
+router.put('/change-password', auth, async (req, res) => {
     try {
-        const userId = req.user.id; // ✅ JWT se lo
+        const userId = req.user.id;
         const { currentPassword, newPassword } = req.body;
+
+        if (req.user.role === 'admin') {
+            return res.status(400).json({ error: true, message: "Fixed system admin credentials can only be updated in system settings." });
+        }
 
         if (!currentPassword || !newPassword) {
             return res.status(400).json({ error: true, message: "Please provide both passwords." });
@@ -150,13 +181,13 @@ router.put('/change-password', authMiddleware, async (req, res) => {
             return res.status(404).json({ error: true, message: "User not found." });
         }
 
-        // ✅ bcrypt se current password verify karo
+        // bcrypt se current password verify karo
         const isMatch = await bcrypt.compare(currentPassword, user.password);
         if (!isMatch) {
             return res.status(400).json({ error: true, message: "Current password is incorrect." });
         }
 
-        // ✅ Naya password bhi hash karo
+        // Naya password bhi hash karo
         user.password = await bcrypt.hash(newPassword, 10);
         await user.save();
 
