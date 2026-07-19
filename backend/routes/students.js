@@ -4,15 +4,38 @@ const User = require('../models/User');
 const Fee = require('../models/fee'); 
 const { auth, isFaculty, isAdmin } = require('../middleware/auth'); 
 
-// 👥 FACULTY & ADMIN: GET ALL STUDENTS WITH DEEP VISIBILITY
+// Require the Attendance model safely handling case-sensitivity variations
+let Attendance;
+try {
+    Attendance = require('../models/attendance');
+} catch(e) {
+    Attendance = require('../models/Attendance');
+}
+
+// 👥 FACULTY & ADMIN: GET ALL STUDENTS WITH LIVE TODAY'S ATTENDANCE STATUS
 router.get('/', auth, isFaculty, async (req, res) => {
     try {
         // Force fully explicit query including email field context execution mapping
         const recentStudents = await User.find({ role: 'student' }).sort({ createdAt: -1 });
 
+        // Get start and end boundaries for today's dynamic system date tracking
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        const todayEnd = new Date();
+        todayEnd.setHours(23, 59, 59, 999);
+
         const formattedStudents = await Promise.all(recentStudents.map(async (s) => {
+            // 1. Live financial tracking evaluation
             const feeRecord = await Fee.findOne({ studentId: s._id });
             const dynamicFeeStatus = feeRecord ? feeRecord.status : 'pending';
+
+            // 2. 📅 LIVE TODAY'S ATTENDANCE CHECK
+            const todayAttendance = await Attendance.findOne({
+                studentId: s._id,
+                date: { $gte: todayStart, $lte: todayEnd }
+            });
+            
+            const todayStatus = todayAttendance ? todayAttendance.status : 'Not Marked';
 
             return {
                 _id: s._id,
@@ -22,7 +45,8 @@ router.get('/', auth, isFaculty, async (req, res) => {
                 course: s.course || '—',
                 branch: s.branch || '—',
                 year: s.year || '—',
-                feeStatus: dynamicFeeStatus
+                feeStatus: dynamicFeeStatus,
+                todayStatus: todayStatus // Exposed status flag mapping to frontend templates
             };
         }));
 
