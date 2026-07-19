@@ -2,7 +2,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const path = require('path'); // 🟢 Niche se upar shift kiya
+const path = require('path'); 
 require('dotenv').config();
 
 // 2. APP INITIALIZATION
@@ -19,6 +19,7 @@ app.use('/api/students', require('./routes/students'));
 app.use('/api/attendance', require('./routes/attendance'));
 app.use('/api/fees', require('./routes/fees'));
 app.use('/api/results', require('./routes/results'));
+app.use('/api/faculty', require('./routes/faculty')); // ✅ Added Faculty Route Management
 
 // 5. STATIC FILES & FRONTEND PAGES
 // Pehle Home page ka redirect chalega
