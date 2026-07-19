@@ -198,7 +198,6 @@
     .btn:active:not(:disabled) { transform: scale(0.99); }
     .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    /* Spinner Loader CSS Fix */
     .spinner {
       width: 16px; height: 16px;
       border: 2px solid rgba(255,255,255,0.3);
@@ -327,7 +326,6 @@
     try {
         console.log("Sending login request to backend..."); 
         
-        // ✅ Added missing "/api" base router link configuration match
         const res = await fetch(`${API_URL}/api/auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -341,13 +339,21 @@
             console.log("Login Success! Saving token...");
             
             localStorage.setItem("token", data.token);
-            localStorage.setItem("user", JSON.stringify(data.user || { name: "User", role: "admin" }));
+            localStorage.setItem("user", JSON.stringify(data.user));
 
             if (successAlert) successAlert.classList.add("show");
             
             setTimeout(() => {
-                console.log("Redirecting to dashboard...");
-                window.location.href = "index.html"; 
+                console.log("Redirecting to specific dashboard based on role...");
+                
+                // Dynamic routing logic maps user roles directly to unique interface endpoints
+                if (data.user && data.user.role === 'admin') {
+                    window.location.href = "admin-dashboard.html";
+                } else if (data.user && data.user.role === 'faculty') {
+                    window.location.href = "index.html"; // Repurposed current admin files for faculty operations
+                } else {
+                    window.location.href = "profile.html"; // Redirects students to their personal layout
+                }
             }, 1000);
 
         } else {
