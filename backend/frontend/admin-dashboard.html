@@ -324,8 +324,8 @@
         const tbody = document.querySelector('#studentsTable tbody');
         tbody.innerHTML = data.length ? data.map(s => {
           let attClass = 'not-marked';
-          if(s.todayStatus.toLowerCase() === 'present') attClass = 'present';
-          if(s.todayStatus.toLowerCase() === 'absent') attClass = 'absent';
+          if(s.todayStatus && s.todayStatus.toLowerCase() === 'present') attClass = 'present';
+          if(s.todayStatus && s.todayStatus.toLowerCase() === 'absent') attClass = 'absent';
           
           return `
             <tr>
@@ -333,7 +333,7 @@
               <td><strong>${s.name}</strong></td>
               <td>${s.email}</td>
               <td>${s.course} (${s.branch})</td>
-              <td><span class="att-badge ${attClass}">${s.todayStatus}</span></td>
+              <td><span class="att-badge ${attClass}">${s.todayStatus || 'Not Marked'}</span></td>
               <td><span class="fee-status ${s.feeStatus}">${s.feeStatus}</span></td>
               <td><button class="action-btn" onclick="deleteRecord('students', '${s._id}')">Delete</button></td>
             </tr>
