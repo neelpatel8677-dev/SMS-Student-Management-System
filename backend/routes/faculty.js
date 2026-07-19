@@ -1,7 +1,28 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
-const { auth, isFaculty, isAdmin } = require('../middleware/auth'); // Added isFaculty context integration
+const { auth, isFaculty, isAdmin } = require('../middleware/auth'); 
+
+// 👨‍🏫 FACULTY: APNA SELF PROFILE DEKHO
+router.get('/me', auth, async (req, res) => {
+    try {
+        const faculty = await User.findById(req.user.id).select('-password');
+        if (!faculty) {
+            return res.status(404).json({ error: true, message: "Faculty profile not found." });
+        }
+        
+        return res.status(200).json({
+            _id: faculty._id,
+            name: faculty.name,
+            email: faculty.email,
+            department: faculty.department || '—',
+            role: faculty.role
+        });
+    } catch (err) {
+        console.error("Faculty Me Fetching Error:", err);
+        return res.status(500).json({ error: true, message: "Server error loading profile metrics." });
+    }
+});
 
 // 👥 FACULTY & ADMIN: GET ALL REGISTERED FACULTY MEMBERS
 router.get('/', auth, isFaculty, async (req, res) => {
