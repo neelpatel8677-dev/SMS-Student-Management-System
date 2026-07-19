@@ -5,6 +5,35 @@ const Fee = require('../models/fee');
 const mongoose = require('mongoose');
 const { auth, isFaculty, isAdmin } = require('../middleware/auth'); 
 
+// 🎓 STUDENT: APNA SELF PROFILE DEKHO
+router.get('/me', auth, async (req, res) => {
+    try {
+        const student = await User.findById(req.user.id).select('-password'); 
+        if (!student) {
+            return res.status(404).json({ error: true, message: "Student profile not found." });
+        }
+        
+        // Live financial fee status verification
+        const feeRecord = await Fee.findOne({ studentId: student._id });
+        const dynamicFeeStatus = feeRecord ? feeRecord.status : 'pending';
+
+        return res.status(200).json({
+            _id: student._id,
+            name: student.name,
+            email: student.email,
+            rollNo: student.rollNo || '—',
+            course: student.course || '—',
+            branch: student.branch || '—',
+            year: student.year || '—',
+            role: student.role,
+            feeStatus: dynamicFeeStatus
+        });
+    } catch (err) {
+        console.error("Student Me Fetching Error:", err);
+        return res.status(500).json({ error: true, message: "Server error loading profile metrics." });
+    }
+});
+
 // 👥 FACULTY & ADMIN: GET ALL STUDENTS WITH LIVE TODAY'S ATTENDANCE STATUS
 router.get('/', auth, isFaculty, async (req, res) => {
     try {
