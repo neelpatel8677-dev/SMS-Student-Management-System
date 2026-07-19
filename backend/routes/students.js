@@ -1,22 +1,36 @@
 const express = require('express');
-const router = express.Router();
+const router = report = express.Router();
 const User = require('../models/User');
 const Fee = require('../models/fee'); 
-const { auth, isFaculty, isAdmin } = require('../middleware/auth'); // Updated to use new middleware methods
+const { auth, isFaculty, isAdmin } = require('../middleware/auth'); 
 
-// 👥 FACULTY & ADMIN: GET ALL STUDENTS
+// 👥 FACULTY & ADMIN: GET ALL STUDENTS WITH DEEP ACTIVITY VISIBILITY
 router.get('/', auth, isFaculty, async (req, res) => {
     try {
         const recentStudents = await User.find({ role: 'student' }).sort({ createdAt: -1 });
 
-        const formattedStudents = recentStudents.map(s => ({
-            _id: s._id,
-            name: s.name || '—',
-            rollNo: s.rollNo || '—',
-            course: s.course || '—',
-            branch: s.branch || '—',
-            year: s.year || '—',
-            feeStatus: "pending"
+        // Map through users and inject live activities / financial states for comprehensive visibility
+        const formattedStudents = await Promise.all(recentStudents.map(async (s) => {
+            // Fetch the live database fee status dynamically for this student
+            const feeRecord = await Fee.findOne({ studentId: s._id });
+            const dynamicFeeStatus = feeRecord ? feeRecord.status : 'pending';
+
+            return {
+                _id: s._id,
+                name: s.name || '—',
+                email: s.email || '—', // ✅ FIX: Added missing email property so it shows up in dashboard tables
+                rollNo: s.rollNo || '—',
+                course: s.course || '—',
+                branch: s.branch || '—',
+                year: s.year || '—',
+                feeStatus: dynamicFeeStatus,
+                // Activity endpoints context mappings provided for full administrative control pipelines
+                activityLinks: {
+                    attendance: `/api/attendance/student/${s._id}`,
+                    fees: `/api/fees/student/${s._id}`,
+                    results: `/api/results/student/${s._id}`
+                }
+            };
         }));
 
         return res.status(200).json(formattedStudents);
@@ -96,7 +110,7 @@ router.put('/:id', auth, isFaculty, async (req, res) => {
     }
 });
 
-// 🚫 SUPER ADMIN ONLY: DELETE STUDENT
+// 🚫 SUPER ADMIN ONLY: DELETE STUDENT WITH TRANSACTIONS CLEANUP
 router.delete('/:id', auth, isAdmin, async (req, res) => {
     try {
         const studentId = req.params.id;
