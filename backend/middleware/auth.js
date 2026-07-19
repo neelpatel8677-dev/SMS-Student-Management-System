@@ -1,36 +1,65 @@
 const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || "YOUR_FALLBACK_JWT_SECRET_KEY";
 
-// ✅ AUTH MIDDLEWARE — Har protected route pe lagega
-const authMiddleware = (req, res, next) => {
-    try {
-        // Token header se lo
-        const authHeader = req.headers['authorization'];
+/**
+ * Authentication Middleware
+ * Validates the token sent in the Authorization header and attaches the user payload to the request.
+ */
+const auth = function (req, res, next) {
+  // 1. Extract the token from the standard Authorization header format (Bearer <token>)
+  const authHeader = req.header('Authorization');
+  let token;
 
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ message: "Access denied. No token provided." });
-        }
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.split(' ')[1];
+  }
 
-        const token = authHeader.split(' ')[1];
+  // Fallback: Check if the token was sent directly in a custom header field
+  if (!token) {
+    token = req.header('x-auth-token');
+  }
 
-        // Token verify karo
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  // 2. Reject the request immediately if no token structure exists
+  if (!token) {
+    return res.status(401).json({ message: 'No authorization token found. Access denied.' });
+  }
 
-        // User info request mein daal do (agle middleware/route ke liye)
-        req.user = decoded;
-        next();
+  try {
+    // 3. Decrypt and verify the validation payload footprint
+    const decoded = jwt.verify(token, JWT_SECRET);
 
-    } catch (err) {
-        return res.status(401).json({ message: "Invalid or expired token. Please login again." });
-    }
+    // 4. Mount the structural identity data onto the request pipeline
+    req.user = decoded;
+    
+    next();
+  } catch (err) {
+    console.error('Middleware token signature verification failure:', err.message);
+    res.status(401).json({ message: 'Token execution failed verification. Access denied.' });
+  }
 };
 
-// ✅ ADMIN ONLY MIDDLEWARE — Sirf admin routes ke liye
-const adminMiddleware = (req, res, next) => {
-    if (req.user && req.user.role === 'admin') {
-        next();
-    } else {
-        return res.status(403).json({ message: "Access denied. Admins only." });
-    }
+/**
+ * Faculty Access Middleware
+ * Allows entry if the user is either a Faculty member or the Super Admin
+ */
+const isFaculty = function (req, res, next) {
+  if (req.user && (req.user.role === 'faculty' || req.user.role === 'admin')) {
+    next();
+  } else {
+    return res.status(403).json({ message: 'Access denied. Faculty or Admin access only.' });
+  }
 };
 
-module.exports = { authMiddleware, adminMiddleware };
+/**
+ * Super Admin Only Middleware
+ * Restricts entry strictly to the hardcoded Super Admin
+ */
+const isAdmin = function (req, res, next) {
+  if (req.user && req.user.role === 'admin') {
+    next();
+  } else {
+    return res.status(403).json({ message: 'Access denied. Super Admin access only.' });
+  }
+};
+
+module.exports = { auth, isFaculty, isAdmin };
