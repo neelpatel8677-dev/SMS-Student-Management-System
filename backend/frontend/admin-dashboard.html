@@ -19,6 +19,7 @@
       --muted:     #8b949e;
       --error:     #f85149;
       --success:   #3fb950;
+      --warning:   #e3b341;
     }
 
     body {
@@ -72,7 +73,7 @@
 
     main {
       padding: 2rem;
-      max-width: 1200px;
+      max-width: 1250px;
       width: 100%;
       margin: 0 auto;
       flex: 1;
@@ -133,6 +134,7 @@
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 1.5rem;
+      overflow-x: auto;
     }
 
     .panel.active {
@@ -144,17 +146,43 @@
       border-collapse: collapse;
       margin-top: 1rem;
       text-align: left;
+      min-width: 800px;
     }
 
     th, td {
       padding: 0.75rem 1rem;
       border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
     }
 
     th {
       color: var(--muted);
       font-weight: 500;
-      font-size: 0.9rem;
+    }
+
+    .control-links {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .badge-btn {
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: background 0.2s;
+    }
+
+    .badge-btn.attendance { background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.3); color: #60a5fa; }
+    .badge-btn.fees { background: rgba(63,185,80,0.1); border-color: rgba(63,185,80,0.3); color: #4ade80; }
+    .badge-btn.results { background: rgba(227,179,65,0.1); border-color: rgba(227,179,65,0.3); color: #fbbf24; }
+
+    .badge-btn:hover {
+      opacity: 0.85;
     }
 
     .action-btn {
@@ -168,6 +196,13 @@
     .action-btn:hover {
       text-decoration: underline;
     }
+
+    .fee-status {
+      text-transform: capitalize;
+      font-weight: 600;
+    }
+    .fee-status.paid { color: var(--success); }
+    .fee-status.pending { color: var(--warning); }
   </style>
 </head>
 <body>
@@ -217,7 +252,7 @@
 
     <!-- Student Management View -->
     <div id="studentsPanel" class="panel">
-      <h2>Registered Students</h2>
+      <h2>Registered Students & Activities Control</h2>
       <table id="studentsTable">
         <thead>
           <tr>
@@ -225,11 +260,13 @@
             <th>Name</th>
             <th>Email</th>
             <th>Course & Branch</th>
+            <th>Fee Status</th>
+            <th>Deep Performance Tracking Links</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td colspan="5">Loading data fields...</td></tr>
+          <tr><td colspan="7">Loading data fields...</td></tr>
         </tbody>
       </table>
     </div>
@@ -239,7 +276,6 @@
     const API_URL = "https://sms-student-management-system-1.onrender.com";
     const token = localStorage.getItem("token");
 
-    // Secure authorization gateway verification check
     if (!token) {
       window.location.href = "login.html";
     }
@@ -302,19 +338,27 @@
         tbody.innerHTML = data.length ? data.map(s => `
           <tr>
             <td>${s.rollNo}</td>
-            <td>${s.name}</td>
-            <td>${s.email || '—'}</td>
+            <td><strong>${s.name}</strong></td>
+            <td>${s.email}</td>
             <td>${s.course} (${s.branch})</td>
+            <td><span class="fee-status ${s.feeStatus}">${s.feeStatus}</span></td>
+            <td>
+              <div class="control-links">
+                <a href="admin-attendance.html?studentId=${s._id}" class="badge-btn attendance">📅 Attendance</a>
+                <a href="admin-fees.html?studentId=${s._id}" class="badge-btn fees">💵 Fees</a>
+                <a href="admin-results.html?studentId=${s._id}" class="badge-btn results">📝 Results</a>
+              </div>
+            </td>
             <td><button class="action-btn" onclick="deleteRecord('students', '${s._id}')">Delete</button></td>
           </tr>
-        `).join('') : `<tr><td colspan="5">No student entries found.</td></tr>`;
+        `).join('') : `<tr><td colspan="7">No student entries found.</td></tr>`;
       } catch (err) {
-        document.querySelector('#studentsTable tbody').innerHTML = `<tr><td colspan="5" style="color:var(--error)">Error loading rows.</td></tr>`;
+        document.querySelector('#studentsTable tbody').innerHTML = `<tr><td colspan="7" style="color:var(--error)">Error loading rows.</td></tr>`;
       }
     }
 
     async function deleteRecord(endpoint, id) {
-      if (!confirm(`Are you sure you want to delete this structural account?`)) return;
+      if (!confirm(`Are you sure you want to completely delete this structural account?`)) return;
       try {
         const res = await fetch(`${API_URL}/api/${endpoint}/${id}`, {
           method: "DELETE",
