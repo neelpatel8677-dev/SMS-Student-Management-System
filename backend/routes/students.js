@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
-const Fee = require('../models/fee'); // ✅ Added
-const { authMiddleware, adminMiddleware } = require('../middleware/auth');
+const Fee = require('../models/fee'); 
+const { auth, isFaculty, isAdmin } = require('../middleware/auth'); // Updated to use new middleware methods
 
-// ✅ ADMIN ONLY: GET ALL STUDENTS
-router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
+// 👥 FACULTY & ADMIN: GET ALL STUDENTS
+router.get('/', auth, isFaculty, async (req, res) => {
     try {
         const recentStudents = await User.find({ role: 'student' }).sort({ createdAt: -1 });
 
@@ -26,8 +26,8 @@ router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
     }
 });
 
-// ✅ ADMIN ONLY: TOTAL STUDENTS COUNT
-router.get('/count', authMiddleware, adminMiddleware, async (req, res) => {
+// 📊 FACULTY & ADMIN: TOTAL STUDENTS COUNT
+router.get('/count', auth, isFaculty, async (req, res) => {
     try {
         const totalStudents = await User.countDocuments({ role: 'student' });
         const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
@@ -42,12 +42,12 @@ router.get('/count', authMiddleware, adminMiddleware, async (req, res) => {
     }
 });
 
-// ✅ STUDENT: APNA PROFILE DEKHO
-router.get('/me', authMiddleware, async (req, res) => {
+// 🎓 STUDENT: APNA PROFILE DEKHO
+router.get('/me', auth, async (req, res) => {
     try {
-        const studentId = req.user.id; // ✅ JWT se lo, header se nahi
+        const studentId = req.user.id; 
 
-        const student = await User.findById(studentId).select('-password'); // ✅ Password hide karo
+        const student = await User.findById(studentId).select('-password'); 
         if (!student) return res.status(404).json({ message: "Student not found." });
 
         return res.status(200).json(student);
@@ -56,10 +56,10 @@ router.get('/me', authMiddleware, async (req, res) => {
     }
 });
 
-// ✅ STUDENT: APNA PROFILE UPDATE KARO
-router.put('/me', authMiddleware, async (req, res) => {
+// ✍️ STUDENT: APNA PROFILE UPDATE KARO
+router.put('/me', auth, async (req, res) => {
     try {
-        const studentId = req.user.id; // ✅ JWT se lo
+        const studentId = req.user.id; 
         const { name, rollNo, course, branch, year } = req.body;
 
         const updatedStudent = await User.findByIdAndUpdate(
@@ -74,29 +74,8 @@ router.put('/me', authMiddleware, async (req, res) => {
     }
 });
 
-// ✅ ADMIN ONLY: DELETE STUDENT
-router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
-    try {
-        const studentId = req.params.id;
-
-        // ✅ Delete student's fee record first
-        await Fee.deleteOne({ studentId });
-
-        const deletedUser = await User.findByIdAndDelete(studentId);
-
-        if (!deletedUser) {
-            return res.status(404).json({ error: true, message: "Student not found." });
-        }
-
-        return res.status(200).json({ error: false, message: "Student deleted successfully! 🚀" });
-    } catch (err) {
-        console.error("Delete Error:", err);
-        return res.status(500).json({ error: true, message: "Server error." });
-    }
-});
-
-// ✅ ADMIN ONLY: UPDATE STUDENT
-router.put('/:id', authMiddleware, adminMiddleware, async (req, res) => {
+// 🛠️ FACULTY & ADMIN: UPDATE STUDENT
+router.put('/:id', auth, isFaculty, async (req, res) => {
     try {
         const studentId = req.params.id;
         const { name, rollNo, course, branch, year } = req.body;
@@ -113,6 +92,27 @@ router.put('/:id', authMiddleware, adminMiddleware, async (req, res) => {
 
         return res.status(200).json({ error: false, message: "Updated successfully!", student: updatedUser });
     } catch (err) {
+        return res.status(500).json({ error: true, message: "Server error." });
+    }
+});
+
+// 🚫 SUPER ADMIN ONLY: DELETE STUDENT
+router.delete('/:id', auth, isAdmin, async (req, res) => {
+    try {
+        const studentId = req.params.id;
+
+        // Delete student's fee record first
+        await Fee.deleteOne({ studentId });
+
+        const deletedUser = await User.findByIdAndDelete(studentId);
+
+        if (!deletedUser) {
+            return res.status(404).json({ error: true, message: "Student not found." });
+        }
+
+        return res.status(200).json({ error: false, message: "Student deleted successfully! 🚀" });
+    } catch (err) {
+        console.error("Delete Error:", err);
         return res.status(500).json({ error: true, message: "Server error." });
     }
 });
