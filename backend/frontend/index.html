@@ -581,7 +581,7 @@
             gap: 1.25rem;
         }
 
-        /* ── Modernized Modal Styles ── */
+        /* ── Modernized Modal Structure Fix ── */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -1066,30 +1066,60 @@
         </div>
     </div>
 
-    <!-- ==================== POPUP FORM ENTRY LAYOUT MODALS ==================== -->
+    <!-- ==================== DYNAMICALLY ALIGNED FIXED GRID OVERLAY MODALS ==================== -->
     <div class="modal-overlay" id="addStudentModal">
-        <div class="modal-card"><button class="close-modal" onclick="closeModal('addStudentModal')">✕</button>
+        <div class="modal-card">
+            <button class="close-modal" onclick="closeModal('addStudentModal')">✕</button>
             <h3>Add New Student Account</h3>
             <form id="addStudentForm">
                 <div class="form-row">
-                    <div class="form-group"><label for="sfName">First Name</label><input type="text" id="sfName" required placeholder="John"></div>
-                    <div class="form-group"><label for="slName">Last Name</label><input type="text" id="slName" required placeholder="Doe"></div>
+                    <div class="form-group">
+                        <label for="sfName">First Name</label>
+                        <input type="text" id="sfName" required placeholder="John">
+                    </div>
+                    <div class="form-group">
+                        <label for="slName">Last Name</label>
+                        <input type="text" id="slName" required placeholder="Doe">
+                    </div>
                 </div>
-                <div class="form-group"><label for="sEmail">Email Address</label><input type="email" id="sEmail" required placeholder="student@sms.com"></div>
-                <div class="form-row">
-                    <div class="form-group"><label for="sRoll">Roll Number</label><input type="text" id="sRoll" required placeholder="e.g. 202601"></div>
-                    <div class="form-group"><label for="sCourse">Course</label><input type="text" id="sCourse" placeholder="e.g. B.Sc" required></div>
+                
+                <div class="form-group">
+                    <label for="sEmail">Email Address</label>
+                    <input type="email" id="sEmail" required placeholder="student@sms.com">
                 </div>
+                
                 <div class="form-row">
-                    <div class="form-group"><label for="sBranch">Branch</label><input type="text" id="sBranch" required placeholder="CS"></div>
-                    <div class="form-group"><label for="sYear">Year</label><select id="sYear" required>
+                    <div class="form-group">
+                        <label for="sRoll">Roll Number</label>
+                        <input type="text" id="sRoll" required placeholder="e.g. 202601">
+                    </div>
+                    <div class="form-group">
+                        <label for="sCourse">Course</label>
+                        <input type="text" id="sCourse" placeholder="e.g. B.Sc" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sBranch">Branch</label>
+                        <input type="text" id="sBranch" required placeholder="CS">
+                    </div>
+                    <div class="form-group">
+                        <label for="sYear">Year</label>
+                        <select id="sYear" required>
                             <option value="1">1st Year</option>
                             <option value="2">2nd Year</option>
                             <option value="3">3rd Year</option>
                             <option value="4">4th Year</option>
-                        </select></div>
+                        </select>
+                    </div>
                 </div>
-                <div class="form-group"><label for="sPassword">Access Password</label><input type="password" id="sPassword" required minlength="6" placeholder="Min 6 characters"></div>
+                
+                <div class="form-group">
+                    <label for="sPassword">Access Password</label>
+                    <input type="password" id="sPassword" required minlength="6" placeholder="Min 6 characters">
+                </div>
+                
                 <button type="submit" class="modal-submit-btn">Publish Student Record</button>
             </form>
         </div>
@@ -1220,7 +1250,6 @@
                 <tr><td><strong>${s.name}</strong></td><td>${s.rollNo || '—'}</td><td>${s.course || '—'}</td><td><span class="pill ${s.feeStatus === 'paid' ? 'paid' : 'pending'}">${s.feeStatus}</span></td></tr>
             `).join('');
 
-            // Quick Actions implementation mappings safely bind to active view layers & explicit triggers
             bottom.innerHTML = `
                 <div class="panel">
                   <div class="panel-header"><span class="panel-title">Recent Students</span><span class="panel-link" onclick="switchWorkspaceView('studentsListView','nav-students')">View all →</span></div>
@@ -1408,7 +1437,7 @@
                   <td><div style="display:flex;align-items:center;gap:0.5rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">${s.name.charAt(0).toUpperCase()}</div><div><strong>${s.name}</strong><br><small style="color:var(--muted)">${s.rollNo || 1}</small></div></div></td>
                   <td>${s.course || 'B.Sc'} / Yr ${s.year || 1}</td><td>Sem1</td>
                   <td style="color:#fff;font-weight:600;">70 <br><small style="color:var(--muted)">Obtained</small></td><td><strong>100</strong></td>
-                  <td><div style="display:flex;align-items:center;gap:0.4rem;"><div style="background:var(--border);width:40px;height:4px;"><div style="background:var(--warning);width:70%;height:100%;"></div></div>70%</div></td>
+                  <td><div style="display:flex; align-items:center; gap:0.4rem;"><div style="background:var(--border);width:40px;height:4px;"><div style="background:var(--warning);width:70%;height:100%;"></div></div>70%</div></td>
                   <td><span class="pill" style="background:rgba(37,99,235,0.15);color:#93c5fd;">B</span></td><td><span class="pill present">✓ Pass</span></td>
                   <td><button class="btn-inline-edit">📝</button></td>
                 </tr>`).join('');
