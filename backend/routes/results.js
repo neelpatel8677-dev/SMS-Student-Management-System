@@ -3,10 +3,10 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const Result = require('../models/Result');
 const User = require('../models/User');
-const { authMiddleware, adminMiddleware } = require('../middleware/auth');
+const { auth, isFaculty, isAdmin } = require('../middleware/auth'); // Updated to use the new middleware framework
 
-// ✅ ADMIN ONLY: ALL RESULTS DEKHO
-router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
+// 👥 FACULTY & ADMIN: ALL RESULTS DEKHO
+router.get('/', auth, isFaculty, async (req, res) => {
     try {
         const records = await Result.find({}).populate('studentId', 'name rollNo course branch year');
 
@@ -40,10 +40,10 @@ router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
     }
 });
 
-// ✅ STUDENT: APNE RESULTS DEKHO
-router.get('/me', authMiddleware, async (req, res) => {
+// 🎓 STUDENT: APNE RESULTS DEKHO
+router.get('/me', auth, async (req, res) => {
     try {
-        const studentId = req.user.id; // ✅ JWT se lo
+        const studentId = req.user.id; 
 
         const results = await Result.find({
             studentId: new mongoose.Types.ObjectId(studentId)
@@ -83,8 +83,8 @@ router.get('/me', authMiddleware, async (req, res) => {
     }
 });
 
-// ✅ ADMIN ONLY: NEW RESULT BANAO
-router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
+// 👥 FACULTY & ADMIN: NEW RESULT BANAO
+router.post('/', auth, isFaculty, async (req, res) => {
     try {
         const { studentId, exam, date, passMarks, remarks, subjects, marksObtained, totalMarks, percentage, grade, result } = req.body;
 
@@ -114,8 +114,8 @@ router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
     }
 });
 
-// ✅ ADMIN ONLY: RESULT UPDATE KARO
-router.put('/:id', authMiddleware, adminMiddleware, async (req, res) => {
+// 👥 FACULTY & ADMIN: RESULT UPDATE KARO
+router.put('/:id', auth, isFaculty, async (req, res) => {
     try {
         const { exam, date, passMarks, remarks, subjects, marksObtained, totalMarks, percentage, grade, result } = req.body;
 
@@ -132,8 +132,8 @@ router.put('/:id', authMiddleware, adminMiddleware, async (req, res) => {
     }
 });
 
-// ✅ ADMIN ONLY: RESULT DELETE KARO
-router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
+// 🚫 SUPER ADMIN ONLY: RESULT DELETE KARO
+router.delete('/:id', auth, isAdmin, async (req, res) => {
     try {
         const target = await Result.findByIdAndDelete(req.params.id);
         if (!target) return res.status(404).json({ error: true, message: "Result not found." });
