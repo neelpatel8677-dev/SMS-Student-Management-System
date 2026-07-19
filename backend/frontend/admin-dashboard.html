@@ -73,7 +73,7 @@
 
     main {
       padding: 2rem;
-      max-width: 1250px;
+      max-width: 1350px;
       width: 100%;
       margin: 0 auto;
       flex: 1;
@@ -146,7 +146,7 @@
       border-collapse: collapse;
       margin-top: 1rem;
       text-align: left;
-      min-width: 800px;
+      min-width: 950px;
     }
 
     th, td {
@@ -203,6 +203,19 @@
     }
     .fee-status.paid { color: var(--success); }
     .fee-status.pending { color: var(--warning); }
+
+    /* Live Attendance Badges Styling */
+    .att-badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: inline-block;
+      text-transform: uppercase;
+    }
+    .att-badge.present { background: rgba(63,185,80,0.1); color: var(--success); border: 1px solid rgba(63,185,80,0.2); }
+    .att-badge.absent { background: rgba(248,81,73,0.1); color: var(--error); border: 1px solid rgba(248,81,73,0.2); }
+    .att-badge.not-marked { background: rgba(227,179,65,0.1); color: var(--warning); border: 1px solid rgba(227,179,65,0.2); }
   </style>
 </head>
 <body>
@@ -260,13 +273,14 @@
             <th>Name</th>
             <th>Email</th>
             <th>Course & Branch</th>
+            <th>Today's Attendance</th>
             <th>Fee Status</th>
             <th>Deep Performance Tracking Links</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td colspan="7">Loading data fields...</td></tr>
+          <tr><td colspan="8">Loading data fields...</td></tr>
         </tbody>
       </table>
     </div>
@@ -335,25 +349,33 @@
         const data = await res.json();
         
         const tbody = document.querySelector('#studentsTable tbody');
-        tbody.innerHTML = data.length ? data.map(s => `
-          <tr>
-            <td>${s.rollNo}</td>
-            <td><strong>${s.name}</strong></td>
-            <td>${s.email}</td>
-            <td>${s.course} (${s.branch})</td>
-            <td><span class="fee-status ${s.feeStatus}">${s.feeStatus}</span></td>
-            <td>
-              <div class="control-links">
-                <a href="admin-attendance.html?studentId=${s._id}" class="badge-btn attendance">📅 Attendance</a>
-                <a href="admin-fees.html?studentId=${s._id}" class="badge-btn fees">💵 Fees</a>
-                <a href="admin-results.html?studentId=${s._id}" class="badge-btn results">📝 Results</a>
-              </div>
-            </td>
-            <td><button class="action-btn" onclick="deleteRecord('students', '${s._id}')">Delete</button></td>
-          </tr>
-        `).join('') : `<tr><td colspan="7">No student entries found.</td></tr>`;
+        tbody.innerHTML = data.length ? data.map(s => {
+          // Dynamic CSS status class matching configuration assignments
+          let attClass = 'not-marked';
+          if(s.todayStatus.toLowerCase() === 'present') attClass = 'present';
+          if(s.todayStatus.toLowerCase() === 'absent') attClass = 'absent';
+          
+          return `
+            <tr>
+              <td>${s.rollNo}</td>
+              <td><strong>${s.name}</strong></td>
+              <td>${s.email}</td>
+              <td>${s.course} (${s.branch})</td>
+              <td><span class="att-badge ${attClass}">${s.todayStatus}</span></td>
+              <td><span class="fee-status ${s.feeStatus}">${s.feeStatus}</span></td>
+              <td>
+                <div class="control-links">
+                  <a href="admin-attendance.html?studentId=${s._id}" class="badge-btn attendance">📅 Attendance</a>
+                  <a href="admin-fees.html?studentId=${s._id}" class="badge-btn fees">💵 Fees</a>
+                  <a href="admin-results.html?studentId=${s._id}" class="badge-btn results">📝 Results</a>
+                </div>
+              </td>
+              <td><button class="action-btn" onclick="deleteRecord('students', '${s._id}')">Delete</button></td>
+            </tr>
+          `;
+        }).join('') : `<tr><td colspan="8">No student entries found.</td></tr>`;
       } catch (err) {
-        document.querySelector('#studentsTable tbody').innerHTML = `<tr><td colspan="7" style="color:var(--error)">Error loading rows.</td></tr>`;
+        document.querySelector('#studentsTable tbody').innerHTML = `<tr><td colspan="8" style="color:var(--error)">Error loading rows.</td></tr>`;
       }
     }
 
