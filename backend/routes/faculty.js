@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
-const { auth, isAdmin } = require('../middleware/auth');
+const { auth, isFaculty, isAdmin } = require('../middleware/auth'); // Added isFaculty context integration
 
-// 🛠️ SUPER ADMIN ONLY: GET ALL REGISTERED FACULTY MEMBERS
-router.get('/', auth, isAdmin, async (req, res) => {
+// 👥 FACULTY & ADMIN: GET ALL REGISTERED FACULTY MEMBERS
+router.get('/', auth, isFaculty, async (req, res) => {
     try {
         const facultyMembers = await User.find({ role: 'faculty' }).sort({ createdAt: -1 }).select('-password');
         return res.status(200).json(facultyMembers);
@@ -14,8 +14,8 @@ router.get('/', auth, isAdmin, async (req, res) => {
     }
 });
 
-// 🛠️ SUPER ADMIN ONLY: TOTAL FACULTY COUNT FOR DASHBOARD
-router.get('/count', auth, isAdmin, async (req, res) => {
+// 👥 FACULTY & ADMIN: TOTAL FACULTY COUNT FOR DASHBOARD
+router.get('/count', auth, isFaculty, async (req, res) => {
     try {
         const totalFaculty = await User.countDocuments({ role: 'faculty' });
         return res.status(200).json({ total: totalFaculty });
@@ -24,7 +24,7 @@ router.get('/count', auth, isAdmin, async (req, res) => {
     }
 });
 
-// 🛠️ SUPER ADMIN ONLY: DELETE A FACULTY MEMBER
+// 🚫 SUPER ADMIN ONLY: DELETE A FACULTY MEMBER
 router.delete('/:id', auth, isAdmin, async (req, res) => {
     try {
         const facultyId = req.params.id;
