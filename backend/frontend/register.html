@@ -169,10 +169,6 @@
       color: #93c5fd;
     }
 
-    .role-icon {
-      font-size: 1.2rem;
-    }
-
     .form-group {
       margin-bottom: 1.1rem;
     }
@@ -356,7 +352,8 @@
       text-decoration: underline;
     }
 
-    #studentFields, #facultyFields {
+    #studentFields,
+    #facultyFields {
       display: none;
     }
 
@@ -400,15 +397,11 @@
       <div class="role-options">
         <label class="role-card">
           <input type="radio" name="role" value="student" id="roleStudent" checked />
-          <span class="role-label">
-            <span class="role-icon">🎒</span> Student
-          </span>
+          <span class="role-label">🎒 Student</span>
         </label>
         <label class="role-card">
           <input type="radio" name="role" value="faculty" id="roleFaculty" />
-          <span class="role-label">
-            <span class="role-icon">👨‍🏫</span> Faculty
-          </span>
+          <span class="role-label">👨‍🏫 Faculty</span>
         </label>
       </div>
     </div>
@@ -463,6 +456,10 @@
         <label for="department">Department</label>
         <input type="text" id="department" placeholder="e.g. Information Technology" />
       </div>
+      <div class="form-group">
+        <label for="facultySecretKey" style="color: var(--warning);">Faculty Secret Key 🔑</label>
+        <input type="password" id="facultySecretKey" placeholder="Enter faculty system registration code" />
+      </div>
     </div>
 
     <div class="form-group">
@@ -496,7 +493,7 @@
   </div>
 
   <script>
-    const API_URL = "https://sms-student-management-system-1.onrender.com"; 
+    const API_URL = "https://sms-student-management-system-1.onrender.com";
     const REGISTER_URL = `${API_URL}/api/auth/register`;
     const REDIRECT = 'login.html';
 
@@ -508,6 +505,7 @@
     const branchEl = document.getElementById('branch');
     const yearEl = document.getElementById('year');
     const departmentEl = document.getElementById('department');
+    const facultySecretKeyEl = document.getElementById('facultySecretKey');
     const passwordEl = document.getElementById('password');
     const confirmPasswordEl = document.getElementById('confirmPassword');
     const registerBtn = document.getElementById('registerBtn');
@@ -537,7 +535,6 @@
       radio.addEventListener('change', toggleFields);
     });
 
-    // Run initial configuration state layout load check
     toggleFields();
 
     function makeToggle(inputEl, btn) {
@@ -574,7 +571,7 @@
       strengthText.style.color = level.color;
     });
 
-    [firstNameEl, lastNameEl, emailEl, rollNoEl, courseEl, branchEl, yearEl, departmentEl, passwordEl, confirmPasswordEl].forEach(el => {
+    [firstNameEl, lastNameEl, emailEl, rollNoEl, courseEl, branchEl, yearEl, departmentEl, facultySecretKeyEl, passwordEl, confirmPasswordEl].forEach(el => {
       if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') handleRegister(); });
     });
 
@@ -614,12 +611,13 @@
       if (role === 'student') {
         if (!rollNoEl.value.trim()) { showError('Roll number is required.'); rollNoEl.focus(); return false; }
         if (!courseEl.value.trim()) { showError('Course is required.'); courseEl.focus(); return false; }
-        if (!branchEl.value.trim()) { showError('Branch is required.'); branchEl.focus(); return false; }
+        if (!branchEl.value.trim()) { showError('Branch is solid requirement.'); branchEl.focus(); return false; }
         if (!yearEl.value) { showError('Please select your year.'); yearEl.focus(); return false; }
       }
 
       if (role === 'faculty') {
         if (!departmentEl.value.trim()) { showError('Department is required for faculty registration.'); departmentEl.focus(); return false; }
+        if (!facultySecretKeyEl.value.trim()) { showError('Faculty Secret Key is required.'); facultySecretKeyEl.focus(); return false; }
       }
 
       if (!passwordEl.value) { showError('Password is required.'); passwordEl.focus(); return false; }
@@ -650,7 +648,8 @@
         payload.branch = branchEl.value.trim();
         payload.year = parseInt(yearEl.value);
       } else if (role === 'faculty') {
-        payload.department = departmentEl.value.trim(); 
+        payload.department = departmentEl.value.trim();
+        payload.facultySecretKey = facultySecretKeyEl.value.trim();
       }
 
       setLoading(true);
