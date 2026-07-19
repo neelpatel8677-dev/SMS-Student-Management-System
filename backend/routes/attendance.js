@@ -3,12 +3,12 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const Attendance = require('../models/Attendance');
 const User = require('../models/User');
-const { authMiddleware, adminMiddleware } = require('../middleware/auth');
+const { auth, isFaculty } = require('../middleware/auth'); // Updated to use the new middleware framework
 
-// ✅ STUDENT: APNI ATTENDANCE DEKHO
-router.get('/me', authMiddleware, async (req, res) => {
+// 🎓 STUDENT: APNI ATTENDANCE DEKHO
+router.get('/me', auth, async (req, res) => {
     try {
-        const studentId = req.user.id; // ✅ JWT se lo
+        const studentId = req.user.id; 
 
         const logs = await Attendance.find({
             studentId: new mongoose.Types.ObjectId(studentId)
@@ -38,8 +38,8 @@ router.get('/me', authMiddleware, async (req, res) => {
     }
 });
 
-// ✅ ADMIN ONLY: ATTENDANCE MARK KARO
-router.post('/mark', authMiddleware, adminMiddleware, async (req, res) => {
+// 👥 FACULTY & ADMIN: ATTENDANCE MARK KARO
+router.post('/mark', auth, isFaculty, async (req, res) => {
     try {
         const { rollNo, date, status, remarks } = req.body;
 
@@ -68,8 +68,8 @@ router.post('/mark', authMiddleware, adminMiddleware, async (req, res) => {
     }
 });
 
-// ✅ ADMIN ONLY: ATTENDANCE SUMMARY
-router.get('/summary', authMiddleware, adminMiddleware, async (req, res) => {
+// 👥 FACULTY & ADMIN: ATTENDANCE SUMMARY
+router.get('/summary', auth, isFaculty, async (req, res) => {
     try {
         const totalStudents = await User.countDocuments({ role: 'student' });
 
