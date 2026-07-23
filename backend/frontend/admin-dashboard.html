@@ -277,75 +277,93 @@
       document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
 
       if (target === 'faculty') {
-        document.querySelector('[onclick="switchTab(\'faculty\')"]').classList.add('active');
+        document.querySelectorAll('.tab')[0].classList.add('active');
         document.getElementById('facultyPanel').classList.add('active');
       } else {
-        document.querySelector('[onclick="switchTab(\'students\')"]').classList.add('active');
+        document.querySelectorAll('.tab')[1].classList.add('active');
         document.getElementById('studentsPanel').classList.add('active');
       }
     }
 
     async function fetchStats() {
       try {
-        const fRes = await fetch(`${API_URL}/api/faculty/count`, { headers: { "Authorization": `Bearer ${token}` } });
-        const sRes = await fetch(`${API_URL}/api/students/count`, { headers: { "Authorization": `Bearer ${token}` } });
+        const headers = { "Authorization": `Bearer ${token}` };
+        const fRes = await fetch(`${API_URL}/api/faculty/count`, { headers });
+        const sRes = await fetch(`${API_URL}/api/students/count`, { headers });
         
-        if(fRes.ok) document.getElementById('facultyCount').textContent = (await fRes.json()).total;
-        if(sRes.ok) document.getElementById('studentCount').textContent = (await sRes.json()).total;
-      } catch (err) { console.error("Stats fetching error:", err); }
+        if (fRes.ok) {
+          const fData = await fRes.json();
+          document.getElementById('facultyCount').textContent = fData.total ?? 0;
+        }
+        if (sRes.ok) {
+          const sData = await sRes.json();
+          document.getElementById('studentCount').textContent = sData.total ?? 0;
+        }
+      } catch (err) { 
+        console.error("Stats fetching error:", err); 
+      }
     }
 
     async function loadFaculty() {
       try {
-        const res = await fetch(`${API_URL}/api/faculty`, { headers: { "Authorization": `Bearer ${token}` } });
-        if (!res.ok) throw new Error();
+        const res = await fetch(`${API_URL}/api/faculty`, { 
+          headers: { "Authorization": `Bearer ${token}` } 
+        });
+        if (!res.ok) throw new Error("HTTP error " + res.status);
         const data = await res.json();
         
         const tbody = document.querySelector('#facultyTable tbody');
-        tbody.innerHTML = data.length ? data.map(f => `
+        tbody.innerHTML = (Array.isArray(data) && data.length) ? data.map(f => `
           <tr>
-            <td>${f.name}</td>
-            <td>${f.email}</td>
+            <td><strong>${f.name || '—'}</strong></td>
+            <td>${f.email || '—'}</td>
             <td>${f.department || '—'}</td>
             <td><button class="action-btn" onclick="deleteRecord('faculty', '${f._id}')">Remove</button></td>
           </tr>
-        `).join('') : `<tr><td colspan="4">No faculty entries found.</td></tr>`;
+        `).join('') : `<tr><td colspan="4" style="text-align:center; color:var(--muted)">No faculty entries found.</td></tr>`;
       } catch (err) {
-        document.querySelector('#facultyTable tbody').innerHTML = `<tr><td colspan="4" style="color:var(--error)">Error loading rows.</td></tr>`;
+        console.error("Faculty load error:", err);
+        document.querySelector('#facultyTable tbody').innerHTML = `<tr><td colspan="4" style="color:var(--error); text-align:center;">Error loading rows. Please check server.</td></tr>`;
       }
     }
 
     async function loadStudents() {
       try {
-        const res = await fetch(`${API_URL}/api/students`, { headers: { "Authorization": `Bearer ${token}` } });
-        if (!res.ok) throw new Error();
+        const res = await fetch(`${API_URL}/api/students`, { 
+          headers: { "Authorization": `Bearer ${token}` } 
+        });
+        if (!res.ok) throw new Error("HTTP error " + res.status);
         const data = await res.json();
         
         const tbody = document.querySelector('#studentsTable tbody');
-        tbody.innerHTML = data.length ? data.map(s => {
+        tbody.innerHTML = (Array.isArray(data) && data.length) ? data.map(s => {
           let attClass = 'not-marked';
-          if(s.todayStatus && s.todayStatus.toLowerCase() === 'present') attClass = 'present';
-          if(s.todayStatus && s.todayStatus.toLowerCase() === 'absent') attClass = 'absent';
+          const statusLower = (s.todayStatus || '').toLowerCase();
+          if (statusLower === 'present') attClass = 'present';
+          else if (statusLower === 'absent') attClass = 'absent';
           
+          const feeStatusLower = (s.feeStatus || 'pending').toLowerCase();
+
           return `
             <tr>
-              <td>${s.rollNo}</td>
-              <td><strong>${s.name}</strong></td>
-              <td>${s.email}</td>
-              <td>${s.course} (${s.branch})</td>
+              <td>${s.rollNo || '—'}</td>
+              <td><strong>${s.name || '—'}</strong></td>
+              <td>${s.email || '—'}</td>
+              <td>${s.course || '—'} (${s.branch || '—'})</td>
               <td><span class="att-badge ${attClass}">${s.todayStatus || 'Not Marked'}</span></td>
-              <td><span class="fee-status ${s.feeStatus}">${s.feeStatus}</span></td>
+              <td><span class="fee-status ${feeStatusLower}">${feeStatusLower}</span></td>
               <td><button class="action-btn" onclick="deleteRecord('students', '${s._id}')">Delete</button></td>
             </tr>
           `;
-        }).join('') : `<tr><td colspan="7">No student entries found.</td></tr>`;
+        }).join('') : `<tr><td colspan="7" style="text-align:center; color:var(--muted)">No student entries found.</td></tr>`;
       } catch (err) {
-        document.querySelector('#studentsTable tbody').innerHTML = `<tr><td colspan="7" style="color:var(--error)">Error loading rows.</td></tr>`;
+        console.error("Students load error:", err);
+        document.querySelector('#studentsTable tbody').innerHTML = `<tr><td colspan="7" style="color:var(--error); text-align:center;">Error loading rows. Please check server.</td></tr>`;
       }
     }
 
     async function deleteRecord(endpoint, id) {
-      if (!confirm(`Are you sure you want to completely delete this structural account?`)) return;
+      if (!confirm(`Are you sure you want to completely delete this record?`)) return;
       try {
         const res = await fetch(`${API_URL}/api/${endpoint}/${id}`, {
           method: "DELETE",
@@ -355,8 +373,12 @@
           fetchStats();
           if (endpoint === 'faculty') loadFaculty();
           else loadStudents();
-        } else { alert("Deletion sequence rejected by server."); }
-      } catch (err) { console.error(err); }
+        } else { 
+          alert("Deletion failed or unauthorized."); 
+        }
+      } catch (err) { 
+        console.error("Delete error:", err); 
+      }
     }
 
     window.onload = () => {
