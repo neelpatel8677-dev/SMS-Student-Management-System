@@ -1,1457 +1,659 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard | SMS Portal</title>
-    <link rel="icon" type="image/png" href="SMS Logo.png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <style>
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        :root {
-            --bg: #0d1117;
-            --surface: #161b22;
-            --surface2: #1c2128;
-            --border: #30363d;
-            --accent: #2563eb;
-            --accent-h: #1d4ed8;
-            --text: #e6edf3;
-            --muted: #8b949e;
-            --success: #3fb950;
-            --warning: #e3b341;
-            --danger: #f85149;
-            --purple: #7c3aed;
-            --cyan: #22d3ee;
-        }
-
-        body {
-            background: var(--bg);
-            font-family: 'Inter', sans-serif;
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-        }
-
-        /* ── Sidebar Nav ── */
-        .sidebar {
-            width: 240px;
-            min-height: 100vh;
-            background: var(--surface);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            z-index: 100;
-        }
-
-        .sidebar-brand {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            padding: 1.25rem 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .brand-icon {
-            width: 34px;
-            height: 34px;
-            background: var(--accent);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-        }
-
-        .brand-text {
-            font-size: 0.9rem;
-            font-weight: 700;
-        }
-
-        .brand-sub {
-            font-size: 0.68rem;
-            color: var(--muted);
-        }
-
-        .nav-section {
-            padding: 1rem 0.75rem 0.25rem;
-            font-size: 0.68rem;
-            font-weight: 600;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 0.65rem;
-            padding: 0.55rem 0.875rem;
-            margin: 0.1rem 0.5rem;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--muted);
-            cursor: pointer;
-            transition: background 0.15s, color 0.15s;
-            text-decoration: none;
-        }
-
-        .nav-item:hover,
-        .nav-item.active {
-            color: var(--text);
-        }
-
-        .nav-item.active {
-            background: rgba(37, 99, 235, 0.15);
-            color: #93c5fd;
-        }
-
-        .sidebar-footer {
-            margin-top: auto;
-            padding: 1rem;
-            border-top: 1px solid var(--border);
-        }
-
-        .user-card {
-            display: flex;
-            align-items: center;
-            gap: 0.65rem;
-            padding: 0.5rem;
-        }
-
-        .avatar {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            background: var(--accent);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.85rem;
-        }
-
-        .user-name {
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: capitalize;
-        }
-
-        .user-role {
-            font-size: 0.72rem;
-            color: var(--muted);
-            text-transform: capitalize;
-        }
-
-        .logout-btn {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 0.875rem;
-            margin: 0.5rem;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            color: var(--danger);
-            cursor: pointer;
-            background: none;
-            border: none;
-            font-family: inherit;
-            width: calc(100% - 1rem);
-            transition: background 0.15s;
-        }
-
-        .logout-btn:hover {
-            background: rgba(248, 81, 73, 0.1);
-        }
-
-        /* ── Main Layout Workspace ── */
-        .main {
-            margin-left: 240px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        .topbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1rem 1.5rem;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 50;
-        }
-
-        .page-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
-
-        .page-sub {
-            font-size: 0.78rem;
-            color: var(--muted);
-            margin-top: 0.1rem;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 0.2rem 0.6rem;
-            border-radius: 999px;
-            font-size: 0.72rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .badge.admin {
-            background: rgba(37, 99, 235, 0.15);
-            color: #93c5fd;
-        }
-
-        .badge.faculty {
-            background: rgba(124, 58, 237, 0.15);
-            color: #c084fc;
-        }
-
-        .badge.student {
-            background: rgba(63, 185, 80, 0.15);
-            color: #3fb950;
-        }
-
-        .content {
-            padding: 1.5rem;
-            flex: 1;
-        }
-
-        .welcome-banner {
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(124, 58, 237, 0.1));
-            border: 1px solid rgba(37, 99, 235, 0.25);
-            border-radius: 12px;
-            padding: 1.25rem 1.5rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .welcome-text h2 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-        }
-
-        .welcome-text p {
-            font-size: 0.85rem;
-            color: var(--muted);
-        }
-
-        .welcome-emoji {
-            font-size: 2.5rem;
-        }
-
-        /* Stats Summary Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .stat-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.25rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-        }
-
-        .stat-card.blue::after {
-            background: var(--accent);
-        }
-
-        .stat-card.purple::after {
-            background: var(--purple);
-        }
-
-        .stat-card.green::after {
-            background: var(--success);
-        }
-
-        .stat-card.yellow::after {
-            background: var(--warning);
-        }
-
-        .stat-card.cyan::after {
-            background: var(--cyan);
-        }
-
-        .stat-card.red::after {
-            background: var(--danger);
-        }
-
-        .stat-icon {
-            font-size: 1.5rem;
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .stat-card.blue .stat-icon {
-            background: rgba(37, 99, 235, 0.15);
-        }
-
-        .stat-card.purple .stat-icon {
-            background: rgba(124, 58, 237, 0.15);
-        }
-
-        .stat-card.green .stat-icon {
-            background: rgba(63, 185, 80, 0.15);
-        }
-
-        .stat-card.yellow .stat-icon {
-            background: rgba(227, 179, 65, 0.15);
-        }
-
-        .stat-card.cyan .stat-icon {
-            background: rgba(34, 211, 238, 0.15);
-        }
-
-        .stat-card.red .stat-icon {
-            background: rgba(248, 81, 73, 0.15);
-        }
-
-        .stat-label {
-            font-size: 0.78rem;
-            color: var(--muted);
-            font-weight: 500;
-        }
-
-        .stat-value {
-            font-size: 1.75rem;
-            font-weight: 700;
-            line-height: 1;
-        }
-
-        .stat-sub {
-            font-size: 0.75rem;
-            color: var(--muted);
-        }
-
-        /* Workspace Switchers Views */
-        .workspace-view {
-            display: none;
-        }
-
-        .workspace-view.active {
-            display: block;
-        }
-
-        .bottom-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        /* Mockup Exact Content Panel Cards Styles */
-        .panel {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 1.5rem;
-        }
-
-        .panel-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1rem 1.25rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .panel-title {
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        .panel-sub-title {
-            font-size: 0.8rem;
-            color: var(--muted);
-            padding: 0.5rem 1.25rem 0;
-        }
-
-        .panel-link {
-            font-size: 0.78rem;
-            color: var(--accent);
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .panel-link:hover {
-            text-decoration: underline;
-        }
-
-        /* Filter Controls Row (Mockup Exact Alignment) */
-        .filter-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            padding: 1rem 1.25rem;
-            background: rgba(255, 255, 255, 0.01);
-            border-bottom: 1px solid var(--border);
-            align-items: center;
-        }
-
-        .search-input-wrapper {
-            flex: 1;
-            min-width: 200px;
-            position: relative;
-        }
-
-        .search-input-wrapper input {
-            width: 100%;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 0.55rem 0.875rem;
-            color: var(--text);
-            outline: none;
-            font-size: 0.85rem;
-        }
-
-        .filter-dropdown {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 0.55rem 0.75rem;
-            color: var(--text);
-            outline: none;
-            font-size: 0.85rem;
-            min-width: 120px;
-        }
-
-        .btn-action-top {
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            padding: 0.55rem 1rem;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-
-        .btn-action-top:hover {
-            background: var(--accent-h);
-        }
-
-        .btn-reset {
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 0.55rem 1rem;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            cursor: pointer;
-        }
-
-        /* Tables */
-        .table-wrap {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-        }
-
-        th {
-            padding: 0.6rem 1.25rem;
-            text-align: left;
-            font-size: 0.72rem;
-            font-weight: 600;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            background: var(--surface2);
-            border-bottom: 1px solid var(--border);
-        }
-
-        td {
-            padding: 0.75rem 1.25rem;
-            border-bottom: 1px solid var(--border);
-            color: var(--text);
-            vertical-align: middle;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover td {
-            background: var(--surface2);
-        }
-
-        .pill {
-            display: inline-block;
-            padding: 0.15rem 0.5rem;
-            border-radius: 999px;
-            font-size: 0.72rem;
-            font-weight: 500;
-            text-transform: capitalize;
-        }
-
-        .pill.paid,
-        .pill.present {
-            background: rgba(63, 185, 80, 0.15);
-            color: var(--success);
-        }
-
-        .pill.pending,
-        .pill.absent {
-            background: rgba(227, 179, 65, 0.15);
-            color: var(--warning);
-        }
-
-        .pill.danger {
-            background: rgba(248, 81, 73, 0.15);
-            color: var(--danger);
-        }
-
-        .actions-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.75rem;
-            padding: 1rem 1.25rem;
-        }
-
-        .action-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 1rem;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            cursor: pointer;
-            text-decoration: none;
-            color: var(--text);
-        }
-
-        .action-btn:hover {
-            border-color: var(--accent);
-            background: rgba(37, 99, 235, 0.08);
-        }
-
-        .btn-inline-edit {
-            background: rgba(37, 99, 235, 0.15);
-            border: 1px solid rgba(37, 99, 235, 0.3);
-            color: #93c5fd;
-            padding: 0.3rem 0.6rem;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            margin-right: 0.4rem;
-        }
-
-        .btn-inline-delete {
-            background: rgba(248, 81, 73, 0.15);
-            border: 1px solid rgba(248, 81, 73, 0.3);
-            color: var(--danger);
-            padding: 0.3rem 0.6rem;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            cursor: pointer;
-        }
-
-        /* Form control alignment for Profile/Settings mockups */
-        .settings-form-box {
-            max-width: 500px;
-            padding: 1.5rem 1.25rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-        }
-
-        /* Modals Design Elements */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-            z-index: 200;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
-
-        .modal-overlay.show {
-            display: flex;
-        }
-
-        .modal-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            max-width: 480px;
-            width: 100%;
-            padding: 1.75rem;
-            position: relative;
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: none;
-            border: none;
-            color: var(--muted);
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-
-        .modal-submit-btn {
-            width: 100%;
-            padding: 0.7rem;
-            background: var(--accent);
-            border: none;
-            color: #fff;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 0.5rem;
-        }
-
-        /* Attendance tracking toggle buttons inside layout lists */
-        .toggle-check-btn {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            color: var(--muted);
-            padding: 0.3rem 0.6rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.75rem;
-        }
-
-        .toggle-check-btn.p-active {
-            background: rgba(63, 185, 80, 0.2);
-            color: var(--success);
-            border-color: var(--success);
-        }
-
-        .toggle-check-btn.a-active {
-            background: rgba(248, 81, 73, 0.2);
-            color: var(--danger);
-            border-color: var(--danger);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard | Student Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --surface2:  #1c2128;
+      --border:    #30363d;
+      --accent:    #2563eb;
+      --accent-h:  #1d4ed8;
+      --text:      #e6edf3;
+      --muted:     #8b949e;
+      --success:   #3fb950;
+      --warning:   #e3b341;
+      --danger:    #f85149;
+      --purple:    #7c3aed;
+      --cyan:      #22d3ee;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ── Sidebar Navigation ── */
+    .sidebar {
+      width: 240px;
+      min-height: 100vh;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 1.25rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand-icon {
+      width: 34px; height: 34px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0;
+    }
+
+    .brand-text { font-size: 0.9rem; font-weight: 700; }
+    .brand-sub  { font-size: 0.68rem; color: var(--muted); }
+
+    .nav-section {
+      padding: 1rem 0.75rem 0.25rem;
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.55rem 0.875rem;
+      margin: 0.1rem 0.5rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      text-decoration: none;
+    }
+
+    .nav-item:hover { background: var(--surface2); color: var(--text); }
+    .nav-item.active { background: rgba(37,99,235,0.15); color: #93c5fd; }
+    .nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .user-card {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.5rem;
+      border-radius: 8px;
+    }
+
+    .avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
+    }
+
+    .user-name  { font-size: 0.85rem; font-weight: 600; }
+    .user-role  { font-size: 0.72rem; color: var(--muted); text-transform: capitalize; }
+
+    .logout-btn {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.5rem 0.875rem;
+      margin-top: 0.5rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: var(--danger);
+      cursor: pointer;
+      background: none; border: none; font-family: inherit;
+      width: 100%;
+      transition: background 0.15s;
+    }
+
+    .logout-btn:hover { background: rgba(248,81,73,0.1); }
+
+    /* ── Main Workspace ── */
+    .main {
+      margin-left: 240px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Topbar */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 50;
+    }
+
+    .topbar-left { display: flex; align-items: center; gap: 0.75rem; }
+
+    .hamburger {
+      display: none;
+      background: none; border: none;
+      color: var(--text); font-size: 1.25rem;
+      cursor: pointer; padding: 0.25rem;
+    }
+
+    .page-title { font-size: 1.1rem; font-weight: 700; }
+    .page-sub   { font-size: 0.78rem; color: var(--muted); margin-top: 0.1rem; }
+
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge.admin   { background: rgba(37,99,235,0.15); color: #93c5fd; }
+    .badge.faculty { background: rgba(124,58,237,0.15); color: #c084fc; }
+    .badge.student { background: rgba(63,185,80,0.15); color: #3fb950; }
+
+    /* Content */
+    .content { padding: 1.5rem; flex: 1; }
+
+    .welcome-banner {
+      background: linear-gradient(135deg, rgba(37,99,235,0.15), rgba(124,58,237,0.1));
+      border: 1px solid rgba(37,99,235,0.25);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .welcome-text h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .welcome-text p  { font-size: 0.85rem; color: var(--muted); }
+    .welcome-emoji   { font-size: 2.5rem; }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      transition: border-color 0.2s, transform 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+    }
+
+    .stat-card.blue::after   { background: var(--accent); }
+    .stat-card.green::after  { background: var(--success); }
+    .stat-card.yellow::after { background: var(--warning); }
+    .stat-card.purple::after { background: var(--purple); }
+    .stat-card.cyan::after   { background: var(--cyan); }
+
+    .stat-icon {
+      font-size: 1.5rem;
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .stat-card.blue   .stat-icon { background: rgba(37,99,235,0.15); }
+    .stat-card.green  .stat-icon { background: rgba(63,185,80,0.15); }
+    .stat-card.yellow .stat-icon { background: rgba(227,179,65,0.15); }
+    .stat-card.purple .stat-icon { background: rgba(124,58,237,0.15); }
+    .stat-card.cyan   .stat-icon { background: rgba(34,211,238,0.15); }
+
+    .stat-label { font-size: 0.78rem; color: var(--muted); font-weight: 500; }
+    .stat-value { font-size: 1.75rem; font-weight: 700; line-height: 1; }
+    .stat-sub   { font-size: 0.75rem; color: var(--muted); }
+
+    /* Bottom Panels */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-title { font-size: 0.9rem; font-weight: 600; }
+    .panel-link  { font-size: 0.78rem; color: var(--accent); text-decoration: none; }
+    .panel-link:hover { text-decoration: underline; }
+
+    /* Table Styles */
+    .table-wrap { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th {
+      padding: 0.6rem 1.25rem;
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 0.75rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface2); }
+
+    .pill {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 500;
+    }
+
+    .pill.paid    { background: rgba(63,185,80,0.15);  color: var(--success); }
+    .pill.pending { background: rgba(227,179,65,0.15); color: var(--warning); }
+
+    /* Quick Action Buttons */
+    .actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+    }
+
+    .action-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 1rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .action-btn:hover { border-color: var(--accent); background: rgba(37,99,235,0.08); }
+    .action-btn .act-icon { font-size: 1.4rem; }
+    .action-btn .act-label { font-size: 0.78rem; font-weight: 500; text-align: center; }
+
+    /* Skeleton Loading */
+    .skeleton {
+      background: linear-gradient(90deg, var(--surface2) 25%, var(--border) 50%, var(--surface2) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 6px;
+      height: 1rem;
+    }
+
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    .overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 99;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .overlay.show { display: block; }
+      .main { margin-left: 0; }
+      .hamburger { display: block; }
+      .bottom-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .welcome-emoji { display: none; }
+    }
+  </style>
 </head>
-
 <body>
 
-    <aside class="sidebar">
-        <div class="sidebar-brand">
-            <div class="brand-icon">🎓</div>
-            <div>
-                <div class="brand-text">SMS Portal</div>
-                <div class="brand-sub">Student Management System</div>
-            </div>
-        </div>
+<div class="overlay" id="overlay"></div>
 
-        <div class="nav-section">Main</div>
-        <div class="nav-item active" id="nav-dashboard" onclick="switchWorkspaceView('dashboardView', 'nav-dashboard')">
-            <span class="nav-icon">🏠</span> Dashboard</div>
+<!-- ── Sidebar ── -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">🎓</div>
+    <div>
+      <div class="brand-text">SMS Portal</div>
+      <div class="brand-sub">Student Management System</div>
+    </div>
+  </div>
 
-        <!-- Shared Management Routes for Admin & Faculty (Bypasses URL drops redirecting to login page) -->
-        <div id="managementNavGroup" style="display:none;">
-            <div class="nav-section">Management</div>
-            <div class="nav-item" id="nav-students" onclick="switchWorkspaceView('studentsListView', 'nav-students')">
-                <span class="nav-icon">👨‍🎓</span> Students</div>
-            <div class="nav-item" id="nav-courses" onclick="switchWorkspaceView('coursesListView', 'nav-courses')"><span
-                    class="nav-icon">📚</span> Courses</div>
-            <div class="nav-item" id="nav-attendance"
-                onclick="switchWorkspaceView('attendanceLogView', 'nav-attendance')"><span class="nav-icon">📋</span>
-                Attendance</div>
-            <div class="nav-item" id="nav-fees" onclick="switchWorkspaceView('feesLogView', 'nav-fees')"><span
-                    class="nav-icon">💰</span> Fees</div>
-            <div class="nav-item" id="nav-results" onclick="switchWorkspaceView('resultsLogView', 'nav-results')"><span
-                    class="nav-icon">📊</span> Results</div>
+  <div class="nav-section">Main</div>
+  <a class="nav-item active" href="index.html">
+    <span class="nav-icon">🏠</span> Dashboard
+  </a>
 
-            <div id="settingsNavBlock">
-                <div class="nav-section">System</div>
-                <div class="nav-item" id="nav-settings" onclick="switchWorkspaceView('settingsView', 'nav-settings')">
-                    <span class="nav-icon">⚙️</span> Settings</div>
-            </div>
-        </div>
+  <!-- Admin Navigation Link Block -->
+  <div id="adminNav">
+    <div class="nav-section">Management</div>
+    <a class="nav-item" href="students.html">
+      <span class="nav-icon">👨‍🎓</span> Students
+    </a>
+    <a class="nav-item" href="courses.html">
+      <span class="nav-icon">📚</span> Courses
+    </a>
+    <a class="nav-item" href="attendance.html">
+      <span class="nav-icon">📋</span> Attendance
+    </a>
+    <a class="nav-item" href="fees.html">
+      <span class="nav-icon">💰</span> Fees
+    </a>
+    <a class="nav-item" href="results.html">
+      <span class="nav-icon">📊</span> Results
+    </a>
+    <div class="nav-section">System</div>
+    <a class="nav-item" href="settings.html">
+      <span class="nav-icon">⚙️</span> Settings
+    </a>
+  </div>
 
-        <!-- Student Routes Context -->
-        <div id="studentNavGroup" style="display:none;">
-            <div class="nav-section">My Academics</div>
-            <div class="nav-item" id="nav-s-profile"
-                onclick="switchWorkspaceView('studentPersonalView', 'nav-s-profile')"><span class="nav-icon">👤</span>
-                My Profile</div>
-        </div>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="avatar" id="sidebarAvatar">A</div>
+      <div>
+        <div class="user-name" id="sidebarName">Loading...</div>
+        <div class="user-role" id="sidebarRole">Admin</div>
+      </div>
+    </div>
+    <button class="logout-btn" id="logoutBtn">
+      🚪 Sign out
+    </button>
+  </div>
+</aside>
 
-        <div class="sidebar-footer">
-            <div class="user-card">
-                <div class="avatar" id="sbAvatar">?</div>
-                <div>
-                    <div class="user-name" id="sbName">Loading...</div>
-                    <div class="user-role" id="sbRole">—</div>
-                </div>
-            </div>
-            <button class="logout-btn" onclick="triggerSystemLogout()">🚪 Sign out</button>
-        </div>
-    </aside>
+<!-- ── Main Workspace ── -->
+<div class="main">
 
-    <div class="main">
-        <header class="topbar">
-            <div>
-                <div class="page-title" id="workspaceTitleText">Dashboard</div>
-                <div class="page-sub" id="liveTimestampLabel">—</div>
-            </div>
-            <span class="badge" id="workspaceRoleBadge">—</span>
-        </header>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" id="hamburger">☰</button>
+      <div>
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub" id="dateLabel">—</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span class="badge admin" id="roleBadge">ADMIN</span>
+    </div>
+  </header>
 
-        <div class="content">
+  <div class="content">
 
-            <!-- ==================== VIEW 1: HOME METRICS DASHBOARD ==================== -->
-            <div id="dashboardView" class="workspace-view active">
-                <div class="welcome-banner">
-                    <div class="welcome-text">
-                        <h2 id="greetUserName">Welcome back! 👋</h2>
-                        <p id="greetSubtitle">Synchronizing records...</p>
-                    </div>
-                    <div class="welcome-emoji" id="greetEmojiIcon">🎓</div>
-                </div>
-                <div class="stats-grid" id="metricsCountersContainer"></div>
-                <div class="bottom-grid" id="dashboardSplitLayoutGrid"></div>
-            </div>
-
-            <!-- ==================== VIEW 2: MOCKUP STUDENTS TAB WITH FULL FILTERS ==================== -->
-            <div id="studentsListView" class="workspace-view">
-                <div class="panel">
-                    <div class="panel-header">
-                        <div>
-                            <span class="panel-title" style="display:block;">Students</span>
-                            <span style="font-size:0.75rem; color:var(--muted);" id="studentsCountSubLabel">0 total
-                                students</span>
-                        </div>
-                        <button class="btn-action-top" onclick="openModal('addStudentModal')">➕ Add Student</button>
-                    </div>
-
-                    <!-- Mockup Accurate Filtering Row Element Bindings -->
-                    <div class="filter-row">
-                        <div class="search-input-wrapper"><input type="text" id="studentsSearchInput"
-                                placeholder="Search by name, roll no, email..." oninput="filterStudentsDataTable()">
-                        </div>
-                        <select id="studentsCourseFilter" class="filter-dropdown" onchange="filterStudentsDataTable()">
-                            <option value="">All Courses</option>
-                        </select>
-                        <select id="studentsYearFilter" class="filter-dropdown" onchange="filterStudentsDataTable()">
-                            <option value="">All Years</option>
-                            <option value="1">Year 1</option>
-                            <option value="2">Year 2</option>
-                            <option value="3">Year 3</option>
-                            <option value="4">Year 4</option>
-                        </select>
-                        <select id="studentsFeeFilter" class="filter-dropdown" onchange="filterStudentsDataTable()">
-                            <option value="">All Fee Status</option>
-                            <option value="paid">Paid</option>
-                            <option value="pending">Pending</option>
-                        </select>
-                        <button class="btn-reset" onclick="resetStudentFilterControls()">🔄 Reset</button>
-                    </div>
-
-                    <div class="table-wrap">
-                        <table id="fullStudentsDataTable">
-                            <thead>
-                                <tr>
-                                    <th>Name ↕</th>
-                                    <th>Roll No ↕</th>
-                                    <th>Email</th>
-                                    <th>Course ↕</th>
-                                    <th>Year ↕</th>
-                                    <th>Fee Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ==================== VIEW 3: MOCKUP COURSES PANEL WITH COUNTERS ==================== -->
-            <div id="coursesListView" class="workspace-view">
-                <div class="panel">
-                    <div class="panel-header">
-                        <div><span class="panel-title" style="display:block;">Courses</span><span
-                                style="font-size:0.75rem; color:var(--muted);" id="coursesCountSubLabel">0 active
-                                programs</span></div>
-                    </div>
-                    <div class="table-wrap">
-                        <table id="uniqueCoursesSummaryTable">
-                            <thead>
-                                <tr>
-                                    <th>Course Name</th>
-                                    <th>Branch Stream</th>
-                                    <th>Total Enrolled Students</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ==================== VIEW 4: MOCKUP SCREEN ATTENDANCE PANEL ==================== -->
-            <div id="attendanceLogView" class="workspace-view">
-                <div class="stats-grid" id="attendanceSectionMiniStats"></div>
-
-                <div class="panel">
-                    <div class="panel-header">
-                        <span class="panel-title">Mark Attendance</span>
-                        <div style="display:flex; gap:0.6rem; align-items:center;">
-                            <input type="date" id="attendanceMainDatePicker" class="filter-dropdown"
-                                onchange="syncAttendanceTabMetrics()">
-                            <select id="attendanceCourseDropdown" class="filter-dropdown"
-                                onchange="syncAttendanceTabMetrics()">
-                                <option value="">All Courses</option>
-                            </select>
-                            <button class="btn-action-top" onclick="commitAttendanceSheetToServer()">Save
-                                Attendance</button>
-                        </div>
-                    </div>
-                    <div class="filter-row" style="padding:0.75rem 1.25rem;">
-                        <span style="font-size:0.8rem; color:var(--muted);">Mark all as:</span>
-                        <button class="toggle-check-btn p-active"
-                            style="margin-left:0.5rem; background:rgba(63,185,80,0.15); color:var(--success);"
-                            onclick="bulkToggleAttendanceState('Present')">✅ Present</button>
-                        <button class="toggle-check-btn a-active"
-                            style="margin-left:0.5rem; background:rgba(248,81,73,0.15); color:var(--danger);"
-                            onclick="bulkToggleAttendanceState('Absent')">❌ Absent</button>
-                    </div>
-                    <div class="table-wrap">
-                        <table id="attendanceTrackingTable">
-                            <thead>
-                                <tr>
-                                    <th>Student</th>
-                                    <th>Status</th>
-                                    <th>Remarks</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ==================== VIEW 5: MOCKUP FEES MANAGEMENT SHEET ==================== -->
-            <div id="feesLogView" class="workspace-view">
-                <div class="stats-grid" id="feesSectionMiniStats"></div>
-
-                <div class="panel">
-                    <div class="panel-header">
-                        <span class="panel-title">Fees Management</span>
-                        <button class="btn-action-top" onclick="openModal('manageFeesModal')">➕ Assign Fee
-                            Status</button>
-                    </div>
-                    <div class="filter-row">
-                        <div class="search-input-wrapper"><input type="text" id="feesSearchInput"
-                                placeholder="Search by name or roll no..." oninput="filterFeesDataTable()"></div>
-                        <select id="feesCourseFilter" class="filter-dropdown" onchange="filterFeesDataTable()">
-                            <option value="">All Courses</option>
-                        </select>
-                        <select id="feesYearFilter" class="filter-dropdown" onchange="filterFeesDataTable()">
-                            <option value="">All Years</option>
-                        </select>
-                        <button class="btn-reset" onclick="resetFeesFilterControls()">🔄 Reset</button>
-                    </div>
-                    <div class="table-wrap">
-                        <table id="feesManagementMasterTable">
-                            <thead>
-                                <tr>
-                                    <th>Student</th>
-                                    <th>Course / Year</th>
-                                    <th>Total Fee</th>
-                                    <th>Paid</th>
-                                    <th>Pending</th>
-                                    <th>Due Date</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ==================== VIEW 6: MOCKUP RESULTS SCORE PERFORMANCE TAB ==================== -->
-            <div id="resultsLogView" class="workspace-view">
-                <div class="stats-grid" id="resultsSectionMiniStats"></div>
-
-                <div class="panel">
-                    <div class="panel-header">
-                        <span class="panel-title">All Results</span>
-                        <button class="btn-action-top" onclick="openModal('uploadResultsModal')">➕ Add Result</button>
-                    </div>
-                    <div class="filter-row">
-                        <div class="search-input-wrapper"><input type="text" id="resultsSearchInput"
-                                placeholder="Search by name, roll no, exam..." oninput="filterResultsDataTable()"></div>
-                        <select id="resultsCourseFilter" class="filter-dropdown" onchange="filterResultsDataTable()">
-                            <option value="">All Courses</option>
-                        </select>
-                        <button class="btn-reset" onclick="resetResultsFilterControls()">🔄 Reset</button>
-                    </div>
-                    <div class="table-wrap">
-                        <table id="resultsPerformanceMasterTable">
-                            <thead>
-                                <tr>
-                                    <th>Student</th>
-                                    <th>Course / Year</th>
-                                    <th>Exam</th>
-                                    <th>Marks Obtained</th>
-                                    <th>Out Of</th>
-                                    <th>Percentage</th>
-                                    <th>Grade</th>
-                                    <th>Result</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ==================== VIEW 7: SYSTEM PROFILE & SETTINGS MOCKUP ==================== -->
-            <div id="settingsView" class="workspace-view">
-                <div class="panel">
-                    <div class="panel-header"><span class="panel-title">Admin Profile Info</span></div>
-                    <div class="settings-form-box">
-                        <div class="form-group"><label>Full Name</label><input type="text" id="settingsFullNameField"
-                                placeholder="Enter Full Name"></div>
-                        <div class="form-group"><label>Email Address</label><input type="email" id="settingsEmailField"
-                                readonly></div>
-                        <button class="modal-submit-btn" style="width:fit-content; padding:0.55rem 1.25rem;"
-                            onclick="alert('Profile changes logged!')">Save Profile</button>
-                    </div>
-                </div>
-                <div class="panel">
-                    <div class="panel-header"><span class="panel-title">Security & Password</span></div>
-                    <div class="settings-form-box">
-                        <div class="form-group"><label>Current Password</label><input type="password" value="********"
-                                disabled></div>
-                        <div class="form-group"><label>New Password</label><input type="password"
-                                placeholder="Minimum 6 characters"></div>
-                        <div class="form-group"><label>Confirm New Password</label><input type="password"
-                                placeholder="Re-enter new password"></div>
-                        <button class="modal-submit-btn" style="width:fit-content; padding:0.55rem 1.25rem;"
-                            onclick="alert('Password configuration updated!')">Update Password</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ==================== VIEW 8: STUDENT PERSONAL OVERVIEW ==================== -->
-            <div id="studentPersonalView" class="workspace-view">
-                <div class="bottom-grid" id="studentWidgetsSplitGrid"></div>
-            </div>
-
-        </div>
+    <div class="welcome-banner">
+      <div class="welcome-text">
+        <h2 id="welcomeMsg">Welcome back, Admin! 👋</h2>
+        <p id="welcomeSub">Here's an overview of your institution today.</p>
+      </div>
+      <div class="welcome-emoji" id="welcomeEmoji">🛡️</div>
     </div>
 
-    <!-- ==================== POPUP FORM ENTRY LAYOUT MODALS ==================== -->
-    <div class="modal-overlay" id="addStudentModal">
-        <div class="modal-card"><button class="close-modal" onclick="closeModal('addStudentModal')">✕</button>
-            <h3>Add New Student Account</h3>
-            <form id="addStudentForm">
-                <div class="form-row">
-                    <div class="form-group"><label>First Name</label><input type="text" id="sfName" required></div>
-                    <div class="form-group"><label>Last Name</label><input type="text" id="slName" required></div>
-                </div>
-                <div class="form-group"><label>Email Address</label><input type="email" id="sEmail" required></div>
-                <div class="form-row">
-                    <div class="form-group"><label>Roll Number</label><input type="text" id="sRoll" required></div>
-                    <div class="form-group"><label>Course</label><input type="text" id="sCourse" placeholder="e.g. B.Sc"
-                            required></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>Branch</label><input type="text" id="sBranch" required
-                            placeholder="CS"></div>
-                    <div class="form-group"><label>Year</label><select id="sYear" required>
-                            <option value="1">1st Year</option>
-                            <option value="2">2nd Year</option>
-                            <option value="3">3rd Year</option>
-                            <option value="4">4th Year</option>
-                        </select></div>
-                </div>
-                <div class="form-group"><label>Access Password</label><input type="password" id="sPassword" required
-                        minlength="6"></div><button type="submit" class="modal-submit-btn">Publish Student
-                    Record</button>
-            </form>
+    <div class="stats-grid" id="statsGrid"></div>
+    <div class="bottom-grid" id="bottomGrid"></div>
+
+  </div>
+</div>
+
+<script>
+  const API_URL = "https://sms-student-management-system-1.onrender.com"; 
+
+  // 1. Auth Guard & Modular Redirect Check
+  const token = localStorage.getItem('token');
+  const user  = JSON.parse(localStorage.getItem('user') || '{}');
+  if (!token) {
+    window.location.href = 'login.html';
+  }
+
+  const role = user.role || 'admin';
+  const name = user.name || 'Admin User';
+
+  // Redirect Faculty or Student logins directly to their dedicated separated dashboards
+  if (role === 'faculty' && !window.location.href.includes('faculty-dashboard.html')) {
+    window.location.href = 'faculty-dashboard.html';
+  } else if (role === 'student' && !window.location.href.includes('student-dashboard.html')) {
+    window.location.href = 'student-dashboard.html';
+  }
+
+  // Mobile Menu Drawer
+  const sidebar   = document.getElementById('sidebar');
+  const overlay   = document.getElementById('overlay');
+  const hamburger = document.getElementById('hamburger');
+
+  hamburger.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('show');
+  });
+
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('show');
+  });
+
+  // User Info Setup
+  document.getElementById('sidebarAvatar').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('sidebarName').textContent   = name;
+  document.getElementById('sidebarRole').textContent   = role;
+
+  // Date Setup
+  const now = new Date();
+  document.getElementById('dateLabel').textContent = now.toLocaleDateString('en-IN', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
+
+  // Welcome Message
+  const hour = now.getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('welcomeMsg').textContent = `${greeting}, ${name.split(' ')[0]}! 👋`;
+
+  // Sign out
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    localStorage.clear();
+    window.location.href = 'login.html';
+  });
+
+  // API Fetch Helper
+  async function apiFetch(endpoint) {
+    const userObj = JSON.parse(localStorage.getItem('user') || '{}');
+    const res = await fetch(`${API_URL}${endpoint}`, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'user-id': userObj.id || userObj._id || '' 
+      }
+    });
+    if (res.status === 401) { localStorage.clear(); window.location.href = 'login.html'; }
+    return res.json();
+  }
+
+  // Load Admin Data Overview
+  async function loadAdminDashboard() {
+    const statsGrid  = document.getElementById('statsGrid');
+    const bottomGrid = document.getElementById('bottomGrid');
+
+    statsGrid.innerHTML = Array(5).fill(`
+      <div class="stat-card blue">
+        <div class="skeleton" style="width:40px;height:40px;border-radius:10px;"></div>
+        <div class="skeleton" style="width:60%;"></div>
+        <div class="skeleton" style="width:40%;height:1.75rem;"></div>
+      </div>`).join('');
+
+    try {
+      const [studentsRes, coursesRes, attendanceRes, feesRes, resultsRes] = await Promise.allSettled([
+        apiFetch('/api/students/count'),
+        apiFetch('/api/courses/count'),
+        apiFetch('/api/attendance/summary'),
+        apiFetch('/api/fees/summary'),
+        apiFetch('/api/results/summary'),
+      ]);
+
+      const students   = studentsRes.status   === 'fulfilled' ? studentsRes.value   : {};
+      const courses    = coursesRes.status    === 'fulfilled' ? coursesRes.value    : {};
+      const attendance = attendanceRes.status === 'fulfilled' ? attendanceRes.value : {};
+      const fees       = feesRes.status       === 'fulfilled' ? feesRes.value       : {};
+      const results    = resultsRes.status    === 'fulfilled' ? resultsRes.value    : {};
+
+      statsGrid.innerHTML = `
+        <div class="stat-card blue">
+          <div class="stat-icon">👨‍🎓</div>
+          <div class="stat-label">Total Students</div>
+          <div class="stat-value">${students.total ?? '—'}</div>
+          <div class="stat-sub">${students.newThisMonth ?? 0} joined this month</div>
         </div>
-    </div>
-    <div class="modal-overlay" id="manageFeesModal">
-        <div class="modal-card"><button class="close-modal" onclick="closeModal('manageFeesModal')">✕</button>
-            <h3>Assign Student Fee Status</h3>
-            <form id="updateFeesForm">
-                <div class="form-group"><label>Select Student</label><select id="feeStudentSelect" required></select>
-                </div>
-                <div class="form-group"><label>Ledger Fee Status</label><select id="feeStatusSelect" required>
-                        <option value="pending">Pending</option>
-                        <option value="paid">Paid</option>
-                    </select></div><button type="submit" class="modal-submit-btn">Commit Changes</button>
-            </form>
+        <div class="stat-card purple">
+          <div class="stat-icon">📚</div>
+          <div class="stat-label">Courses</div>
+          <div class="stat-value">${courses.total ?? '—'}</div>
+          <div class="stat-sub">${courses.active ?? 0} active</div>
         </div>
-    </div>
-    <div class="modal-overlay" id="uploadResultsModal">
-        <div class="modal-card"><button class="close-modal" onclick="closeModal('uploadResultsModal')">✕</button>
-            <h3>Publish Academic Score</h3>
-            <form id="uploadResultsForm">
-                <div class="form-group"><label>Select Student</label><select id="resultStudentSelect" required></select>
-                </div>
-                <div class="form-group"><label>Subject Term Module</label><input type="text" id="resSubject" required
-                        placeholder="e.g. Sem1"></div>
-                <div class="form-row">
-                    <div class="form-group"><label>Marks Secured</label><input type="number" id="resObtained" required>
-                    </div>
-                    <div class="form-group"><label>Max Scale Limit</label><input type="number" id="resMax" required
-                            value="100"></div>
-                </div><button type="submit" class="modal-submit-btn">Publish Report Card</button>
-            </form>
+        <div class="stat-card green">
+          <div class="stat-icon">📋</div>
+          <div class="stat-label">Avg Attendance</div>
+          <div class="stat-value">${attendance.avgPercent ?? '—'}%</div>
+          <div class="stat-sub">Today: ${attendance.presentToday ?? 0} present</div>
         </div>
-    </div>
+        <div class="stat-card yellow">
+          <div class="stat-icon">💰</div>
+          <div class="stat-label">Fees Collected</div>
+          <div class="stat-value">₹${fees.collected ?? '—'}</div>
+          <div class="stat-sub">${fees.pending ?? 0} pending</div>
+        </div>
+        <div class="stat-card cyan">
+          <div class="stat-icon">📊</div>
+          <div class="stat-label">Avg Result</div>
+          <div class="stat-value">${results.avgScore ?? '—'}%</div>
+          <div class="stat-sub">${results.passed ?? 0} passed this term</div>
+        </div>
+      `;
 
-    <script>
-        const API_URL = "https://sms-student-management-system-1.onrender.com";
-        const token = localStorage.getItem('token');
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
+      let recentStudents = [];
+      try {
+        const data = await apiFetch('/api/students?limit=5&sort=createdAt');
+        recentStudents = data.students ?? data ?? [];
+      } catch(_) {}
 
-        if (!token) window.location.href = 'login.html';
+      const tableRows = recentStudents.length
+        ? recentStudents.map(s => `
+            <tr>
+              <td style="font-weight:600">${s.name ?? '—'}</td>
+              <td>${s.rollNo ?? '—'}</td>
+              <td>${s.course ?? '—'}</td>
+              <td><span class="pill ${s.feeStatus === 'paid' ? 'paid' : 'pending'}">${s.feeStatus ?? 'pending'}</span></td>
+            </tr>`).join('')
+        : `<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:2rem;">No student data yet</td></tr>`;
 
-        const role = user.role || 'student';
-        const name = user.name || 'User';
-
-        let cachedStudentsArray = [];
-        let currentAttendanceBatchState = {};
-        let cachedResultsArray = [];
-
-        // Default values initialization
-        document.getElementById('attendanceMainDatePicker').value = "2026-06-22";
-        document.getElementById('liveTimestampLabel').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-        // Map user header profiles details 
-        document.getElementById('sbAvatar').textContent = name.charAt(0).toUpperCase();
-        document.getElementById('sbName').textContent = name;
-        document.getElementById('sbRole').textContent = role;
-
-        const badgeObj = document.getElementById('workspaceRoleBadge');
-        badgeObj.textContent = role === 'admin' ? 'Admin' : role.toUpperCase();
-        badgeObj.className = `badge ${role}`;
-
-        function openModal(id) { document.getElementById(id).classList.add('show'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-        function triggerSystemLogout() { localStorage.clear(); window.location.href = 'login.html'; }
-
-        // Configure views navigation options based on credentials roles
-        if (role === 'admin' || role === 'faculty') {
-            document.getElementById('managementNavGroup').style.display = 'block';
-            if (role === 'faculty') document.getElementById('settingsNavBlock').style.display = 'none';
-        } else {
-            document.getElementById('studentNavGroup').style.display = 'block';
-        }
-
-        // Unified Switcher Tab Views Engine (Bypasses external URL re-routing)
-        function switchWorkspaceView(targetViewId, navBtnId) {
-            document.querySelectorAll('.workspace-view').forEach(view => view.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
-
-            const viewElement = document.getElementById(targetViewId);
-            if (viewElement) viewElement.classList.add('active');
-
-            const btnElement = document.getElementById(navBtnId);
-            if (btnElement) btnElement.classList.add('active');
-
-            const titleMap = {
-                'dashboardView': 'Dashboard', 'studentsListView': 'Students',
-                'coursesListView': 'Courses', 'attendanceLogView': 'Attendance',
-                'feesLogView': 'Fees Management', 'resultsLogView': 'Results', 'settingsView': 'System Settings'
-            };
-            document.getElementById('workspaceTitleText').textContent = titleMap[targetViewId] || 'Dashboard';
-
-            // Lazy dynamic data binding on switch triggers
-            if (targetViewId === 'studentsListView') renderStudentsMasterView();
-            if (targetViewId === 'coursesListView') renderCoursesMasterView();
-            if (targetViewId === 'attendanceLogView') syncAttendanceTabMetrics();
-            if (targetViewId === 'feesLogView') syncFeesTabMetrics();
-            if (targetViewId === 'resultsLogView') syncResultsTabMetrics();
-        }
-
-        async function apiSecureFetch(endpoint) {
-            const res = await fetch(`${API_URL}${endpoint}`, { headers: { 'Authorization': `Bearer ${token}` } });
-            if (res.status === 401) { localStorage.clear(); window.location.href = 'login.html'; }
-            return res.json();
-        }
-
-        // ==================== WORKSPACE TELEMETRY COMPILERS ====================
-        async function initializeSMSPortalWorkspace() {
-            try {
-                const students = await apiSecureFetch('/api/students');
-                cachedStudentsArray = students;
-
-                // Sync local caches results mapping values fallback mock arrays safely
-                try {
-                    cachedResultsArray = await apiSecureFetch('/api/results/me');
-                } catch (e) {
-                    cachedResultsArray = [{ subject: 'Sem1', marksObtained: 70, maxMarks: 100 }];
-                }
-
-                if (role === 'faculty' || role === 'admin') {
-                    document.getElementById('greetUserName').textContent = `Good morning, ${name.split(' ')[0]}! 👋`;
-                    document.getElementById('greetSubtitle').textContent = "Here's an overview of your institution today.";
-                    document.getElementById('greetEmojiIcon').textContent = "🛡️";
-
-                    renderHomeManagementDashboard();
-                } else {
-                    document.getElementById('greetUserName').textContent = `Good morning, ${name.split(' ')[0]}! 👋`;
-                    document.getElementById('greetSubtitle').textContent = "Here's your academic summary.";
-                    document.getElementById('greetEmojiIcon').textContent = "🎒";
-
-                    renderHomeStudentDashboard();
-                }
-
-                // Populate system setting fields configuration profile
-                document.getElementById('settingsFullNameField').value = name;
-                document.getElementById('settingsEmailField').value = user.email || 'faculty@sms.com';
-
-            } catch (err) { console.error(err); }
-        }
-
-        // ==================== RENDERING DOM TILES METHODS ====================
-        function renderHomeManagementDashboard() {
-            const stats = document.getElementById('metricsCountersContainer');
-            const split = document.getElementById('dashboardSplitLayoutGrid');
-
-            const total = cachedStudentsArray.length || 0;
-            const distinctCourses = [...new Set(cachedStudentsArray.map(s => (s.course || '').trim().toLowerCase()))].filter(Boolean).length || 1;
-
-            stats.innerHTML = `
-        <div class="stat-card blue"><div class="stat-icon">🎓</div><div class="stat-label">Total Students</div><div class="stat-value">${total}</div><div class="stat-sub">Synchronized records</div></div>
-        <div class="stat-card purple"><div class="stat-icon">📚</div><div class="stat-label">Courses</div><div class="stat-value">${distinctCourses}</div><div class="stat-sub">Active terms</div></div>
-        <div class="stat-card green"><div class="stat-icon">📋</div><div class="stat-label">Avg Attendance</div><div class="stat-value">77%</div><div class="stat-sub">Today's tracking live</div></div>
-        <div class="stat-card yellow"><div class="stat-icon">💰</div><div class="stat-label">Fees Summary</div><div class="stat-value">₹—</div><div class="stat-sub">Pending evaluation accounts</div></div>
-     `;
-
-            const rows = cachedStudentsArray.slice(0, 3).map(s => `
-        <tr><td><strong>${s.name}</strong></td><td>${s.rollNo || '—'}</td><td>${s.course || '—'}</td><td><span class="pill ${s.feeStatus === 'paid' ? 'paid' : 'pending'}">${s.feeStatus || 'pending'}</span></td></tr>
-     `).join('');
-
-            split.innerHTML = `
+      bottomGrid.innerHTML = `
         <div class="panel">
-          <div class="panel-header"><span class="panel-title">Recent Students</span><span class="panel-link" onclick="switchWorkspaceView('studentsListView','nav-students')">View all →</span></div>
-          <div class="table-wrap"><table><thead><tr><th>Name</th><th>Roll No</th><th>Course</th><th>Fees</th></tr></thead><tbody>${rows || '<tr><td colspan="4">No entries</td></tr>'}</tbody></table></div>
+          <div class="panel-header">
+            <span class="panel-title">Recent Students</span>
+            <a class="panel-link" href="students.html">View all →</a>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Roll No</th>
+                  <th>Course</th>
+                  <th>Fees</th>
+                </tr>
+              </thead>
+              <tbody>${tableRows}</tbody>
+            </table>
+          </div>
         </div>
         <div class="panel">
-          <div class="panel-header"><span class="panel-title">Quick Actions</span></div>
+          <div class="panel-header">
+            <span class="panel-title">Quick Actions</span>
+          </div>
           <div class="actions-grid">
-             <div class="action-btn" onclick="openModal('addStudentModal')"><span class="act-icon">➕</span><span class="act-label">Add Student</span></div>
-             <div class="action-btn" onclick="switchWorkspaceView('attendanceLogView','nav-attendance')"><span class="act-icon">📋</span><span class="act-label">Mark Attendance</span></div>
-             <div class="action-btn" onclick="switchWorkspaceView('feesLogView','nav-fees')"><span class="act-icon">💰</span><span class="act-label">Manage Fees</span></div>
-             <div class="action-btn" onclick="switchWorkspaceView('resultsLogView','nav-results')"><span class="act-icon">📊</span><span class="act-label">Upload Results</span></div>
+            <a class="action-btn" href="students.html?action=add">
+              <span class="act-icon">➕</span>
+              <span class="act-label">Add Student</span>
+            </a>
+            <a class="action-btn" href="attendance.html">
+              <span class="act-icon">📋</span>
+              <span class="act-label">Mark Attendance</span>
+            </a>
+            <a class="action-btn" href="fees.html">
+              <span class="act-icon">💰</span>
+              <span class="act-label">Manage Fees</span>
+            </a>
+            <a class="action-btn" href="results.html">
+              <span class="act-icon">📊</span>
+              <span class="act-label">Upload Results</span>
+            </a>
           </div>
-        </div>
-     `;
+        </div>`;
 
-            // Populate options mapping inside modal targets options lists
-            const optHtml = cachedStudentsArray.map(s => `<option value="${s._id}">${s.name} (Roll: ${s.rollNo})</option>`).join('');
-            document.getElementById('feeStudentSelect').innerHTML = `<option value="">Select Student</option>` + optHtml;
-            document.getElementById('resultStudentSelect').innerHTML = `<option value="">Select Student</option>` + optHtml;
-        }
+    } catch (err) {
+      console.error('Admin dashboard error:', err);
+    }
+  }
 
-        function renderHomeStudentDashboard() {
-            const stats = document.getElementById('metricsCountersContainer');
-            const split = document.getElementById('dashboardSplitLayoutGrid');
-
-            stats.innerHTML = `
-        <div class="stat-card purple"><div class="stat-icon">📚</div><div class="stat-label">Course & Branch</div><div class="stat-value" style="font-size:1.1rem">B.Sc (IT)</div><div class="stat-sub">Year 1</div></div>
-        <div class="stat-card green"><div class="stat-icon">📋</div><div class="stat-label">Attendance</div><div class="stat-value">60%</div><div class="stat-sub">Today: 0 present</div></div>
-        <div class="stat-card yellow"><div class="stat-icon">💰</div><div class="stat-label">Fee Status</div><div class="stat-value" style="font-size:1.1rem;">Pending</div><div class="stat-sub">All clear</div></div>
-        <div class="stat-card cyan"><div class="stat-icon">📊</div><div class="stat-label">Latest Score</div><div class="stat-value">70.0%</div><div class="stat-sub">Sem1 pass metrics</div></div>
-     `;
-
-            split.innerHTML = `
-        <div class="panel">
-          <div class="panel-header"><span class="panel-title">My Profile Overview</span></div>
-          <div class="profile-card">
-             <div class="profile-row"><span class="profile-key">Full Name</span><span class="profile-val">${name}</span></div>
-             <div class="profile-row"><span class="profile-key">Roll Number</span><span class="profile-val">1</span></div>
-             <div class="profile-row"><span class="profile-key">Email</span><span class="profile-val">${user.email || 'student@sms.com'}</span></div>
-          </div>
-        </div>
-        <div class="panel">
-          <div class="panel-header"><span class="panel-title">Attendance Progress</span></div>
-          <div class="profile-card">
-             <div class="profile-row"><span class="profile-key">Attendance %</span><span class="profile-val" style="color:var(--warning)">60%</span></div>
-             <div class="progress-bar"><div class="progress-fill" style="width:60%; background:var(--warning);"></div></div>
-             <div class="stat-sub" style="margin-top:0.5rem;">⚠️ Below 75% — improve attendance thresholds.</div>
-          </div>
-        </div>
-     `;
-        }
-
-        // ==================== SUB TABS SCREEN RENDERS IMPLEMENTATIONS ====================
-        function renderStudentsMasterView() {
-            document.getElementById('studentsCountSubLabel').textContent = `${cachedStudentsArray.length} total students`;
-
-            // Dynamically build select filter array maps
-            const courses = [...new Set(cachedStudentsArray.map(s => s.course || 'B.Sc'))];
-            document.getElementById('studentsCourseFilter').innerHTML = `<option value="">All Courses</option>` + courses.map(c => `<option value="${c}">${c}</option>`).join('');
-            document.getElementById('attendanceCourseDropdown').innerHTML = `<option value="">All Courses</option>` + courses.map(c => `<option value="${c}">${c}</option>`).join('');
-            document.getElementById('feesCourseFilter').innerHTML = `<option value="">All Courses</option>` + courses.map(c => `<option value="${c}">${c}</option>`).join('');
-            document.getElementById('resultsCourseFilter').innerHTML = `<option value="">All Courses</option>` + courses.map(c => `<option value="${c}">${c}</option>`).join('');
-
-            filterStudentsDataTable();
-        }
-
-        function filterStudentsDataTable() {
-            const search = document.getElementById('studentsSearchInput').value.toLowerCase().trim();
-            const course = document.getElementById('studentsCourseFilter').value;
-            const year = document.getElementById('studentsYearFilter').value;
-            const fee = document.getElementById('studentsFeeFilter').value;
-
-            const filtered = cachedStudentsArray.filter(s => {
-                const matchesSearch = !search || s.name.toLowerCase().includes(search) || (s.rollNo && String(s.rollNo).includes(search));
-                const matchesCourse = !course || s.course === course;
-                const matchesYear = !year || String(s.year) === year;
-                const matchesFee = !fee || s.feeStatus === fee;
-                return matchesSearch && matchesCourse && matchesYear && matchesFee;
-            });
-
-            const tbody = document.querySelector('#fullStudentsDataTable tbody');
-            tbody.innerHTML = filtered.map(s => `
-        <tr>
-          <td><div style="display:flex; align-items:center; gap:0.5rem;"><div class="avatar" style="width:28px; height:28px; font-size:0.75rem;">${s.name.charAt(0).toUpperCase()}</div><strong>${s.name}</strong></div></td>
-          <td>${s.rollNo || '—'}</td>
-          <td>${s.email || '—'}</td>
-          <td>${s.course || '—'}</td>
-          <td><span class="pill" style="background:rgba(37,99,235,0.1); color:#93c5fd;">Year ${s.year || '1'}</span></td>
-          <td><span class="pill ${s.feeStatus === 'paid' ? 'paid' : 'pending'}">${s.feeStatus || 'pending'}</span></td>
-          <td><button class="btn-inline-edit" onclick="alert('Inline student editor initialized!')">📝 Edit</button><button class="btn-inline-delete" onclick="triggerDeleteStudentRecord('${s._id}')">🗑️ Delete</button></td>
-        </tr>
-     `).join('');
-        }
-
-        function resetStudentFilterControls() {
-            document.getElementById('studentsSearchInput').value = '';
-            document.getElementById('studentsCourseFilter').value = '';
-            document.getElementById('studentsYearFilter').value = '';
-            document.getElementById('studentsFeeFilter').value = '';
-            filterStudentsDataTable();
-        }
-
-        function renderCoursesMasterView() {
-            const groups = {};
-            cachedStudentsArray.forEach(s => {
-                const c = s.course || 'B.Sc';
-                const b = s.branch || 'General';
-                const key = `${c}|||${b}`;
-                groups[key] = (groups[key] || 0) + 1;
-            });
-
-            const keys = Object.keys(groups);
-            document.getElementById('coursesCountSubLabel').textContent = `${keys.length} active programs`;
-
-            const tbody = document.querySelector('#uniqueCoursesSummaryTable tbody');
-            tbody.innerHTML = keys.map(k => {
-                const parts = k.split('|||');
-                return `<tr><td><strong>${parts[0]}</strong></td><td>${parts[1]}</td><td><span class="pill present">${groups[k]} students registered</span></td></tr>`;
-            }).join('');
-        }
-
-        // Attendance Tab Controller (Mockup exact match screen)
-        function syncAttendanceTabMetrics() {
-            const count = cachedStudentsArray.length;
-            document.getElementById('attendanceSectionMiniStats').innerHTML = `
-        <div class="stat-card blue"><div class="stat-label">TOTAL STUDENTS</div><div class="stat-value">${count}</div></div>
-        <div class="stat-card green"><div class="stat-label">PRESENT TODAY</div><div class="stat-value">0</div></div>
-        <div class="stat-card red"><div class="stat-label">ABSENT TODAY</div><div class="stat-value">0</div></div>
-        <div class="stat-card yellow"><div class="stat-label">AVG ATTENDANCE</div><div class="stat-value">60%</div><div class="stat-sub">overall</div></div>
-     `;
-
-            const courseFilter = document.getElementById('attendanceCourseDropdown').value;
-            const filtered = cachedStudentsArray.filter(s => !courseFilter || s.course === courseFilter);
-
-            const tbody = document.querySelector('#attendanceTrackingTable tbody');
-            tbody.innerHTML = filtered.map(s => {
-                currentAttendanceBatchState[s._id] = 'Present';
-                return `
-          <tr>
-            <td><div style="display:flex; align-items:center; gap:0.5rem;"><div class="avatar" style="width:28px; height:28px; font-size:0.75rem;">${s.name.charAt(0).toUpperCase()}</div><div><strong>${s.name}</strong><br><small style="color:var(--muted)">${s.rollNo || 0}</small></div></div></td>
-            <td class="att-options">
-               <button class="toggle-check-btn p-active" id="p-tab-${s._id}" onclick="setRowAttState('${s._id}','Present')">Present</button>
-               <button class="toggle-check-btn" id="a-tab-${s._id}" onclick="setRowAttState('${s._id}','Absent')">Absent</button>
-            </td>
-            <td><input type="text" placeholder="Remarks (optional)" style="background:var(--surface2); border:1px solid var(--border); border-radius:4px; padding:0.3rem 0.6rem; color:#fff; font-size:0.8rem; width:100%;"></td>
-          </tr>
-        `;
-            }).join('');
-        }
-
-        function setRowAttState(id, state) {
-            currentAttendanceBatchState[id] = state;
-            const pBtn = document.getElementById(`p-tab-${id}`);
-            const aBtn = document.getElementById(`a-tab-${id}`);
-            if (state === 'Present') { pBtn.classList.add('p-active'); aBtn.classList.remove('a-active'); }
-            else { aBtn.classList.add('a-active'); pBtn.classList.remove('p-active'); }
-        }
-
-        function bulkToggleAttendanceState(state) {
-            Object.keys(currentAttendanceBatchState).forEach(id => setRowAttState(id, state));
-        }
-
-        async function commitAttendanceSheetToServer() {
-            const promises = Object.keys(currentAttendanceBatchState).map(studentId =>
-                fetch(`${API_URL}/api/attendance`, {
-                    method: "POST", headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
-                    body: JSON.stringify({ studentId, status: currentAttendanceBatchState[studentId], date: document.getElementById('attendanceMainDatePicker').value })
-                })
-            );
-            await Promise.all(promises); alert("Attendance log saved successfully!");
-        }
-
-        // Fees Tab Metrics
-        function syncFeesTabMetrics() {
-            const count = cachedStudentsArray.length;
-            document.getElementById('feesSectionMiniStats').innerHTML = `
-        <div class="stat-card blue"><div class="stat-icon">💼</div><div class="stat-label">TOTAL FEES</div><div class="stat-value">₹${count * 60000}</div><div class="stat-sub">${count} students</div></div>
-        <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-label">PAID FEES</div><div class="stat-value">₹0</div><div class="stat-sub">0 students paid</div></div>
-        <div class="stat-card yellow"><div class="stat-icon">⏳</div><div class="stat-label">PENDING FEES</div><div class="stat-value">₹${count * 60000}</div><div class="stat-sub">100% pending</div></div>
-        <div class="stat-card red"><div class="stat-icon">🚨</div><div class="stat-label">OVERDUE FEES</div><div class="stat-value">₹0</div><div class="stat-sub">0 overdue</div></div>
-     `;
-            filterFeesDataTable();
-        }
-
-        function filterFeesDataTable() {
-            const search = document.getElementById('feesSearchInput').value.toLowerCase();
-            const filtered = cachedStudentsArray.filter(s => !search || s.name.toLowerCase().includes(search));
-
-            const tbody = document.querySelector('#feesManagementMasterTable tbody');
-            tbody.innerHTML = filtered.map(s => `
-        <tr>
-          <td><div style="display:flex; align-items:center; gap:0.5rem;"><div class="avatar" style="width:28px; height:28px; font-size:0.75rem;">${s.name.charAt(0).toUpperCase()}</div><div><strong>${s.name}</strong><br><small style="color:var(--muted)">${s.rollNo || 0}</small></div></div></td>
-          <td>${s.course || 'B.Sc'} / Year ${s.year || 1}</td>
-          <td><strong>₹60,000</strong></td>
-          <td style="color:var(--success)">₹0</td>
-          <td style="color:var(--warning)">₹60,000</td>
-          <td>—</td>
-          <td><span class="pill ${s.feeStatus === 'paid' ? 'paid' : 'pending'}">${s.feeStatus || 'pending'}</span></td>
-          <td><button class="btn-action-top" style="padding:0.3rem 0.6rem; font-size:0.75rem;" onclick="openModal('manageFeesModal')">💳 Update</button></td>
-        </tr>
-     `).join('');
-        }
-
-        // Results Tab Metrics
-        function syncResultsTabMetrics() {
-            document.getElementById('resultsSectionMiniStats').innerHTML = `
-        <div class="stat-card blue"><div class="stat-label">TOTAL RESULTS</div><div class="stat-value">1</div><div class="stat-sub">records</div></div>
-        <div class="stat-card green"><div class="stat-icon"></div><div class="stat-label">PASSED</div><div class="stat-value">1</div><div class="stat-sub">100% pass rate</div></div>
-        <div class="stat-card red"><div class="stat-label">FAILED</div><div class="stat-value">0</div></div>
-        <div class="stat-card purple"><div class="stat-label">AVG PERCENTAGE</div><div class="stat-value">70.0%</div></div>
-        <div class="stat-card yellow"><div class="stat-label">HIGHEST SCORE</div><div class="stat-value">70.0%</div></div>
-     `;
-            filterResultsDataTable();
-        }
-
-        function filterResultsDataTable() {
-            const tbody = document.querySelector('#resultsPerformanceMasterTable tbody');
-            // Map values to mockup exact alignment matching image specs
-            tbody.innerHTML = cachedStudentsArray.slice(0, 1).map(s => `
-        <tr>
-          <td><div style="display:flex; align-items:center; gap:0.5rem;"><div class="avatar" style="width:28px; height:28px; font-size:0.75rem;">${s.name.charAt(0).toUpperCase()}</div><div><strong>${s.name}</strong><br><small style="color:var(--muted)">${s.rollNo || 1}</small></div></div></td>
-          <td>${s.course || 'B.Sc'} / Yr ${s.year || 1}</td>
-          <td>Sem1</td>
-          <td style="color:#fff; font-weight:600;">70 <br><small style="color:var(--muted)">Obtained</small></td>
-          <td><strong>100</strong><br><small style="color:var(--muted)">Total</small></td>
-          <td><div style="display:flex; align-items:center; gap:0.4rem;"><div style="background:var(--border); width:40px; height:4px; border-radius:2px;"><div style="background:var(--warning); width:70%; height:100%;"></div></div>70%</div></td>
-          <td><span class="pill" style="background:rgba(37,99,235,0.15); color:#93c5fd; padding:0.2rem 0.5rem;">B</span></td>
-          <td><span class="pill paid">✓ Pass</span></td>
-          <td><button class="btn-inline-edit" onclick="alert('Result details!')">📝</button><button class="btn-inline-delete" onclick="alert('Delete item stub')">🗑️</button></td>
-        </tr>
-     `).join('');
-        }
-
-        // API OPERATIONS DATA SUBMISSIONS CHANNELS
-        document.getElementById('addStudentForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const payload = {
-                name: `${document.getElementById('sfName').value.trim()} ${document.getElementById('slName').value.trim()}`,
-                email: document.getElementById('sEmail').value.trim(), role: 'student',
-                rollNo: document.getElementById('sRoll').value.trim(), course: document.getElementById('sCourse').value.trim(),
-                branch: document.getElementById('sBranch').value.trim(), year: parseInt(document.getElementById('sYear').value),
-                password: document.getElementById('sPassword').value
-            };
-            const res = await fetch(`${API_URL}/api/auth/register`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-            if (res.ok) { alert("Student created successfully!"); closeModal('addStudentModal'); initializeSMSPortalWorkspace(); }
-        });
-
-        document.getElementById('updateFeesForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const res = await fetch(`${API_URL}/api/fees`, { method: "POST", headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify({ studentId: document.getElementById('feeStudentSelect').value, status: document.getElementById('feeStatusSelect').value }) });
-            if (res.ok) { alert("Fee configuration committed!"); closeModal('manageFeesModal'); initializeSMSPortalWorkspace(); }
-        });
-
-        document.getElementById('uploadResultsForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const payload = { studentId: document.getElementById('resultStudentSelect').value, subject: document.getElementById('resSubject').value.trim(), marksObtained: parseInt(document.getElementById('resObtained').value), maxMarks: parseInt(document.getElementById('resMax').value) };
-            const res = await fetch(`${API_URL}/api/results`, { method: "POST", headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-            if (res.ok) { alert("Term scores saved!"); closeModal('uploadResultsModal'); initializeSMSPortalWorkspace(); }
-        });
-
-        async function triggerDeleteStudentRecord(id) {
-            if (confirm("Are you sure you want to completely erase this student record?")) {
-                const res = await fetch(`${API_URL}/api/students/${id}`, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` } });
-                if (res.ok) { alert("Student entry dropped!"); initializeSMSPortalWorkspace(); }
-            }
-        }
-
-        window.onload = initializeSMSPortalWorkspace;
-    </script>
-
+  loadAdminDashboard();
+</script>
 </body>
-
 </html>
