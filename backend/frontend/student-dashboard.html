@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Student Portal | SMS</title>
-  <link rel="icon" type="image/png" href="SMS Logo.png">
+  <title>Student-Dashboard | SMS Portal</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -48,10 +47,10 @@
     .nav-item {
       display: flex; align-items: center; gap: 0.65rem; padding: 0.55rem 0.875rem; margin: 0.1rem 0.5rem;
       border-radius: 8px; font-size: 0.875rem; font-weight: 500; color: var(--muted); cursor: pointer;
-      transition: background 0.15s, color 0.15s; text-decoration: none;
+      transition: background 0.15s, color 0.15s; text-decoration: none; user-select: none;
     }
     .nav-item:hover, .nav-item.active { color: var(--text); }
-    .nav-item.active { background: rgba(37,99,235,0.15); color: #93c5fd; }
+    .nav-item.active { background: rgba(37,99,235,0.15); color: #93c5fd; font-weight: 600; }
     .nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
 
     .sidebar-footer { margin-top: auto; padding: 1rem; border-top: 1px solid var(--border); }
@@ -79,7 +78,7 @@
 
     .content { padding: 1.5rem; flex: 1; }
 
-    /* Views */
+    /* Views Switching Logic */
     .workspace-view { display: none; }
     .workspace-view.active { display: block; }
 
@@ -130,7 +129,7 @@
     .pill.paid, .pill.present { background: rgba(63,185,80,0.15); color: var(--success); }
     .pill.pending, .pill.absent { background: rgba(227,179,65,0.15); color: var(--warning); }
 
-    /* ── Sub-Pages Centered Containers (Images 40, 41, 42, 43 Exact Match) ── */
+    /* ── Sub-Pages Centered Layout Boxes ── */
     .centered-sub-container {
       max-width: 480px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border);
       border-radius: 16px; padding: 1.75rem; box-shadow: 0 12px 40px rgba(0,0,0,0.5);
@@ -177,7 +176,7 @@
     }
     .back-dashboard-btn:hover { border-color: var(--accent); color: var(--text); background: rgba(37,99,235,0.05); }
 
-    /* Fee Management Box (Image 41) */
+    /* Fee Management */
     .status-banner { padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.9rem; font-weight: 700; text-align: center; margin-bottom: 1.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
     .status-banner.pending { background: rgba(227,179,65,0.15); border: 1px solid var(--warning); color: var(--warning); }
     .status-banner.paid { background: rgba(63,185,80,0.15); border: 1px solid var(--success); color: var(--success); }
@@ -193,7 +192,7 @@
     th { background: rgba(255,255,255,0.01); font-weight: 600; color: var(--muted); font-size: 0.75rem; }
     tr:last-child td { border-bottom: none; }
 
-    /* Edit Profile Form (Image 43) */
+    /* Edit Profile Form */
     .edit-form-group { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.4rem; }
     .edit-form-group label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em; }
     .edit-form-group input, .edit-form-group select {
@@ -255,7 +254,7 @@
     <div class="user-card">
       <div class="avatar" id="sbAvatar">A</div>
       <div>
-        <div class="user-name" id="sbName">Arya Patel</div>
+        <div class="user-name" id="sbName">Student User</div>
         <div class="user-role" id="sbRole">Student</div>
       </div>
     </div>
@@ -269,7 +268,7 @@
       <button class="hamburger" id="hamburger">☰</button>
       <div>
         <div class="page-title" id="pageTitleText">Dashboard</div>
-        <div class="page-sub" id="liveTimestampLabel">Monday, 22 June 2026</div>
+        <div class="page-sub" id="liveTimestampLabel">Academic Session</div>
       </div>
     </div>
     <span class="badge student">STUDENT</span>
@@ -277,11 +276,11 @@
 
   <div class="content">
 
-    <!-- 1. MAIN STUDENT DASHBOARD (Image 39) -->
+    <!-- 1. MAIN STUDENT DASHBOARD -->
     <div id="dashboardView" class="workspace-view active">
       <div class="welcome-banner">
         <div class="welcome-text">
-          <h2>Good morning, <span id="welcomeStudentFirstName">Arya</span>! 👋</h2>
+          <h2>Good day, <span id="welcomeStudentFirstName">Student</span>! 👋</h2>
           <p>Here's your academic summary.</p>
         </div>
         <div class="welcome-emoji">🎒</div>
@@ -291,20 +290,20 @@
         <div class="stat-card purple">
           <div class="stat-icon">📚</div>
           <div class="stat-label">Course & Branch</div>
-          <div class="stat-value" style="font-size:1.1rem" id="cardCourseBranch">B.Sc (Science)</div>
-          <div class="stat-sub" id="cardYear">Year 1</div>
+          <div class="stat-value" style="font-size:1.1rem" id="cardCourseBranch">—</div>
+          <div class="stat-sub" id="cardYear">Year —</div>
         </div>
         <div class="stat-card green">
           <div class="stat-icon">📋</div>
           <div class="stat-label">Attendance</div>
-          <div class="stat-value" id="cardAttPct">100%</div>
-          <div class="stat-sub" id="cardAttCount">1/1 classes</div>
+          <div class="stat-value" id="cardAttPct">0%</div>
+          <div class="stat-sub" id="cardAttCount">0/0 classes</div>
         </div>
         <div class="stat-card yellow">
           <div class="stat-icon">💰</div>
           <div class="stat-label">Fee Status</div>
           <div class="stat-value" style="font-size:1.1rem" id="cardFeeStatus">Pending</div>
-          <div class="stat-sub" id="cardFeeDue">Due: ₹60000</div>
+          <div class="stat-sub" id="cardFeeDue">Due: ₹60,000</div>
         </div>
         <div class="stat-card cyan">
           <div class="stat-icon">📊</div>
@@ -321,12 +320,12 @@
             <span class="panel-link" onclick="switchStudentWorkspace('editProfileView', 'nav-profile')">Edit →</span>
           </div>
           <div class="profile-card">
-            <div class="profile-row"><span class="profile-key">Full Name</span><span class="profile-val" id="ovFullName">Arya Patel</span></div>
-            <div class="profile-row"><span class="profile-key">Roll Number</span><span class="profile-val" id="ovRollNo">2</span></div>
-            <div class="profile-row"><span class="profile-key">Email</span><span class="profile-val" id="ovEmail">arya123@gmail.com</span></div>
-            <div class="profile-row"><span class="profile-key">Course</span><span class="profile-val" id="ovCourse">B.Sc</span></div>
-            <div class="profile-row"><span class="profile-key">Branch</span><span class="profile-val" id="ovBranch">Science</span></div>
-            <div class="profile-row"><span class="profile-key">Year</span><span class="profile-val" id="ovYear">Year 1</span></div>
+            <div class="profile-row"><span class="profile-key">Full Name</span><span class="profile-val" id="ovFullName">—</span></div>
+            <div class="profile-row"><span class="profile-key">Roll Number</span><span class="profile-val" id="ovRollNo">—</span></div>
+            <div class="profile-row"><span class="profile-key">Email</span><span class="profile-val" id="ovEmail">—</span></div>
+            <div class="profile-row"><span class="profile-key">Course</span><span class="profile-val" id="ovCourse">—</span></div>
+            <div class="profile-row"><span class="profile-key">Branch</span><span class="profile-val" id="ovBranch">—</span></div>
+            <div class="profile-row"><span class="profile-key">Year</span><span class="profile-val" id="ovYear">—</span></div>
           </div>
         </div>
 
@@ -336,9 +335,9 @@
             <span class="panel-link" onclick="switchStudentWorkspace('attendanceView', 'nav-att')">Details →</span>
           </div>
           <div class="profile-card">
-            <div class="profile-row"><span class="profile-key">Attendance %</span><span class="profile-val" style="color:var(--success)" id="ovAttPct">100%</span></div>
-            <div class="progress-bar"><div class="progress-fill" style="width:100%; background:var(--success)" id="ovAttFill"></div></div>
-            <div class="stat-sub" style="margin-top:0.5rem;" id="ovAttNotice">✅ Attendance is good!</div>
+            <div class="profile-row"><span class="profile-key">Attendance %</span><span class="profile-val" style="color:var(--success)" id="ovAttPct">0%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:0%; background:var(--success)" id="ovAttFill"></div></div>
+            <div class="stat-sub" style="margin-top:0.5rem;" id="ovAttNotice">Attendance track active</div>
             
             <div style="margin-top:1rem;">
               <div class="profile-row"><span class="profile-key">Fee Status</span><span class="pill pending" id="ovFeePill">pending</span></div>
@@ -352,7 +351,7 @@
       </div>
     </div>
 
-    <!-- 2. ATTENDANCE CALENDAR (Image 40) -->
+    <!-- 2. ATTENDANCE CALENDAR -->
     <div id="attendanceView" class="workspace-view">
       <div class="centered-sub-container">
         <div class="sub-header-bar">
@@ -363,7 +362,7 @@
         <div class="chart-container">
           <div class="circular-progress" id="circularProgress">
             <div class="chart-center-text">
-              <span class="chart-center-val" id="centerPct">100%</span>
+              <span class="chart-center-val" id="centerPct">0%</span>
               <span class="chart-center-lbl">PRESENT</span>
             </div>
           </div>
@@ -379,7 +378,7 @@
         <div class="calendar-wrapper">
           <div class="cal-header">
             <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
-            <span class="month-label" id="monthYearLabel">June 2026</span>
+            <span class="month-label" id="monthYearLabel">—</span>
             <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
           </div>
           <div class="weekdays-grid"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
@@ -390,7 +389,7 @@
       </div>
     </div>
 
-    <!-- 3. FEE MANAGEMENT (Image 41) -->
+    <!-- 3. FEE MANAGEMENT -->
     <div id="feesView" class="workspace-view">
       <div class="centered-sub-container">
         <div class="sub-header-bar">
@@ -418,7 +417,7 @@
       </div>
     </div>
 
-    <!-- 4. EXAMINATION RESULTS (Image 42) -->
+    <!-- 4. EXAMINATION RESULTS -->
     <div id="resultsView" class="workspace-view">
       <div class="centered-sub-container">
         <div class="sub-header-bar">
@@ -441,7 +440,7 @@
       </div>
     </div>
 
-    <!-- 5. EDIT MY PROFILE (Image 43) -->
+    <!-- 5. EDIT MY PROFILE -->
     <div id="editProfileView" class="workspace-view">
       <div class="centered-sub-container">
         <h2 style="font-size:1.25rem; font-weight:700; text-align:center; margin-bottom:1.5rem;">Edit My Profile 👤</h2>
@@ -484,23 +483,35 @@
 
   function triggerSystemLogout() { localStorage.clear(); window.location.href = 'login.html'; }
 
+  // ✅ FIXED SWITCHING LOGIC (NO JS SYNTAX ERROR)
   function switchStudentWorkspace(targetViewId, navBtnId) {
     document.querySelectorAll('.workspace-view').forEach(v => v.classList.remove('active'));
-    document.querySelectorAll('.sidebar .nav-item').forEach(b => btn.classList.remove('active'));
+    document.querySelectorAll('.sidebar .nav-item').forEach(b => b.classList.remove('active'));
 
     const vEl = document.getElementById(targetViewId);
     if (vEl) vEl.classList.add('active');
+    
     const bEl = document.getElementById(navBtnId);
     if (bEl) bEl.classList.add('active');
 
-    const titleMap = { 'dashboardView':'Dashboard', 'attendanceView':'Attendance', 'feesView':'Fee Management', 'resultsView':'Examination Results', 'editProfileView':'Edit Profile' };
+    const titleMap = { 
+      'dashboardView': 'Dashboard', 
+      'attendanceView': 'My Attendance', 
+      'feesView': 'Fee Management', 
+      'resultsView': 'Examination Results', 
+      'editProfileView': 'Edit Profile' 
+    };
     document.getElementById('pageTitleText').textContent = titleMap[targetViewId] || 'Dashboard';
+    
+    // Close mobile menu if open
+    sidebar.classList.remove('open');
+    overlay.classList.remove('show');
   }
 
-  // 1. Fetch Real-time Data Pipelines
+  // Fetch Real-time Data Pipelines
   async function fetchLiveStudentData() {
     try {
-      // 1A. Profile Fetch
+      // 1. Profile Fetch
       const pRes = await fetch(`${API_URL}/api/students/me`, { headers: { 'Authorization': `Bearer ${token}` } });
       if (pRes.ok) {
         const student = await pRes.json();
@@ -521,7 +532,7 @@
         document.getElementById('ovBranch').textContent = student.branch || '—';
         document.getElementById('ovYear').textContent = `Year ${student.year || 1}`;
 
-        // Populate Edit Form Input Fields (Image 43)
+        // Form Inputs
         document.getElementById('pName').value = full;
         document.getElementById('pRollNo').value = student.rollNo || '';
         document.getElementById('pCourse').value = student.course || '';
@@ -529,7 +540,7 @@
         document.getElementById('pYear').value = student.year || '1';
       }
 
-      // 1B. Real-Time Attendance Fetch
+      // 2. Real-Time Attendance Fetch
       const aRes = await fetch(`${API_URL}/api/attendance/me`, { headers: { 'Authorization': `Bearer ${token}` } });
       if (aRes.ok) {
         const att = await aRes.json();
@@ -537,34 +548,28 @@
 
         const pct = att.percentage ?? (att.history?.length > 0 ? 100 : 0);
         document.getElementById('cardAttPct').textContent = `${pct}%`;
-        document.getElementById('cardAttCount').textContent = `${att.present || (pct > 0 ? 1 : 0)}/${att.total || (pct > 0 ? 1 : 0)} classes`;
+        document.getElementById('cardAttCount').textContent = `${att.present || 0}/${att.total || 0} classes`;
         
         document.getElementById('ovAttPct').textContent = `${pct}%`;
         document.getElementById('ovAttFill').style.width = `${pct}%`;
         document.getElementById('centerPct').textContent = `${pct}%`;
-
-        if (pct < 75) {
-          document.getElementById('ovAttNotice').textContent = "⚠️ Below 75% — improve attendance";
-          document.getElementById('ovAttPct').style.color = "var(--warning)";
-          document.getElementById('ovAttFill').style.background = "var(--warning)";
-        }
       }
 
-      // 1C. Real-Time Fees Fetch
+      // 3. Real-Time Fees Fetch
       const fRes = await fetch(`${API_URL}/api/fees/me`, { headers: { 'Authorization': `Bearer ${token}` } });
       if (fRes.ok) {
         const fee = await fRes.json();
         const status = (fee.status || 'pending').toLowerCase();
 
         document.getElementById('cardFeeStatus').textContent = status.toUpperCase();
-        document.getElementById('cardFeeDue').textContent = status === 'paid' ? 'All clear' : `Due: ₹${fee.due || 60000}`;
+        document.getElementById('cardFeeDue').textContent = status === 'paid' ? 'All clear' : `Due: ₹${fee.due ?? 60000}`;
         document.getElementById('ovFeePill').textContent = status;
         document.getElementById('ovFeePill').className = `pill ${status === 'paid' ? 'paid' : 'pending'}`;
 
         document.getElementById('statusBanner').textContent = status.toUpperCase();
         document.getElementById('statusBanner').className = `status-banner ${status}`;
 
-        const totalAmt = fee.totalFee || 60000;
+        const totalAmt = fee.totalFee || fee.totalAmount || 60000;
         const paidAmt = status === 'paid' ? totalAmt : (fee.paidAmount || 0);
         const dueAmt = totalAmt - paidAmt;
 
@@ -573,7 +578,7 @@
         document.getElementById('subDueFee').textContent = `₹${dueAmt.toLocaleString('en-IN')}`;
       }
 
-      // 1D. Real-Time Results Fetch
+      // 4. Real-Time Results Fetch
       const rRes = await fetch(`${API_URL}/api/results/me`, { headers: { 'Authorization': `Bearer ${token}` } });
       if (rRes.ok) {
         const resData = await rRes.json();
@@ -594,9 +599,10 @@
     } catch(err) { console.error("Error fetching live student metrics:", err); }
   }
 
-  // 2. Attendance Calendar Engine Renders
+  // Attendance Calendar Engine
   function renderCalendarEngine() {
     const container = document.getElementById('daysGridContainer');
+    if (!container) return;
     container.innerHTML = '';
 
     const year = currentCalendarDate.getFullYear();
@@ -640,8 +646,9 @@
     renderCalendarEngine();
   };
 
-  // 3. Edit Profile Save Action Sync
+  // Edit Profile Save Action
   document.getElementById('saveProfileBtn').addEventListener('click', async () => {
+    const saveBtn = document.getElementById('saveProfileBtn');
     const payload = {
       name: document.getElementById('pName').value.trim(),
       rollNo: document.getElementById('pRollNo').value.trim(),
@@ -649,6 +656,9 @@
       branch: document.getElementById('pBranch').value.trim(),
       year: parseInt(document.getElementById('pYear').value) || 1
     };
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving...';
 
     try {
       const res = await fetch(`${API_URL}/api/students/me`, {
@@ -662,6 +672,10 @@
         switchStudentWorkspace('dashboardView', 'nav-dashboard');
       } else { alert("Failed to update profile."); }
     } catch(err) { alert("Network error."); }
+    finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save Changes';
+    }
   });
 
   window.onload = fetchLiveStudentData;
