@@ -446,7 +446,6 @@
       border: 1px solid var(--accent);
     }
 
-    /* Table Inset */
     .inset-table {
       width: 100%;
       border-collapse: collapse;
@@ -493,29 +492,29 @@
   </div>
 
   <div class="nav-section">Main</div>
-  <a class="nav-item active" onclick="switchView('main')">
+  <a class="nav-item active" id="nav-main" onclick="switchView('main')">
     <span class="nav-icon">🏠</span> Dashboard
   </a>
 
   <div class="nav-section">My Academics</div>
-  <a class="nav-item" onclick="switchView('attendance')">
+  <a class="nav-item" id="nav-attendance" onclick="switchView('attendance')">
     <span class="nav-icon">📋</span> My Attendance
   </a>
-  <a class="nav-item" onclick="switchView('fees')">
+  <a class="nav-item" id="nav-fees" onclick="switchView('fees')">
     <span class="nav-icon">💰</span> My Fees
   </a>
-  <a class="nav-item" onclick="switchView('results')">
+  <a class="nav-item" id="nav-results" onclick="switchView('results')">
     <span class="nav-icon">📊</span> My Results
   </a>
-  <a class="nav-item" onclick="switchView('profile')">
+  <a class="nav-item" id="nav-profile" onclick="switchView('profile')">
     <span class="nav-icon">👤</span> My Profile
   </a>
 
   <div class="sidebar-footer">
     <div class="user-card">
-      <div class="avatar" id="sidebarAvatar">A</div>
+      <div class="avatar" id="sidebarAvatar">S</div>
       <div>
-        <div class="user-name" id="sidebarName">Arya Patel</div>
+        <div class="user-name" id="sidebarName">Loading...</div>
         <div class="user-role">Student</div>
       </div>
     </div>
@@ -547,7 +546,7 @@
     <div id="mainDashboardView">
       <div class="welcome-banner">
         <div class="welcome-text">
-          <h2 id="welcomeMsg">Good morning, Arya! 👋</h2>
+          <h2 id="welcomeMsg">Welcome back! 👋</h2>
           <p>Here's your academic summary.</p>
         </div>
         <div class="welcome-emoji">🎒</div>
@@ -557,8 +556,8 @@
         <div class="stat-card purple" onclick="switchView('profile')">
           <div class="stat-icon">📚</div>
           <div class="stat-label">Course & Branch</div>
-          <div class="stat-value" id="cardCourse">B.Sc (Science)</div>
-          <div class="stat-sub" id="cardYear">Year 1</div>
+          <div class="stat-value" id="cardCourse">—</div>
+          <div class="stat-sub" id="cardYear">—</div>
         </div>
 
         <div class="stat-card green" onclick="switchView('attendance')">
@@ -591,12 +590,12 @@
             <span class="panel-link" onclick="switchView('profile')">Edit →</span>
           </div>
           <div class="profile-card">
-            <div class="profile-row"><span class="profile-key">Full Name</span><span class="profile-val" id="profName">Arya Patel</span></div>
-            <div class="profile-row"><span class="profile-key">Roll Number</span><span class="profile-val" id="profRoll">2</span></div>
-            <div class="profile-row"><span class="profile-key">Email</span><span class="profile-val" id="profEmail">arya123@gmail.com</span></div>
-            <div class="profile-row"><span class="profile-key">Course</span><span class="profile-val" id="profCourse">B.Sc</span></div>
-            <div class="profile-row"><span class="profile-key">Branch</span><span class="profile-val" id="profBranch">Science</span></div>
-            <div class="profile-row"><span class="profile-key">Year</span><span class="profile-val" id="profYear">Year 1</span></div>
+            <div class="profile-row"><span class="profile-key">Full Name</span><span class="profile-val" id="profName">—</span></div>
+            <div class="profile-row"><span class="profile-key">Roll Number</span><span class="profile-val" id="profRoll">—</span></div>
+            <div class="profile-row"><span class="profile-key">Email</span><span class="profile-val" id="profEmail">—</span></div>
+            <div class="profile-row"><span class="profile-key">Course</span><span class="profile-val" id="profCourse">—</span></div>
+            <div class="profile-row"><span class="profile-key">Branch</span><span class="profile-val" id="profBranch">—</span></div>
+            <div class="profile-row"><span class="profile-key">Year</span><span class="profile-val" id="profYear">—</span></div>
           </div>
         </div>
 
@@ -645,24 +644,24 @@
       <form id="profileForm" onsubmit="saveProfile(event)">
         <div class="form-group">
           <label class="form-label">Full Name</label>
-          <input type="text" class="form-input" id="inputName" value="Arya Patel" required />
+          <input type="text" class="form-input" id="inputName" required />
         </div>
         <div class="form-group">
           <label class="form-label">Roll Number</label>
-          <input type="text" class="form-input" id="inputRoll" value="2" required />
+          <input type="text" class="form-input" id="inputRoll" required />
         </div>
         <div class="form-group">
           <label class="form-label">Course</label>
-          <input type="text" class="form-input" id="inputCourse" value="B.Sc" required />
+          <input type="text" class="form-input" id="inputCourse" required />
         </div>
         <div class="form-group">
           <label class="form-label">Branch</label>
-          <input type="text" class="form-input" id="inputBranch" value="Science" required />
+          <input type="text" class="form-input" id="inputBranch" required />
         </div>
         <div class="form-group">
           <label class="form-label">Year</label>
           <select class="form-select" id="inputYear">
-            <option value="Year 1" selected>1st Year</option>
+            <option value="Year 1">1st Year</option>
             <option value="Year 2">2nd Year</option>
             <option value="Year 3">3rd Year</option>
             <option value="Year 4">4th Year</option>
@@ -692,7 +691,7 @@
       </div>
 
       <div style="background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:1rem; margin-top:1rem;">
-        <div style="text-align:center; font-weight:700; font-size:0.9rem; margin-bottom:0.75rem;">June 2026</div>
+        <div style="text-align:center; font-weight:700; font-size:0.9rem; margin-bottom:0.75rem;">July 2026</div>
         <div class="calendar-grid">
           <div class="cal-day-head">Mon</div><div class="cal-day-head">Tue</div><div class="cal-day-head">Wed</div>
           <div class="cal-day-head">Thu</div><div class="cal-day-head">Fri</div><div class="cal-day-head">Sat</div><div class="cal-day-head">Sun</div>
@@ -701,7 +700,7 @@
           <div class="cal-day">8</div><div class="cal-day">9</div><div class="cal-day">10</div><div class="cal-day">11</div><div class="cal-day">12</div><div class="cal-day">13</div><div class="cal-day">14</div>
           <div class="cal-day">15</div><div class="cal-day">16</div><div class="cal-day">17</div><div class="cal-day">18</div><div class="cal-day">19</div><div class="cal-day">20</div><div class="cal-day active-present">21</div>
           <div class="cal-day today">22</div><div class="cal-day">23</div><div class="cal-day">24</div><div class="cal-day">25</div><div class="cal-day">26</div><div class="cal-day">27</div><div class="cal-day">28</div>
-          <div class="cal-day">29</div><div class="cal-day">30</div>
+          <div class="cal-day">29</div><div class="cal-day">30</div><div class="cal-day">31</div>
         </div>
       </div>
 
@@ -786,24 +785,31 @@
   // Auth Guard
   const token = localStorage.getItem('token');
   const user  = JSON.parse(localStorage.getItem('user') || '{}');
-  if (!token) window.location.href = 'login.html';
 
-  // Responsive Drawer
+  if (!token) {
+    window.location.href = 'login.html';
+  }
+
+  // Mobile Drawer Setup
   const sidebar   = document.getElementById('sidebar');
   const overlay   = document.getElementById('overlay');
   const hamburger = document.getElementById('hamburger');
 
-  hamburger.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
-    overlay.classList.toggle('show');
-  });
+  if (hamburger) {
+    hamburger.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('show');
+    });
+  }
 
-  overlay.addEventListener('click', () => {
-    sidebar.classList.remove('open');
-    overlay.classList.remove('show');
-  });
+  if (overlay) {
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('show');
+    });
+  }
 
-  // Date Header
+  // Date Label
   const now = new Date();
   document.getElementById('dateLabel').textContent = now.toLocaleDateString('en-IN', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
@@ -815,7 +821,7 @@
     window.location.href = 'login.html';
   });
 
-  // View Switcher Router
+  // Tab View Switcher (Prevents invalid 401 logouts during internal navigation)
   function switchView(view) {
     document.getElementById('mainDashboardView').style.display = 'none';
     document.getElementById('profileView').style.display       = 'none';
@@ -823,25 +829,34 @@
     document.getElementById('feesView').style.display          = 'none';
     document.getElementById('resultsView').style.display       = 'none';
 
-    // Highlight nav items
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
 
     const titleEl = document.getElementById('pageTitle');
 
     if (view === 'main') {
       document.getElementById('mainDashboardView').style.display = 'block';
+      const navMain = document.getElementById('nav-main');
+      if (navMain) navMain.classList.add('active');
       titleEl.textContent = 'Dashboard';
     } else if (view === 'profile') {
       document.getElementById('profileView').style.display = 'block';
+      const navProf = document.getElementById('nav-profile');
+      if (navProf) navProf.classList.add('active');
       titleEl.textContent = 'Edit Profile';
     } else if (view === 'attendance') {
       document.getElementById('attendanceView').style.display = 'block';
+      const navAtt = document.getElementById('nav-attendance');
+      if (navAtt) navAtt.classList.add('active');
       titleEl.textContent = 'My Attendance';
     } else if (view === 'fees') {
       document.getElementById('feesView').style.display = 'block';
+      const navFees = document.getElementById('nav-fees');
+      if (navFees) navFees.classList.add('active');
       titleEl.textContent = 'My Fees';
     } else if (view === 'results') {
       document.getElementById('resultsView').style.display = 'block';
+      const navRes = document.getElementById('nav-results');
+      if (navRes) navRes.classList.add('active');
       titleEl.textContent = 'My Results';
     }
 
@@ -851,52 +866,91 @@
     }
   }
 
-  // Profile Save Action
+  // Dynamic Session Hydration
+  function syncUIFromUser(u) {
+    const sName   = u.name || "Student";
+    const sRoll   = u.rollNo || u.rollNumber || "N/A";
+    const sEmail  = u.email || "N/A";
+    const sCourse = u.course || "B.Sc";
+    const sBranch = u.branch || "Science";
+    const sYear   = u.year || "Year 1";
+
+    document.getElementById('sidebarAvatar').textContent = sName.charAt(0).toUpperCase();
+    document.getElementById('sidebarName').textContent   = sName;
+    document.getElementById('welcomeMsg').textContent   = `Good morning, ${sName.split(' ')[0]}! 👋`;
+
+    // Overview Stats
+    document.getElementById('cardCourse').textContent = `${sCourse} (${sBranch})`;
+    document.getElementById('cardYear').textContent   = sYear;
+
+    // Profile Summary Card
+    document.getElementById('profName').textContent   = sName;
+    document.getElementById('profRoll').textContent   = sRoll;
+    document.getElementById('profEmail').textContent  = sEmail;
+    document.getElementById('profCourse').textContent = sCourse;
+    document.getElementById('profBranch').textContent = sBranch;
+    document.getElementById('profYear').textContent   = sYear;
+
+    // Form Field Defaults
+    document.getElementById('inputName').value   = sName;
+    document.getElementById('inputRoll').value   = sRoll;
+    document.getElementById('inputCourse').value = sCourse;
+    document.getElementById('inputBranch').value = sBranch;
+    
+    const yearSelect = document.getElementById('inputYear');
+    if (yearSelect) {
+      yearSelect.value = sYear.includes('Year') ? sYear : `Year ${sYear}`;
+    }
+  }
+
+  // Save Profile Locally
   function saveProfile(e) {
     e.preventDefault();
-    const name = document.getElementById('inputName').value;
-    const roll = document.getElementById('inputRoll').value;
-    const course = document.getElementById('inputCourse').value;
-    const branch = document.getElementById('inputBranch').value;
-    const year = document.getElementById('inputYear').value;
+    const updatedUser = {
+      ...user,
+      name: document.getElementById('inputName').value,
+      rollNo: document.getElementById('inputRoll').value,
+      course: document.getElementById('inputCourse').value,
+      branch: document.getElementById('inputBranch').value,
+      year: document.getElementById('inputYear').value
+    };
 
-    // Local update UI bindings
-    document.getElementById('profName').textContent = name;
-    document.getElementById('profRoll').textContent = roll;
-    document.getElementById('profCourse').textContent = course;
-    document.getElementById('profBranch').textContent = branch;
-    document.getElementById('profYear').textContent = year;
-    document.getElementById('sidebarName').textContent = name;
-    document.getElementById('welcomeMsg').textContent = `Good morning, ${name.split(' ')[0]}! 👋`;
-    document.getElementById('cardCourse').textContent = `${course} (${branch})`;
-    document.getElementById('cardYear').textContent = year;
-
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    syncUIFromUser(updatedUser);
     switchView('main');
   }
 
-  // API Integration Loader
-  async function loadStudentData() {
+  // Safe Network Fetching
+  async function apiFetch(endpoint) {
     try {
-      const userObj = JSON.parse(localStorage.getItem('user') || '{}');
-      const res = await fetch(`${API_URL}/api/students/me`, {
+      const res = await fetch(`${API_URL}${endpoint}`, {
         headers: { 
           'Authorization': `Bearer ${token}`,
-          'user-id': userObj.id || userObj._id || '' 
+          'user-id': user.id || user._id || '' 
         }
       });
       if (res.ok) {
-        const data = await res.json();
-        if (data) {
-          document.getElementById('profName').textContent = data.name || userObj.name || 'Arya Patel';
-          document.getElementById('profRoll').textContent = data.rollNo || '2';
-          document.getElementById('profEmail').textContent = data.email || userObj.email || 'arya123@gmail.com';
-          document.getElementById('profCourse').textContent = data.course || 'B.Sc';
-          document.getElementById('profBranch').textContent = data.branch || 'Science';
-          document.getElementById('profYear').textContent = data.year || 'Year 1';
-        }
+        return await res.json();
       }
     } catch (err) {
-      console.log('Using initial default state for presentation');
+      console.warn(`Silently caught fetch error for ${endpoint}:`, err);
+    }
+    return null;
+  }
+
+  async function loadStudentData() {
+    // 1. Immediately hydrate with the active local session details
+    syncUIFromUser(user);
+
+    // 2. Open dashboard view on load
+    switchView('main');
+
+    // 3. Silently fetch updated records from backend if available
+    const remoteData = await apiFetch('/api/students/me');
+    if (remoteData) {
+      const mergedUser = { ...user, ...remoteData };
+      localStorage.setItem('user', JSON.stringify(mergedUser));
+      syncUIFromUser(mergedUser);
     }
   }
 
