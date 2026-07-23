@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const Fee = require('../models/fee'); 
-const mongoose = require('mongoose');
+const Attendance = require('../models/Attendance'); 
 const { auth, isFaculty, isAdmin } = require('../middleware/auth'); 
 
 // 🎓 1. STUDENT: APNA SELF PROFILE DEKHO
@@ -13,7 +13,6 @@ router.get('/me', auth, async (req, res) => {
             return res.status(404).json({ error: true, message: "Student profile not found." });
         }
         
-        // Live financial fee status verification
         const feeRecord = await Fee.findOne({ studentId: student._id });
         const dynamicFeeStatus = feeRecord ? feeRecord.status : 'pending';
 
@@ -34,7 +33,7 @@ router.get('/me', auth, async (req, res) => {
     }
 });
 
-// 🎓 2. STUDENT: APNI PROFILE EDIT / UPDATE KARO (FIXED MISSING ENDPOINT)
+// 🎓 2. STUDENT: APNI PROFILE EDIT / UPDATE KARO
 router.put('/me', auth, async (req, res) => {
     try {
         const { name, rollNo, course, branch, year } = req.body;
@@ -68,30 +67,27 @@ router.put('/me', auth, async (req, res) => {
     }
 });
 
-// 👥 3. FACULTY & ADMIN: GET ALL STUDENTS WITH LIVE TODAY'S ATTENDANCE STATUS
+// 👥 3. FACULTY & ADMIN: GET ALL STUDENTS WITH TODAY'S ATTENDANCE STATUS
 router.get('/', auth, isFaculty, async (req, res) => {
     try {
         const recentStudents = await User.find({ role: 'student' }).sort({ createdAt: -1 });
 
-        // Today's dynamic system date tracking boundaries
         const todayStart = new Date();
         todayStart.setHours(0, 0, 0, 0);
         const todayEnd = new Date();
         todayEnd.setHours(23, 59, 59, 999);
 
-        const AttendanceModel = mongoose.model('Attendance');
-
-        // Fetch all fees and attendance in bulk for optimized performance
         const studentIds = recentStudents.map(s => s._id);
-        const feeRecords = await Fee.find({ studentId: { $in: studentIds } });
-        const todayAttendanceRecords = await AttendanceModel.find({
+
+        // Safe Queries using explicit Models
+        const feeRecords = await Fee.find({ studentId: { $in: studentIds } }).catch(() => []);
+        const todayAttendanceRecords = await Attendance.find({
             studentId: { $in: studentIds },
             date: { $gte: todayStart, $lte: todayEnd }
-        });
+        }).catch(() => []);
 
-        // Fast In-Memory Map Lookup
-        const feeMap = new Map(feeRecords.map(f => [f.studentId.toString(), f.status]));
-        const attMap = new Map(todayAttendanceRecords.map(a => [a.studentId.toString(), a.status]));
+        const feeMap = new Map(feeRecords.map(f => [f.studentId ? f.studentId.toString() : '', f.status]));
+        const attMap = new Map(todayAttendanceRecords.map(a => [a.studentId ? a.studentId.toString() : '', a.status]));
 
         const formattedStudents = recentStudents.map(s => {
             const sIdStr = s._id.toString();
@@ -111,11 +107,11 @@ router.get('/', auth, isFaculty, async (req, res) => {
         return res.status(200).json(formattedStudents);
     } catch (err) {
         console.error("Students List Master Error:", err);
-        return res.status(500).json({ error: true, message: "Internal server error." });
+        return res.status(500).json({ error: true, message: "Internal server error loading students." });
     }
 });
 
-// 📊 4. FACULTY & ADMIN: TOTAL STUDENTS COUNT & NEW THIS MONTH METRICS
+// 📊 4. FACULTY & ADMIN: TOTAL STUDENTS COUNT
 router.get('/count', auth, isFaculty, async (req, res) => {
     try {
         const totalStudents = await User.countDocuments({ role: 'student' });
@@ -139,7 +135,8 @@ router.get('/count', auth, isFaculty, async (req, res) => {
 router.delete('/:id', auth, isFaculty, async (req, res) => {
     try {
         const studentId = req.params.id;
-        await Fee.deleteOne({ studentId });
+        await Fee.deleteOne({ studentId }).catch(() => {});
+        await Attendance.deleteMany({ studentId }).catch(() => {});
         const deletedUser = await User.findByIdAndDelete(studentId);
         if (!deletedUser) return res.status(404).json({ error: true, message: "Student not found." });
         return res.status(200).json({ error: false, message: "Student deleted successfully!" });
