@@ -5,6 +5,233 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { auth } = require('../middleware/auth'); 
 
+const JWT_SECRET = process.env.JWT_SECRET || "fallback_secret_key_12345";
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "admin@sms.com").toLowerCase();
+
+// 📝 1. REGISTER ROUTE
+router.post('/register', async (req, res) => {
+    try {
+        const { name, email, password, role, rollNo, course, branch, year, department, facultySecretKey } = req.body;
+
+        // Basic Validation
+        if (!name || !email || !password || !role) {
+            return res.status(400).json({ message: "Please fill all required fields." });
+        }
+
+        const userEmailLower = email.toLowerCase().trim();
+
+        // STRICT SECURITY: Explicitly block anyone attempting to register as 'admin'
+        if (role === 'admin' || userEmailLower === ADMIN_EMAIL) {
+            return res.status(403).json({ message: "Unauthorized! Admin registration is prohibited." });
+        }
+
+        // 👨‍🏫 FACULTY VALIDATION LOGIC
+        if (role === 'faculty') {
+            if (!department) {
+                return res.status(400).json({ message: "Department is required for faculty registration." });
+            }
+            const targetSecret = process.env.FACULTY_SECRET_KEY || "FACULTY2026";
+            if (!facultySecretKey || facultySecretKey !== targetSecret) {
+                return res.status(403).json({ message: "Invalid Faculty Secret Key. Access Denied!" });
+            }
+        }
+
+        // Check if user already exists
+        let existingUser = await User.findOne({ email: userEmailLower });
+        if (existingUser) {
+            return res.status(400).json({ message: "User already exists with this email." });
+        }
+
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create New User
+        const newUser = new User({
+            name,
+            email: userEmailLower,
+            password: hashedPassword,
+            role,
+            rollNo: role === 'student' ? rollNo : undefined,
+            course: role === 'student' ? course : undefined,
+            branch: role === 'student' ? branch : undefined,
+            year: role === 'student' ? year : undefined,
+            department: role === 'faculty' ? department : undefined
+        });
+
+        await newUser.save();
+
+        // Default Fee Record for new student
+        if (role === 'student') {
+            try {
+                const Fee = require('../models/fee');
+                const defaultFee = new Fee({
+                    studentId: newUser._id,
+                    totalAmount: 60000,
+                    paidAmount: 0,
+                    status: 'pending',
+                    transactions: []
+                });
+                await defaultFee.save();
+            } catch (feeErr) {
+                console.error("Default Fee Record Init Warning:", feeErr);
+            }
+        }
+
+        res.status(201).json({ message: "User registered successfully! 🎉" });
+
+    } catch (err) {
+        console.error("Registration Error:", err);
+        res.status(500).json({ message: "Server error during registration." });
+    }
+});
+
+// 🔑 2. LOGIN ROUTE
+router.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ message: "Please enter both email and password." });
+        }
+
+        const inputEmailLower = email.toLowerCase().trim();
+
+        // 1. Check against Super Admin credentials
+        if (inputEmailLower === ADMIN_EMAIL) {
+            const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+            if (password === adminPassword) {
+                const token = jwt.sign(
+                    { id: "SUPER_ADMIN_ID", role: "admin" },
+                    JWT_SECRET,
+                    { expiresIn: '1d' }
+                );
+                return res.status(200).json({
+                    message: "Login success",
+                    token,
+                    user: {
+                        id: "SUPER_ADMIN_ID",
+                        name: "System Admin",
+                        email: ADMIN_EMAIL,
+                        role: "admin"
+                    }
+                });
+            } else {
+                return res.status(401).json({ message: "Invalid credentials. Wrong password." });
+            }
+        }
+
+        // 2. Database Lookup for Faculty or Student
+        const user = await User.findOne({ email: inputEmailLower });
+        if (!user) {
+            return res.status(400).json({ message: "User does not exist. Please register first." });
+        }
+
+        // Verify password
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: "Invalid credentials. Wrong password." });
+        }
+
+        // Generate JWT Token
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            JWT_SECRET,
+            { expiresIn: '1d' }
+        );
+
+        // ✅ Complete User Payload with Academic metadata
+        res.status(200).json({
+            message: "Login success",
+            token,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                rollNo: user.rollNo || '',
+                course: user.course || '',
+                branch: user.branch || '',
+                year: user.year || '',
+                department: user.department || ''
+            }
+        });
+
+    } catch (err) {
+        console.error("Login Error:", err);
+        res.status(500).json({ message: "Server error during login." });
+    }
+});
+
+// ⚙️ 3. UPDATE PROFILE ROUTE
+router.put('/update-profile', auth, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { name, email } = req.body;
+
+        if (req.user.role === 'admin') {
+            return res.status(400).json({ error: true, message: "Fixed system admin profiles cannot be changed here." });
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { name, email: email ? email.toLowerCase().trim() : undefined },
+            { new: true }
+        ).select('-password');
+
+        if (!updatedUser) {
+            return res.status(404).json({ error: true, message: "User not found." });
+        }
+
+        return res.status(200).json({ error: false, message: "Profile updated successfully!", user: updatedUser });
+    } catch (err) {
+        console.error("Update Profile Error:", err);
+        return res.status(500).json({ error: true, message: "Server error updating profile." });
+    }
+});
+
+// ⚙️ 4. CHANGE PASSWORD ROUTE
+router.put('/change-password', auth, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { currentPassword, newPassword } = req.body;
+
+        if (req.user.role === 'admin') {
+            return res.status(400).json({ error: true, message: "Fixed system admin credentials can only be updated in environment settings." });
+        }
+
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({ error: true, message: "Please provide both current and new passwords." });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: true, message: "User not found." });
+        }
+
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ error: true, message: "Current password is incorrect." });
+        }
+
+        user.password = await bcrypt.hash(newPassword, 10);
+        await user.save();
+
+        return res.status(200).json({ error: false, message: "Password updated successfully! 🔒" });
+    } catch (err) {
+        console.error("Change Password Error:", err);
+        return res.status(500).json({ error: true, message: "Server error changing password." });
+    }
+});
+
+module.exports = router;
+/*
+const express = require('express');
+const router = express.Router();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+const { auth } = require('../middleware/auth'); 
+
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // 📝 1. REGISTER ROUTE
@@ -209,3 +436,4 @@ router.put('/change-password', auth, async (req, res) => {
 });
 
 module.exports = router;
+*/
