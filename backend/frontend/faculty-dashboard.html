@@ -483,7 +483,7 @@
     <!-- Welcome Banner -->
     <div class="welcome-banner">
       <div class="welcome-text">
-        <h2 id="welcomeMsg">Welcome back, Professor! 👋</h2>
+        <h2 id="welcomeMsg">Welcome back! 👋</h2>
         <p id="welcomeSub">Here is your lecture roadmap and academic summary for today.</p>
       </div>
       <div class="welcome-emoji">👨‍🏫</div>
@@ -620,29 +620,29 @@
   // Auth Guard
   const token = localStorage.getItem('token');
   const user  = JSON.parse(localStorage.getItem('user') || '{}');
-  if (!token) window.location.href = 'login.html';
 
-  const role = user.role || 'faculty';
-  const name = user.name || 'Faculty Member';
+  if (!token) {
+    window.location.href = 'login.html';
+  }
 
   // Mobile navigation setup
   const sidebar   = document.getElementById('sidebar');
   const overlay   = document.getElementById('overlay');
   const hamburger = document.getElementById('hamburger');
 
-  hamburger.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
-    overlay.classList.toggle('show');
-  });
+  if (hamburger) {
+    hamburger.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('show');
+    });
+  }
 
-  overlay.addEventListener('click', () => {
-    sidebar.classList.remove('open');
-    overlay.classList.remove('show');
-  });
-
-  // Render User Header
-  document.getElementById('sidebarAvatar').textContent = name.charAt(0).toUpperCase();
-  document.getElementById('sidebarName').textContent   = name;
+  if (overlay) {
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('show');
+    });
+  }
 
   // Date Label
   const now = new Date();
@@ -650,36 +650,50 @@
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   });
 
-  // Welcome Greeting
-  const hour = now.getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-  document.getElementById('welcomeMsg').textContent = `${greeting}, ${name.split(' ')[0]}! 👋`;
+  // Hydrate Active Faculty Session UI
+  function syncFacultyUI(u) {
+    const fName = u.name || "Faculty Member";
+    const fDept = u.department || "Computer Science";
+
+    document.getElementById('sidebarAvatar').textContent = fName.charAt(0).toUpperCase();
+    document.getElementById('sidebarName').textContent   = fName;
+
+    const hour = now.getHours();
+    const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+    document.getElementById('welcomeMsg').textContent = `${greeting}, ${fName.split(' ')[0]}! 👋`;
+    document.getElementById('deptVal').textContent    = fDept;
+  }
 
   // Sign out
   document.getElementById('logoutBtn').addEventListener('click', () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.clear();
     window.location.href = 'login.html';
   });
 
-  // API Helper
+  // Safe API Helper (Prevents invalid 401 redirect kickouts)
   async function apiFetch(endpoint) {
-    const userObj = JSON.parse(localStorage.getItem('user') || '{}');
-    const res = await fetch(`${API_URL}${endpoint}`, {
-      headers: { 
-        'Authorization': `Bearer ${token}`,
-        'user-id': userObj.id || userObj._id || '' 
+    try {
+      const res = await fetch(`${API_URL}${endpoint}`, {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'user-id': user.id || user._id || '' 
+        }
+      });
+      if (res.ok) {
+        return await res.json();
       }
-    });
-    if (res.status === 401) { 
-      localStorage.clear(); 
-      window.location.href = 'login.html'; 
+    } catch (err) {
+      console.warn(`Silently caught fetch error for ${endpoint}:`, err);
     }
-    return res.json();
+    return null;
   }
 
   // Load Faculty Data
   async function loadFacultyDashboard() {
+    // 1. Instantly render local session user details
+    syncFacultyUI(user);
+
+    // 2. Fetch stats safely
     try {
       const [statsRes, studentsRes, coursesRes] = await Promise.allSettled([
         apiFetch('/api/attendance/summary'), 
@@ -687,24 +701,25 @@
         apiFetch('/api/courses/count')
       ]);
 
-      const statsData = statsRes.status === 'fulfilled' ? statsRes.value : {};
-      const baseStudents = studentsRes.status === 'fulfilled' ? (studentsRes.value.students ?? studentsRes.value ?? []) : [];
-      const coursesData = coursesRes.status === 'fulfilled' ? coursesRes.value : {};
+      const statsData = (statsRes.status === 'fulfilled' && statsRes.value) ? statsRes.value : {};
+      const baseStudents = (studentsRes.status === 'fulfilled' && studentsRes.value) 
+        ? (studentsRes.value.students ?? studentsRes.value ?? []) 
+        : [];
+      const coursesData = (coursesRes.status === 'fulfilled' && coursesRes.value) ? coursesRes.value : {};
 
       // Fill Stat Cards
-      document.getElementById('deptVal').textContent = user.department || 'Computer Science';
       document.getElementById('attVal').textContent  = `${statsData.avgPercent ?? '85'}%`;
       document.getElementById('attSub').textContent  = `${statsData.presentToday ?? 0} present today`;
       document.getElementById('coursesVal').textContent = coursesData.total ?? '4';
       document.getElementById('studentsVal').textContent = baseStudents.length || '0';
 
-      // Render Table
+      // Render Student Table
       const tableBody = document.getElementById('studentTableBody');
       if (baseStudents.length > 0) {
         tableBody.innerHTML = baseStudents.map(s => `
           <tr>
             <td style="font-weight:600;">${s.name ?? '—'}</td>
-            <td>${s.rollNo ?? '—'}</td>
+            <td>${s.rollNo ?? s.rollNumber ?? '—'}</td>
             <td>${s.course ?? '—'}</td>
             <td><span class="pill active">Active</span></td>
           </tr>
