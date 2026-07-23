@@ -258,7 +258,7 @@
     /* Bottom Layout Panel */
     .bottom-grid {
       display: grid;
-      grid-template-columns: 1.6fr 1fr;
+      grid-template-columns: 1.5fr 1fr;
       gap: 1.25rem;
     }
 
@@ -277,7 +277,7 @@
       border-bottom: 1px solid var(--border);
     }
 
-    .panel-title { font-size: 0.92rem; font-weight: 600; }
+    .panel-title { font-size: 0.95rem; font-weight: 600; }
     .panel-link  { font-size: 0.78rem; color: #c084fc; text-decoration: none; font-weight: 500; cursor: pointer; }
     .panel-link:hover { text-decoration: underline; }
 
@@ -316,7 +316,7 @@
 
     .pill.active   { background: rgba(63,185,80,0.15);  color: var(--success); }
 
-    /* Actions Grid */
+    /* Actions Grid (Exact Match to Screenshot) */
     .actions-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -328,8 +328,9 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       gap: 0.5rem;
-      padding: 1.1rem 0.8rem;
+      padding: 1.4rem 1rem;
       background: var(--surface2);
       border: 1px solid var(--border);
       border-radius: 10px;
@@ -346,10 +347,10 @@
       transform: translateY(-2px);
     }
 
-    .action-btn .act-icon { font-size: 1.5rem; }
-    .action-btn .act-label { font-size: 0.8rem; font-weight: 600; }
+    .action-btn .act-icon { font-size: 1.6rem; }
+    .action-btn .act-label { font-size: 0.88rem; font-weight: 600; }
 
-    /* ── Embedded Sub-Views ── */
+    /* ── Sub-Views Container ── */
     .view-card-container {
       max-width: 650px;
       margin: 1rem auto;
@@ -622,34 +623,55 @@
           </div>
         </div>
 
-        <!-- Quick Task Actions -->
+        <!-- Quick Actions Control (Matching Screenshot Exact UI) -->
         <div class="panel">
           <div class="panel-header">
-            <span class="panel-title">Faculty Tasks</span>
+            <span class="panel-title">Quick Actions Control</span>
           </div>
           <div class="actions-grid">
+            <div class="action-btn" onclick="switchView('addStudent')">
+              <span class="act-icon" style="color: #a78bfa;">➕</span>
+              <span class="act-label">Add Student</span>
+            </div>
             <div class="action-btn" onclick="switchView('attendance')">
               <span class="act-icon">📋</span>
               <span class="act-label">Mark Attendance</span>
             </div>
+            <div class="action-btn" onclick="switchView('fees')">
+              <span class="act-icon">💰</span>
+              <span class="act-label">Manage Fees</span>
+            </div>
             <div class="action-btn" onclick="switchView('results')">
               <span class="act-icon">📊</span>
-              <span class="act-label">Upload Grades</span>
-            </div>
-            <div class="action-btn" onclick="switchView('schedule')">
-              <span class="act-icon">📚</span>
-              <span class="act-label">Course Schedule</span>
-            </div>
-            <div class="action-btn" onclick="switchView('roster')">
-              <span class="act-icon">👨‍🎓</span>
-              <span class="act-label">Student Roster</span>
+              <span class="act-label">Upload Results</span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 2. MARK ATTENDANCE VIEW -->
+    <!-- 2. ADD STUDENT VIEW -->
+    <div class="view-card-container" id="addStudentView">
+      <div class="view-header">➕ Add New Student</div>
+      <form onsubmit="submitNewStudent(event)">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-input" id="newStudentName" placeholder="Enter student full name" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Roll Number</label>
+          <input type="text" class="form-input" id="newStudentRoll" placeholder="e.g. 45" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Course</label>
+          <input type="text" class="form-input" id="newStudentCourse" placeholder="e.g. Diploma" required />
+        </div>
+        <button type="submit" class="btn-submit">Add Student to Roster</button>
+        <button type="button" class="back-btn" onclick="switchView('dashboard')">← Back to Dashboard</button>
+      </form>
+    </div>
+
+    <!-- 3. MARK ATTENDANCE VIEW -->
     <div class="view-card-container" id="attendanceView">
       <div class="view-header">📋 Mark Class Attendance</div>
       <form onsubmit="submitAttendance(event)">
@@ -676,7 +698,36 @@
       </form>
     </div>
 
-    <!-- 3. UPLOAD RESULTS VIEW -->
+    <!-- 4. MANAGE FEES VIEW -->
+    <div class="view-card-container" id="feesView">
+      <div class="view-header">💰 Fee Management Control</div>
+      <form onsubmit="submitFeeUpdate(event)">
+        <div class="form-group">
+          <label class="form-label">Select Student</label>
+          <select class="form-select">
+            <option>Test Panchal (Roll: 4)</option>
+            <option>smit gohil (Roll: 12)</option>
+            <option>dev pandya (Roll: 37)</option>
+            <option>himanshu machhi (Roll: 26)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fee Amount (₹)</label>
+          <input type="number" class="form-input" placeholder="e.g. 60000" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-select">
+            <option value="Paid">Paid</option>
+            <option value="Pending" selected>Pending</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-submit">Update Fee Record</button>
+        <button type="button" class="back-btn" onclick="switchView('dashboard')">← Back to Dashboard</button>
+      </form>
+    </div>
+
+    <!-- 5. UPLOAD RESULTS VIEW -->
     <div class="view-card-container" id="resultsView">
       <div class="view-header">📊 Upload Student Grades</div>
       <form onsubmit="submitGrades(event)">
@@ -702,7 +753,7 @@
       </form>
     </div>
 
-    <!-- 4. COURSE SCHEDULE VIEW -->
+    <!-- 6. COURSE SCHEDULE VIEW -->
     <div class="view-card-container" id="scheduleView">
       <div class="view-header">📚 Active Course Timetable</div>
       
@@ -725,7 +776,7 @@
       <button type="button" class="back-btn" onclick="switchView('dashboard')">← Back to Dashboard</button>
     </div>
 
-    <!-- 5. FULL ROSTER VIEW -->
+    <!-- 7. FULL ROSTER VIEW -->
     <div class="view-card-container" id="rosterView">
       <div class="view-header">👨‍🎓 Assigned Student Roster</div>
       <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
@@ -746,7 +797,7 @@
       <button type="button" class="back-btn" onclick="switchView('dashboard')">← Back to Dashboard</button>
     </div>
 
-    <!-- 6. SETTINGS VIEW -->
+    <!-- 8. SETTINGS VIEW -->
     <div class="view-card-container" id="settingsView">
       <div class="view-header">⚙️ Faculty Preferences & Settings</div>
       <form onsubmit="saveSettings(event)">
@@ -807,12 +858,15 @@
   });
 
   // Default Date for Attendance Form
-  document.getElementById('attDate').valueAsDate = now;
+  const attDateInput = document.getElementById('attDate');
+  if (attDateInput) attDateInput.valueAsDate = now;
 
   // View Navigation Router
   function switchView(view) {
     document.getElementById('dashboardView').style.display  = 'none';
+    document.getElementById('addStudentView').style.display = 'none';
     document.getElementById('attendanceView').style.display = 'none';
+    document.getElementById('feesView').style.display       = 'none';
     document.getElementById('resultsView').style.display    = 'none';
     document.getElementById('scheduleView').style.display   = 'none';
     document.getElementById('rosterView').style.display     = 'none';
@@ -826,10 +880,16 @@
       document.getElementById('dashboardView').style.display = 'block';
       document.getElementById('nav-dashboard').classList.add('active');
       titleEl.textContent = 'Faculty Portal';
+    } else if (view === 'addStudent') {
+      document.getElementById('addStudentView').style.display = 'block';
+      titleEl.textContent = 'Add Student';
     } else if (view === 'attendance') {
       document.getElementById('attendanceView').style.display = 'block';
       document.getElementById('nav-attendance').classList.add('active');
       titleEl.textContent = 'Mark Attendance';
+    } else if (view === 'fees') {
+      document.getElementById('feesView').style.display = 'block';
+      titleEl.textContent = 'Manage Fees';
     } else if (view === 'results') {
       document.getElementById('resultsView').style.display = 'block';
       document.getElementById('nav-results').classList.add('active');
@@ -872,7 +932,30 @@
     document.getElementById('setFacultyEmail').value = u.email || "nidhi@sms.com";
   }
 
-  // Save Settings
+  // Submit Actions
+  function submitNewStudent(e) {
+    e.preventDefault();
+    const name = document.getElementById('newStudentName').value;
+    const roll = document.getElementById('newStudentRoll').value;
+    const course = document.getElementById('newStudentCourse').value;
+
+    const tbody = document.getElementById('studentTableBody');
+    tbody.innerHTML += `
+      <tr>
+        <td style="font-weight:600;">${name}</td>
+        <td>${roll}</td>
+        <td>${course}</td>
+        <td><span class="pill active">Active</span></td>
+      </tr>
+    `;
+
+    alert('Student added successfully!');
+    document.getElementById('newStudentName').value = '';
+    document.getElementById('newStudentRoll').value = '';
+    document.getElementById('newStudentCourse').value = '';
+    switchView('dashboard');
+  }
+
   function saveSettings(e) {
     e.preventDefault();
     const updated = {
@@ -890,6 +973,12 @@
   function submitAttendance(e) {
     e.preventDefault();
     alert('Attendance log recorded!');
+    switchView('dashboard');
+  }
+
+  function submitFeeUpdate(e) {
+    e.preventDefault();
+    alert('Fee record updated!');
     switchView('dashboard');
   }
 
