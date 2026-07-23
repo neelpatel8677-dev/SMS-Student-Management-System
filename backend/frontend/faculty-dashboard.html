@@ -143,7 +143,6 @@
       min-height: 100vh;
     }
 
-    /* Topbar */
     .topbar {
       display: flex;
       align-items: center;
@@ -180,7 +179,6 @@
 
     .content { padding: 1.5rem; flex: 1; }
 
-    /* Welcome Banner */
     .welcome-banner {
       background: linear-gradient(135deg, rgba(37,99,235,0.15), rgba(124,58,237,0.1));
       border: 1px solid rgba(37,99,235,0.25);
@@ -197,7 +195,6 @@
     .welcome-text p  { font-size: 0.85rem; color: var(--muted); }
     .welcome-emoji   { font-size: 2.2rem; }
 
-    /* Stat Cards Grid Sequence */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -261,7 +258,6 @@
     .stat-value { font-size: 1.75rem; font-weight: 700; line-height: 1; margin: 0.15rem 0; }
     .stat-sub   { font-size: 0.75rem; color: var(--muted); }
 
-    /* Bottom Panels */
     .bottom-grid {
       display: grid;
       grid-template-columns: 1.5fr 1fr;
@@ -287,7 +283,6 @@
     .panel-link  { font-size: 0.78rem; color: #93c5fd; text-decoration: none; font-weight: 500; cursor: pointer; }
     .panel-link:hover { text-decoration: underline; }
 
-    /* Table Styles */
     .table-wrap { overflow-x: auto; }
 
     table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
@@ -324,9 +319,9 @@
     .pill.pending  { background: rgba(227,179,65,0.15); color: var(--warning); }
     .pill.paid     { background: rgba(63,185,80,0.15);  color: var(--success); }
     .pill.pass     { background: rgba(63,185,80,0.2);   color: var(--success); }
+    .pill.fail     { background: rgba(248,81,73,0.2);   color: var(--danger); }
     .pill.year     { background: rgba(37,99,235,0.15);  color: #93c5fd; }
 
-    /* Quick Actions Grid */
     .actions-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -360,7 +355,6 @@
     .action-btn .act-icon { font-size: 1.6rem; }
     .action-btn .act-label { font-size: 0.88rem; font-weight: 600; }
 
-    /* Filter Toolbar Component */
     .filter-bar {
       display: flex;
       align-items: center;
@@ -447,7 +441,6 @@
       cursor: pointer;
     }
 
-    /* Sub Tabs Strip */
     .sub-tabs {
       display: flex;
       gap: 0.5rem;
@@ -478,7 +471,6 @@
       color: #fff;
     }
 
-    /* Form Fields */
     .form-group {
       margin-bottom: 1rem;
       display: flex;
@@ -538,7 +530,6 @@
       cursor: pointer;
     }
 
-    /* System Settings Views */
     .settings-container {
       max-width: 540px;
       margin: 0 auto;
@@ -629,7 +620,7 @@
     <div class="user-card">
       <div class="avatar" id="sidebarAvatar">N</div>
       <div>
-        <div class="user-name" id="sidebarName">Nidhi Patel</div>
+        <div class="user-name" id="sidebarName">Loading...</div>
         <div class="user-role" id="sidebarRole">Faculty</div>
       </div>
     </div>
@@ -661,40 +652,40 @@
     <div id="dashboardView">
       <div class="welcome-banner">
         <div class="welcome-text">
-          <h2 id="welcomeMsg">Good afternoon, Nidhi! 👋</h2>
+          <h2 id="welcomeMsg">Welcome! 👋</h2>
           <p id="welcomeSub">Here's an overview of your institution today.</p>
         </div>
         <div class="welcome-emoji">🛡️</div>
       </div>
 
-      <!-- Stat Cards Sequence -->
+      <!-- Live Stat Cards Sequence -->
       <div class="stats-grid">
         <div class="stat-card blue" onclick="switchView('students')">
           <div class="stat-icon">👨‍🎓</div>
           <div class="stat-label">Total Students</div>
-          <div class="stat-value">4</div>
-          <div class="stat-sub">4 joined this month</div>
+          <div class="stat-value" id="dashTotalStudents">0</div>
+          <div class="stat-sub" id="dashStudentsSub">0 joined</div>
         </div>
 
         <div class="stat-card purple">
           <div class="stat-icon">📚</div>
           <div class="stat-label">Courses</div>
-          <div class="stat-value">—</div>
-          <div class="stat-sub">0 active</div>
+          <div class="stat-value" id="dashTotalCourses">0</div>
+          <div class="stat-sub" id="dashCoursesSub">0 active</div>
         </div>
 
         <div class="stat-card green" onclick="switchView('attendance')">
           <div class="stat-icon">📋</div>
           <div class="stat-label">Avg Attendance</div>
-          <div class="stat-value">77%</div>
-          <div class="stat-sub">Today: 0 present</div>
+          <div class="stat-value" id="dashAvgAttendance">0%</div>
+          <div class="stat-sub" id="dashAttendanceSub">Today: 0 present</div>
         </div>
 
         <div class="stat-card yellow" onclick="switchView('fees')">
           <div class="stat-icon">💰</div>
           <div class="stat-label">Fees Collected</div>
-          <div class="stat-value">₹—</div>
-          <div class="stat-sub">0 pending</div>
+          <div class="stat-value" id="dashFeesCollected">₹0</div>
+          <div class="stat-sub" id="dashFeesSub">0 pending</div>
         </div>
       </div>
 
@@ -702,8 +693,8 @@
         <div class="stat-card cyan" onclick="switchView('results')">
           <div class="stat-icon">📊</div>
           <div class="stat-label">Avg Result</div>
-          <div class="stat-value">—%</div>
-          <div class="stat-sub">0 passed this term</div>
+          <div class="stat-value" id="dashAvgResult">0%</div>
+          <div class="stat-sub" id="dashResultSub">0 passed this term</div>
         </div>
       </div>
 
@@ -724,31 +715,8 @@
                   <th>Fees</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td style="font-weight:600;">dev pandya</td>
-                  <td>37</td>
-                  <td>diploma</td>
-                  <td><span class="pill pending">pending</span></td>
-                </tr>
-                <tr>
-                  <td style="font-weight:600;">himanshu machhi</td>
-                  <td>26</td>
-                  <td>diploma</td>
-                  <td><span class="pill paid">paid</span></td>
-                </tr>
-                <tr>
-                  <td style="font-weight:600;">smit gohil</td>
-                  <td>12</td>
-                  <td>diploma</td>
-                  <td><span class="pill pending">pending</span></td>
-                </tr>
-                <tr>
-                  <td style="font-weight:600;">Test Panchal</td>
-                  <td>4</td>
-                  <td>Deploma</td>
-                  <td><span class="pill pending">pending</span></td>
-                </tr>
+              <tbody id="dashRecentStudentsTable">
+                <tr><td colspan="4" style="text-align:center; color:var(--muted); padding:2rem;">Loading live student data...</td></tr>
               </tbody>
             </table>
           </div>
@@ -786,75 +754,50 @@
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
         <div>
           <h2 style="font-size:1.3rem; font-weight:700;">Students</h2>
-          <p style="font-size:0.8rem; color:var(--muted); margin-top:0.15rem;">4 total students</p>
+          <p style="font-size:0.8rem; color:var(--muted); margin-top:0.15rem;" id="stTotalLabel">Loading students...</p>
         </div>
-        <button class="btn-action-primary" onclick="alert('Open Add Student Form')">➕ Add Student</button>
+        <button class="btn-action-primary" onclick="switchView('students')">➕ Refresh List</button>
       </div>
 
       <div class="filter-bar">
         <div class="search-input-wrap">
-          <input type="text" placeholder="Search by name, roll no, email..." />
+          <input type="text" id="stSearchInput" placeholder="Search by name, roll no, email..." oninput="renderStudentsTable()" />
         </div>
-        <select class="filter-select"><option>All Courses</option><option>Diploma</option></select>
-        <select class="filter-select"><option>All Years</option><option>Year 1</option><option>Year 3</option></select>
-        <select class="filter-select"><option>All Fee Status</option><option>Pending</option><option>Paid</option></select>
-        <button class="filter-select" style="font-weight:600;">🔄 Reset</button>
+        <select class="filter-select" id="stCourseFilter" onchange="renderStudentsTable()"><option value="">All Courses</option></select>
+        <select class="filter-select" id="stYearFilter" onchange="renderStudentsTable()">
+          <option value="">All Years</option>
+          <option value="1">Year 1</option>
+          <option value="2">Year 2</option>
+          <option value="3">Year 3</option>
+          <option value="4">Year 4</option>
+        </select>
+        <select class="filter-select" id="stFeeFilter" onchange="renderStudentsTable()">
+          <option value="">All Fee Status</option>
+          <option value="pending">Pending</option>
+          <option value="paid">Paid</option>
+        </select>
+        <button class="filter-select" style="font-weight:600;" onclick="resetStudentFilters()">🔄 Reset</button>
       </div>
 
       <div class="panel">
-        <div style="padding:0.75rem 1.25rem; font-size:0.78rem; color:var(--muted); border-bottom:1px solid var(--border);">
-          Showing 1–4 of 4 students
+        <div style="padding:0.75rem 1.25rem; font-size:0.78rem; color:var(--muted); border-bottom:1px solid var(--border);" id="stShowingLabel">
+          Showing records
         </div>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>NAME ↕</th>
-                <th>ROLL NO ↕</th>
+                <th>NAME</th>
+                <th>ROLL NO</th>
                 <th>EMAIL</th>
-                <th>COURSE ↕</th>
-                <th>YEAR ↕</th>
+                <th>COURSE</th>
+                <th>YEAR</th>
                 <th>FEE STATUS</th>
                 <th>ACTIONS</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td><div style="display:flex; align-items:center; gap:0.6rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">DP</div><b>dev pandya</b></div></td>
-                <td>37</td>
-                <td style="color:var(--muted);">devpandya230@gmail.com</td>
-                <td>diploma</td>
-                <td><span class="pill year">Year 3</span></td>
-                <td><span class="pill pending">pending</span></td>
-                <td><div style="display:flex; gap:0.4rem;"><button class="btn-sm-edit">✏️ Edit</button><button class="btn-sm-delete">🗑️ Delete</button></div></td>
-              </tr>
-              <tr>
-                <td><div style="display:flex; align-items:center; gap:0.6rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">HM</div><b>himanshu machhi</b></div></td>
-                <td>26</td>
-                <td style="color:var(--muted);">himanshumachhi65@gmail.com</td>
-                <td>diploma</td>
-                <td><span class="pill year">Year 3</span></td>
-                <td><span class="pill paid">paid</span></td>
-                <td><div style="display:flex; gap:0.4rem;"><button class="btn-sm-edit">✏️ Edit</button><button class="btn-sm-delete">🗑️ Delete</button></div></td>
-              </tr>
-              <tr>
-                <td><div style="display:flex; align-items:center; gap:0.6rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">SG</div><b>smit gohil</b></div></td>
-                <td>12</td>
-                <td style="color:var(--muted);">smitgohil5012@gmail.com</td>
-                <td>diploma</td>
-                <td><span class="pill year">Year 3</span></td>
-                <td><span class="pill pending">pending</span></td>
-                <td><div style="display:flex; gap:0.4rem;"><button class="btn-sm-edit">✏️ Edit</button><button class="btn-sm-delete">🗑️ Delete</button></div></td>
-              </tr>
-              <tr>
-                <td><div style="display:flex; align-items:center; gap:0.6rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">TP</div><b>Test Panchal</b></div></td>
-                <td>4</td>
-                <td style="color:var(--muted);">test123456@gmail.com</td>
-                <td>Deploma</td>
-                <td><span class="pill year">Year 1</span></td>
-                <td><span class="pill pending">pending</span></td>
-                <td><div style="display:flex; gap:0.4rem;"><button class="btn-sm-edit">✏️ Edit</button><button class="btn-sm-delete">🗑️ Delete</button></div></td>
-              </tr>
+            <tbody id="studentsTableBody">
+              <tr><td colspan="7" style="text-align:center; color:var(--muted); padding:2rem;">Loading live students...</td></tr>
             </tbody>
           </table>
         </div>
@@ -871,42 +814,37 @@
       <div class="stats-grid">
         <div class="stat-card blue">
           <div class="stat-label">TOTAL STUDENTS</div>
-          <div class="stat-value">2</div>
+          <div class="stat-value" id="attTotalStudents">0</div>
         </div>
         <div class="stat-card green">
           <div class="stat-label">PRESENT TODAY</div>
-          <div class="stat-value">0</div>
+          <div class="stat-value" id="attPresentToday">0</div>
         </div>
         <div class="stat-card red">
           <div class="stat-label">ABSENT TODAY</div>
-          <div class="stat-value">0</div>
+          <div class="stat-value" id="attAbsentToday">0</div>
         </div>
         <div class="stat-card yellow">
           <div class="stat-label">AVG ATTENDANCE</div>
-          <div class="stat-value">60%</div>
+          <div class="stat-value" id="attAvgPercent">0%</div>
           <div class="stat-sub">overall</div>
         </div>
-      </div>
-
-      <div class="sub-tabs">
-        <button class="sub-tab-btn active">📋 Mark Attendance</button>
-        <button class="sub-tab-btn">📊 Records</button>
       </div>
 
       <div class="panel" style="padding:1.25rem;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.25rem;">
           <h3 style="font-size:1rem; font-weight:700;">Mark Attendance</h3>
           <div style="display:flex; gap:0.6rem; align-items:center;">
-            <input type="date" class="filter-select" id="attDatePicker" value="2026-06-22" />
-            <select class="filter-select"><option>All Courses</option><option>Diploma</option></select>
-            <button class="btn-action-primary">Save Attendance</button>
+            <input type="date" class="filter-select" id="attDatePicker" />
+            <select class="filter-select" id="attCourseFilter"><option value="">All Courses</option></select>
+            <button class="btn-action-primary" onclick="submitAttendanceBatch()">Save Attendance</button>
           </div>
         </div>
 
         <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1.25rem; font-size:0.82rem; color:var(--muted);">
           <span>Mark all as:</span>
-          <button style="padding:0.4rem 0.85rem; background:rgba(63,185,80,0.15); border:1px solid rgba(63,185,80,0.3); color:var(--success); border-radius:6px; font-weight:600; cursor:pointer;">✓ Present</button>
-          <button style="padding:0.4rem 0.85rem; background:rgba(248,81,73,0.15); border:1px solid rgba(248,81,73,0.3); color:var(--danger); border-radius:6px; font-weight:600; cursor:pointer;">✕ Absent</button>
+          <button style="padding:0.4rem 0.85rem; background:rgba(63,185,80,0.15); border:1px solid rgba(63,185,80,0.3); color:var(--success); border-radius:6px; font-weight:600; cursor:pointer;" onclick="markAllAttendance('present')">✓ Present</button>
+          <button style="padding:0.4rem 0.85rem; background:rgba(248,81,73,0.15); border:1px solid rgba(248,81,73,0.3); color:var(--danger); border-radius:6px; font-weight:600; cursor:pointer;" onclick="markAllAttendance('absent')">✕ Absent</button>
         </div>
 
         <div class="table-wrap">
@@ -918,27 +856,8 @@
                 <th>REMARKS</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td><div style="display:flex; align-items:center; gap:0.6rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">AP</div><div><b>Arya Patel</b><div style="font-size:0.72rem; color:var(--muted);">2</div></div></div></td>
-                <td>
-                  <div style="display:flex; gap:0.4rem;">
-                    <button style="padding:0.35rem 0.6rem; background:rgba(63,185,80,0.2); border:1px solid var(--success); color:var(--success); border-radius:6px;">✓</button>
-                    <button style="padding:0.35rem 0.6rem; background:var(--surface2); border:1px solid var(--border); color:var(--muted); border-radius:6px;">✕</button>
-                  </div>
-                </td>
-                <td><input type="text" class="form-input" style="max-width:260px;" placeholder="Remarks (optional)" /></td>
-              </tr>
-              <tr>
-                <td><div style="display:flex; align-items:center; gap:0.6rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">KP</div><div><b>Kanubhai Patel</b><div style="font-size:0.72rem; color:var(--muted);">1</div></div></div></td>
-                <td>
-                  <div style="display:flex; gap:0.4rem;">
-                    <button style="padding:0.35rem 0.6rem; background:rgba(63,185,80,0.2); border:1px solid var(--success); color:var(--success); border-radius:6px;">✓</button>
-                    <button style="padding:0.35rem 0.6rem; background:var(--surface2); border:1px solid var(--border); color:var(--muted); border-radius:6px;">✕</button>
-                  </div>
-                </td>
-                <td><input type="text" class="form-input" style="max-width:260px;" placeholder="Remarks (optional)" /></td>
-              </tr>
+            <tbody id="attStudentTableBody">
+              <tr><td colspan="3" style="text-align:center; color:var(--muted); padding:2rem;">Loading attendance roster...</td></tr>
             </tbody>
           </table>
         </div>
@@ -952,50 +871,34 @@
           <h2 style="font-size:1.3rem; font-weight:700;">Fees Management</h2>
           <p style="font-size:0.8rem; color:var(--muted); margin-top:0.15rem;">Track total, paid & pending fees</p>
         </div>
-        <button class="btn-action-primary">➕ Assign Fee</button>
+        <button class="btn-action-primary" onclick="loadFeesData()">🔄 Refresh Fees</button>
       </div>
 
       <div class="stats-grid">
         <div class="stat-card blue">
           <div class="stat-icon">💼</div>
           <div class="stat-label">TOTAL FEES</div>
-          <div class="stat-value">₹1,20,000</div>
-          <div class="stat-sub">2 students</div>
+          <div class="stat-value" id="feeTotalVal">₹0</div>
+          <div class="stat-sub" id="feeTotalSub">0 students</div>
         </div>
         <div class="stat-card green">
           <div class="stat-icon">✓</div>
           <div class="stat-label">PAID FEES</div>
-          <div class="stat-value">₹0</div>
-          <div class="stat-sub">0 students paid</div>
+          <div class="stat-value" id="feePaidVal">₹0</div>
+          <div class="stat-sub" id="feePaidSub">0 students paid</div>
         </div>
         <div class="stat-card yellow">
           <div class="stat-icon">⏳</div>
           <div class="stat-label">PENDING FEES</div>
-          <div class="stat-value">₹1,20,000</div>
-          <div class="stat-sub">2 students pending</div>
+          <div class="stat-value" id="feePendingVal">₹0</div>
+          <div class="stat-sub" id="feePendingSub">0 students pending</div>
         </div>
         <div class="stat-card red">
           <div class="stat-icon">🚨</div>
           <div class="stat-label">OVERDUE FEES</div>
-          <div class="stat-value">₹0</div>
-          <div class="stat-sub">0 students overdue</div>
+          <div class="stat-value" id="feeOverdueVal">₹0</div>
+          <div class="stat-sub" id="feeOverdueSub">0 students overdue</div>
         </div>
-      </div>
-
-      <div class="sub-tabs">
-        <button class="sub-tab-btn active">All Students</button>
-        <button class="sub-tab-btn">⏳ Pending</button>
-        <button class="sub-tab-btn">✓ Paid</button>
-        <button class="sub-tab-btn">🚨 Overdue</button>
-      </div>
-
-      <div class="filter-bar">
-        <div class="search-input-wrap">
-          <input type="text" placeholder="Search by name or roll no..." />
-        </div>
-        <select class="filter-select"><option>All Courses</option></select>
-        <select class="filter-select"><option>All Years</option></select>
-        <button class="filter-select" style="font-weight:600;">🔄 Reset</button>
       </div>
 
       <div class="panel">
@@ -1010,30 +913,10 @@
                 <th>PENDING</th>
                 <th>DUE DATE</th>
                 <th>STATUS</th>
-                <th>ACTION</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td><div style="display:flex; align-items:center; gap:0.6rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">KP</div><div><b>Kanubhai Patel</b><div style="font-size:0.72rem; color:var(--muted);">1</div></div></div></td>
-                <td>B.Sc / Year 1</td>
-                <td><b>₹60,000</b></td>
-                <td style="color:var(--success); font-weight:600;">₹0</td>
-                <td style="color:var(--warning); font-weight:600;">₹60,000</td>
-                <td style="color:var(--muted);">—</td>
-                <td><span class="pill pending">pending</span></td>
-                <td><button class="btn-sm-edit">💳 Update</button></td>
-              </tr>
-              <tr>
-                <td><div style="display:flex; align-items:center; gap:0.6rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">AP</div><div><b>Arya Patel</b><div style="font-size:0.72rem; color:var(--muted);">2</div></div></div></td>
-                <td>B.Sc / Year 1</td>
-                <td><b>₹60,000</b></td>
-                <td style="color:var(--success); font-weight:600;">₹0</td>
-                <td style="color:var(--warning); font-weight:600;">₹60,000</td>
-                <td style="color:var(--muted);">—</td>
-                <td><span class="pill pending">pending</span></td>
-                <td><button class="btn-sm-edit">💳 Update</button></td>
-              </tr>
+            <tbody id="feesTableBody">
+              <tr><td colspan="7" style="text-align:center; color:var(--muted); padding:2rem;">Loading live fees data...</td></tr>
             </tbody>
           </table>
         </div>
@@ -1047,46 +930,36 @@
           <h2 style="font-size:1.3rem; font-weight:700;">Results</h2>
           <p style="font-size:0.8rem; color:var(--muted); margin-top:0.15rem;">Marks, percentage & grades</p>
         </div>
-        <button class="btn-action-primary">➕ Add Result</button>
+        <button class="btn-action-primary" onclick="loadResultsData()">🔄 Refresh Results</button>
       </div>
 
       <div class="stats-grid" style="grid-template-columns: repeat(5, 1fr);">
         <div class="stat-card blue">
           <div class="stat-label">TOTAL RESULTS</div>
-          <div class="stat-value">1</div>
+          <div class="stat-value" id="resTotalCount">0</div>
           <div class="stat-sub">records</div>
         </div>
         <div class="stat-card green">
           <div class="stat-label">PASSED</div>
-          <div class="stat-value">1</div>
-          <div class="stat-sub">100% pass rate</div>
+          <div class="stat-value" id="resPassedCount">0</div>
+          <div class="stat-sub" id="resPassRateSub">0% pass rate</div>
         </div>
         <div class="stat-card red">
           <div class="stat-label">FAILED</div>
-          <div class="stat-value">0</div>
+          <div class="stat-value" id="resFailedCount">0</div>
         </div>
         <div class="stat-card purple">
           <div class="stat-label">AVG PERCENTAGE</div>
-          <div class="stat-value">70.0%</div>
+          <div class="stat-value" id="resAvgPercent">0%</div>
         </div>
         <div class="stat-card yellow">
           <div class="stat-label">HIGHEST SCORE</div>
-          <div class="stat-value">70.0%</div>
+          <div class="stat-value" id="resHighestScore">0%</div>
         </div>
       </div>
 
       <div class="panel" style="padding:1.25rem;">
         <h3 style="font-size:1rem; font-weight:700; margin-bottom:1rem;">All Results</h3>
-        
-        <div class="filter-bar">
-          <div class="search-input-wrap">
-            <input type="text" placeholder="Search by name, roll no, exam..." />
-          </div>
-          <select class="filter-select"><option>All Courses</option></select>
-          <select class="filter-select"><option>All Exams</option></select>
-          <select class="filter-select"><option>All Results</option></select>
-          <button class="filter-select" style="font-weight:600;">🔄 Reset</button>
-        </div>
 
         <div class="table-wrap">
           <table>
@@ -1100,21 +973,10 @@
                 <th>PERCENTAGE</th>
                 <th>GRADE</th>
                 <th>RESULT</th>
-                <th>ACTIONS</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td><div style="display:flex; align-items:center; gap:0.6rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">KP</div><div><b>Kanubhai Patel</b><div style="font-size:0.72rem; color:var(--muted);">1</div></div></div></td>
-                <td>B.Sc / Yr 1</td>
-                <td>Sem1</td>
-                <td><b style="color:var(--warning);">70</b><div style="font-size:0.7rem; color:var(--muted);">Obtained</div></td>
-                <td><b>100</b><div style="font-size:0.7rem; color:var(--muted);">Total</div></td>
-                <td><span style="font-weight:700; color:var(--warning);">70%</span></td>
-                <td><span class="pill year" style="font-weight:700;">B</span></td>
-                <td><span class="pill pass">✓ Pass</span></td>
-                <td><div style="display:flex; gap:0.4rem;"><button class="btn-sm-edit">✏️</button><button class="btn-sm-delete">🗑️</button></div></td>
-              </tr>
+            <tbody id="resultsTableBody">
+              <tr><td colspan="8" style="text-align:center; color:var(--muted); padding:2rem;">Loading live exam results...</td></tr>
             </tbody>
           </table>
         </div>
@@ -1124,17 +986,16 @@
     <!-- 6. SETTINGS VIEW -->
     <div id="settingsView" style="display:none;">
       <div class="settings-container">
-        
         <div class="settings-card">
           <div class="settings-card-title">Faculty Profile Info</div>
           <form onsubmit="saveProfileSettings(event)">
             <div class="form-group">
               <label class="form-label">FULL NAME</label>
-              <input type="text" class="form-input" id="setFacultyName" value="Nidhi Patel" required />
+              <input type="text" class="form-input" id="setFacultyName" required />
             </div>
             <div class="form-group">
               <label class="form-label">EMAIL ADDRESS</label>
-              <input type="email" class="form-input" id="setFacultyEmail" value="nidhi@sms.com" required />
+              <input type="email" class="form-input" id="setFacultyEmail" required />
             </div>
             <button type="submit" class="btn-submit">Save Profile</button>
           </form>
@@ -1160,7 +1021,6 @@
         </div>
 
         <button type="button" class="back-btn" onclick="switchView('dashboard')">← Back to Dashboard</button>
-
       </div>
     </div>
 
@@ -1170,7 +1030,6 @@
 <script>
   const API_URL = "https://sms-student-management-system-1.onrender.com/api";
 
-  // Auth Guard
   const token = localStorage.getItem('token');
   const user  = JSON.parse(localStorage.getItem('user') || '{}');
 
@@ -1197,7 +1056,29 @@
     });
   }
 
-  // View Navigation Router
+  // Global Memory Cache for Live Filters
+  let liveStudents = [];
+  let liveAttendanceMap = {};
+
+  // Safe API Fetcher
+  async function apiFetch(endpoint) {
+    try {
+      const res = await fetch(`${API_URL}${endpoint}`, {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'user-id': user.id || user._id || '' 
+        }
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch (err) {
+      console.warn(`API Error for ${endpoint}:`, err);
+    }
+    return null;
+  }
+
+  // Router View Switcher
   function switchView(view) {
     document.getElementById('dashboardView').style.display  = 'none';
     document.getElementById('studentsView').style.display   = 'none';
@@ -1215,27 +1096,32 @@
       document.getElementById('dashboardView').style.display = 'block';
       document.getElementById('nav-dashboard').classList.add('active');
       titleEl.textContent = 'Dashboard';
-      subEl.textContent = 'Thursday, 16 July 2026';
+      subEl.textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      loadDashboardData();
     } else if (view === 'students') {
       document.getElementById('studentsView').style.display = 'block';
       document.getElementById('nav-students').classList.add('active');
       titleEl.textContent = 'Students';
       subEl.textContent = 'Student Management';
+      loadStudentsData();
     } else if (view === 'attendance') {
       document.getElementById('attendanceView').style.display = 'block';
       document.getElementById('nav-attendance').classList.add('active');
       titleEl.textContent = 'Attendance';
       subEl.textContent = 'Track & manage student attendance';
+      loadAttendanceData();
     } else if (view === 'fees') {
       document.getElementById('feesView').style.display = 'block';
       document.getElementById('nav-fees').classList.add('active');
       titleEl.textContent = 'Fees Management';
       subEl.textContent = 'Track total, paid & pending fees';
+      loadFeesData();
     } else if (view === 'results') {
       document.getElementById('resultsView').style.display = 'block';
       document.getElementById('nav-results').classList.add('active');
       titleEl.textContent = 'Results';
       subEl.textContent = 'Marks, percentage & grades';
+      loadResultsData();
     } else if (view === 'settings') {
       document.getElementById('settingsView').style.display = 'block';
       document.getElementById('nav-settings').classList.add('active');
@@ -1249,7 +1135,296 @@
     }
   }
 
-  // Hydrate Active User Data
+  // 1. DYNAMIC DASHBOARD LOADER
+  async function loadDashboardData() {
+    const [studentsData, attData, feesData, resultsData] = await Promise.all([
+      apiFetch('/students'),
+      apiFetch('/attendance/summary'),
+      apiFetch('/fees/summary'),
+      apiFetch('/results/summary')
+    ]);
+
+    const students = Array.isArray(studentsData) ? studentsData : (studentsData?.students ?? []);
+    document.getElementById('dashTotalStudents').textContent = students.length;
+    document.getElementById('dashStudentsSub').textContent = `${students.length} joined total`;
+
+    // Modern Stat Counters
+    if (attData) {
+      document.getElementById('dashAvgAttendance').textContent = `${attData.avgPercent ?? 0}%`;
+      document.getElementById('dashAttendanceSub').textContent = `Today: ${attData.presentToday ?? 0} present`;
+    }
+
+    if (feesData) {
+      document.getElementById('dashFeesCollected').textContent = `₹${feesData.collected ?? 0}`;
+      document.getElementById('dashFeesSub').textContent = `${feesData.pending ?? 0} pending`;
+    }
+
+    if (resultsData) {
+      document.getElementById('dashAvgResult').textContent = `${resultsData.avgScore ?? 0}%`;
+      document.getElementById('dashResultSub').textContent = `${resultsData.passed ?? 0} passed this term`;
+    }
+
+    // Render Recent Students Table
+    const recentTable = document.getElementById('dashRecentStudentsTable');
+    if (students.length > 0) {
+      recentTable.innerHTML = students.slice(0, 5).map(s => `
+        <tr>
+          <td style="font-weight:600;">${s.name ?? '—'}</td>
+          <td>${s.rollNo ?? '—'}</td>
+          <td>${s.course ?? '—'}</td>
+          <td><span class="pill ${s.feeStatus === 'paid' ? 'paid' : 'pending'}">${s.feeStatus ?? 'pending'}</span></td>
+        </tr>
+      `).join('');
+    } else {
+      recentTable.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--muted); padding:2rem;">No student records registered yet.</td></tr>`;
+    }
+  }
+
+  // 2. DYNAMIC STUDENTS VIEW LOADER
+  async function loadStudentsData() {
+    const data = await apiFetch('/students');
+    liveStudents = Array.isArray(data) ? data : (data?.students ?? []);
+    
+    // Populate Courses Filter Select
+    const courses = [...new Set(liveStudents.map(s => s.course).filter(Boolean))].sort();
+    const cSel = document.getElementById('stCourseFilter');
+    cSel.innerHTML = '<option value="">All Courses</option>';
+    courses.forEach(c => cSel.innerHTML += `<option value="${c}">${c}</option>`);
+
+    document.getElementById('stTotalLabel').textContent = `${liveStudents.length} total students`;
+    renderStudentsTable();
+  }
+
+  function renderStudentsTable() {
+    const search = document.getElementById('stSearchInput').value.toLowerCase();
+    const course = document.getElementById('stCourseFilter').value;
+    const year   = document.getElementById('stYearFilter').value;
+    const fee    = document.getElementById('stFeeFilter').value;
+
+    const filtered = liveStudents.filter(s => {
+      const mQ = !search || (s.name?.toLowerCase().includes(search) || s.rollNo?.toString().includes(search) || s.email?.toLowerCase().includes(search));
+      const mC = !course || s.course === course;
+      const mY = !year   || String(s.year) === year;
+      const mF = !fee    || s.feeStatus === fee;
+      return mQ && mC && mY && mF;
+    });
+
+    document.getElementById('stShowingLabel').textContent = `Showing ${filtered.length} of ${liveStudents.length} students`;
+    const tbody = document.getElementById('studentsTableBody');
+
+    if (filtered.length > 0) {
+      tbody.innerHTML = filtered.map(s => {
+        const init = (s.name ?? '?').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        return `
+          <tr>
+            <td><div style="display:flex; align-items:center; gap:0.6rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">${init}</div><b>${s.name ?? '—'}</b></div></td>
+            <td>${s.rollNo ?? '—'}</td>
+            <td style="color:var(--muted);">${s.email ?? '—'}</td>
+            <td>${s.course ?? '—'}</td>
+            <td><span class="pill year">Year ${s.year ?? 1}</span></td>
+            <td><span class="pill ${s.feeStatus === 'paid' ? 'paid' : 'pending'}">${s.feeStatus ?? 'pending'}</span></td>
+            <td><div style="display:flex; gap:0.4rem;"><button class="btn-sm-edit">✏️ Edit</button><button class="btn-sm-delete">🗑️ Delete</button></div></td>
+          </tr>`;
+      }).join('');
+    } else {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--muted); padding:2rem;">No students found matching filters.</td></tr>`;
+    }
+  }
+
+  function resetStudentFilters() {
+    document.getElementById('stSearchInput').value = '';
+    document.getElementById('stCourseFilter').value = '';
+    document.getElementById('stYearFilter').value = '';
+    document.getElementById('stFeeFilter').value = '';
+    renderStudentsTable();
+  }
+
+  // 3. DYNAMIC ATTENDANCE LOADER
+  async function loadAttendanceData() {
+    const [summary, studentsData] = await Promise.all([
+      apiFetch('/attendance/summary'),
+      apiFetch('/students')
+    ]);
+
+    liveStudents = Array.isArray(studentsData) ? studentsData : (studentsData?.students ?? []);
+
+    document.getElementById('attTotalStudents').textContent = summary?.totalStudents ?? liveStudents.length;
+    document.getElementById('attPresentToday').textContent = summary?.presentToday ?? 0;
+    document.getElementById('attAbsentToday').textContent  = summary?.absentToday ?? 0;
+    document.getElementById('attAvgPercent').textContent   = `${summary?.avgPercent ?? 0}%`;
+
+    document.getElementById('attDatePicker').valueAsDate = new Date();
+
+    // Populate course dropdown
+    const courses = [...new Set(liveStudents.map(s => s.course).filter(Boolean))].sort();
+    const cSel = document.getElementById('attCourseFilter');
+    cSel.innerHTML = '<option value="">All Courses</option>';
+    courses.forEach(c => cSel.innerHTML += `<option value="${c}">${c}</option>`);
+
+    // Reset status map
+    liveAttendanceMap = {};
+    liveStudents.forEach(s => {
+      if (s.rollNo) liveAttendanceMap[s.rollNo] = { status: 'present', remarks: '' };
+    });
+
+    renderAttendanceList();
+  }
+
+  function renderAttendanceList() {
+    const course = document.getElementById('attCourseFilter').value;
+    const filtered = course ? liveStudents.filter(s => s.course === course) : liveStudents;
+    const tbody = document.getElementById('attStudentTableBody');
+
+    if (filtered.length > 0) {
+      tbody.innerHTML = filtered.map(s => {
+        const init = (s.name ?? '?').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        const st = liveAttendanceMap[s.rollNo] || { status: 'present', remarks: '' };
+        const isPres = st.status === 'present';
+        return `
+          <tr id="att-row-${s.rollNo}">
+            <td><div style="display:flex; align-items:center; gap:0.6rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">${init}</div><div><b>${s.name}</b><div style="font-size:0.72rem; color:var(--muted);">${s.rollNo}</div></div></div></td>
+            <td>
+              <div style="display:flex; gap:0.4rem;">
+                <button style="padding:0.35rem 0.6rem; background:${isPres ? 'rgba(63,185,80,0.2)' : 'var(--surface2)'}; border:1px solid ${isPres ? 'var(--success)' : 'var(--border)'}; color:${isPres ? 'var(--success)' : 'var(--muted)'}; border-radius:6px; cursor:pointer;" onclick="setAttStatus('${s.rollNo}', 'present')">✓</button>
+                <button style="padding:0.35rem 0.6rem; background:${!isPres ? 'rgba(248,81,73,0.2)' : 'var(--surface2)'}; border:1px solid ${!isPres ? 'var(--danger)' : 'var(--border)'}; color:${!isPres ? 'var(--danger)' : 'var(--muted)'}; border-radius:6px; cursor:pointer;" onclick="setAttStatus('${s.rollNo}', 'absent')">✕</button>
+              </div>
+            </td>
+            <td><input type="text" class="form-input" style="max-width:260px;" placeholder="Remarks (optional)" value="${st.remarks}" oninput="setAttRemarks('${s.rollNo}', this.value)" /></td>
+          </tr>`;
+      }).join('');
+    } else {
+      tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--muted); padding:2rem;">No students available for attendance.</td></tr>`;
+    }
+  }
+
+  function setAttStatus(rollNo, status) {
+    if (!liveAttendanceMap[rollNo]) liveAttendanceMap[rollNo] = { status: 'present', remarks: '' };
+    liveAttendanceMap[rollNo].status = status;
+    renderAttendanceList();
+  }
+
+  function setAttRemarks(rollNo, val) {
+    if (!liveAttendanceMap[rollNo]) liveAttendanceMap[rollNo] = { status: 'present', remarks: '' };
+    liveAttendanceMap[rollNo].remarks = val;
+  }
+
+  function markAllAttendance(status) {
+    Object.keys(liveAttendanceMap).forEach(k => liveAttendanceMap[k].status = status);
+    renderAttendanceList();
+  }
+
+  async function submitAttendanceBatch() {
+    const date = document.getElementById('attDatePicker').value;
+    if (!date) return alert('Please select a date');
+
+    for (const rollNo of Object.keys(liveAttendanceMap)) {
+      const entry = liveAttendanceMap[rollNo];
+      await fetch(`${API_URL}/attendance/mark`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'user-id': user.id || user._id || ''
+        },
+        body: JSON.stringify({ rollNo, date, status: entry.status, remarks: entry.remarks })
+      });
+    }
+
+    alert('Attendance log updated successfully!');
+    loadAttendanceData();
+  }
+
+  // 4. DYNAMIC FEES LOADER
+  async function loadFeesData() {
+    const data = await apiFetch('/fees');
+    const fees = Array.isArray(data) ? data : (data?.fees ?? []);
+
+    let total = 0, paid = 0, pending = 0, overdue = 0;
+    let paidCnt = 0, pendingCnt = 0, overdueCnt = 0;
+
+    fees.forEach(f => {
+      const tot = f.totalFee || 0;
+      const pd = f.paidAmount || 0;
+      total += tot;
+      paid  += pd;
+      pending += (tot - pd);
+      if (f.status === 'paid') paidCnt++;
+      if (f.status === 'pending') pendingCnt++;
+      if (f.status === 'overdue') { overdueCnt++; overdue += (tot - pd); }
+    });
+
+    document.getElementById('feeTotalVal').textContent = `₹${total.toLocaleString('en-IN')}`;
+    document.getElementById('feeTotalSub').textContent = `${fees.length} students`;
+    document.getElementById('feePaidVal').textContent  = `₹${paid.toLocaleString('en-IN')}`;
+    document.getElementById('feePaidSub').textContent  = `${paidCnt} students paid`;
+    document.getElementById('feePendingVal').textContent = `₹${pending.toLocaleString('en-IN')}`;
+    document.getElementById('feePendingSub').textContent = `${pendingCnt} students pending`;
+    document.getElementById('feeOverdueVal').textContent = `₹${overdue.toLocaleString('en-IN')}`;
+    document.getElementById('feeOverdueSub').textContent = `${overdueCnt} students overdue`;
+
+    const tbody = document.getElementById('feesTableBody');
+    if (fees.length > 0) {
+      tbody.innerHTML = fees.map(f => {
+        const init = (f.studentName ?? '?').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        const pend = (f.totalFee || 0) - (f.paidAmount || 0);
+        return `
+          <tr>
+            <td><div style="display:flex; align-items:center; gap:0.6rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">${init}</div><div><b>${f.studentName ?? '—'}</b><div style="font-size:0.72rem; color:var(--muted);">${f.rollNo ?? ''}</div></div></div></td>
+            <td>${f.course ?? '—'} / Year ${f.year ?? 1}</td>
+            <td><b>₹${(f.totalFee || 0).toLocaleString('en-IN')}</b></td>
+            <td style="color:var(--success); font-weight:600;">₹${(f.paidAmount || 0).toLocaleString('en-IN')}</td>
+            <td style="color:var(--warning); font-weight:600;">₹${pend.toLocaleString('en-IN')}</td>
+            <td style="color:var(--muted);">${f.dueDate ? new Date(f.dueDate).toLocaleDateString('en-IN') : '—'}</td>
+            <td><span class="pill ${f.status === 'paid' ? 'paid' : 'pending'}">${f.status ?? 'pending'}</span></td>
+          </tr>`;
+      }).join('');
+    } else {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--muted); padding:2rem;">No fee records recorded yet.</td></tr>`;
+    }
+  }
+
+  // 5. DYNAMIC RESULTS LOADER
+  async function loadResultsData() {
+    const data = await apiFetch('/results');
+    const results = Array.isArray(data) ? data : (data?.results ?? []);
+
+    const total  = results.length;
+    const passed = results.filter(r => r.result === 'pass').length;
+    const failed = results.filter(r => r.result === 'fail').length;
+    const pcts   = results.map(r => r.percentage ?? 0);
+    const avg    = total ? (pcts.reduce((a, b) => a + b, 0) / total).toFixed(1) : 0;
+    const top    = total ? Math.max(...pcts).toFixed(1) : 0;
+
+    document.getElementById('resTotalCount').textContent   = total;
+    document.getElementById('resPassedCount').textContent  = passed;
+    document.getElementById('resPassRateSub').textContent = `${total ? Math.round(passed / total * 100) : 0}% pass rate`;
+    document.getElementById('resFailedCount').textContent  = failed;
+    document.getElementById('resAvgPercent').textContent   = `${avg}%`;
+    document.getElementById('resHighestScore').textContent = `${top}%`;
+
+    const tbody = document.getElementById('resultsTableBody');
+    if (results.length > 0) {
+      tbody.innerHTML = results.map(r => {
+        const init = (r.studentName ?? '?').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        const isPass = r.result === 'pass';
+        return `
+          <tr>
+            <td><div style="display:flex; align-items:center; gap:0.6rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">${init}</div><div><b>${r.studentName ?? '—'}</b><div style="font-size:0.72rem; color:var(--muted);">${r.rollNo ?? ''}</div></div></div></td>
+            <td>${r.course ?? '—'} / Yr ${r.year ?? 1}</td>
+            <td>${r.exam ?? '—'}</td>
+            <td><b style="color:var(--warning);">${r.marksObtained ?? 0}</b><div style="font-size:0.7rem; color:var(--muted);">Obtained</div></td>
+            <td><b>${r.totalMarks ?? 100}</b><div style="font-size:0.7rem; color:var(--muted);">Total</div></td>
+            <td><span style="font-weight:700; color:var(--warning);">${r.percentage ?? 0}%</span></td>
+            <td><span class="pill year" style="font-weight:700;">${r.grade ?? 'B'}</span></td>
+            <td><span class="pill ${isPass ? 'pass' : 'fail'}">${isPass ? '✓ Pass' : '✕ Fail'}</span></td>
+          </tr>`;
+      }).join('');
+    } else {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--muted); padding:2rem;">No examination results uploaded yet.</td></tr>`;
+    }
+  }
+
+  // Hydrate User Data
   function syncFacultyUI(u) {
     const fName = u.name || "Nidhi Patel";
 
@@ -1257,8 +1432,7 @@
     document.getElementById('sidebarName').textContent   = fName;
     document.getElementById('sidebarRole').textContent   = u.role || "Faculty";
 
-    const greeting = 'Good afternoon';
-    document.getElementById('welcomeMsg').textContent = `${greeting}, ${fName.split(' ')[0]}! 👋`;
+    document.getElementById('welcomeMsg').textContent = `Good afternoon, ${fName.split(' ')[0]}! 👋`;
 
     document.getElementById('setFacultyName').value  = fName;
     document.getElementById('setFacultyEmail').value = u.email || "nidhi@sms.com";
