@@ -330,7 +330,6 @@
         const data = await res.json();
 
         if (res.ok) {
-            // ✅ Clean previous user session completely to avoid profile bleed/glitches
             localStorage.clear();
 
             const userData = data.user || data.student || data.faculty || {};
@@ -352,13 +351,15 @@
             if (successAlert) successAlert.classList.add("show");
             
             setTimeout(() => {
-                // ✅ Smart role router
+                // ✅ Independent 3-Module Routing Architecture
                 if (userRole === "faculty") {
                     window.location.href = "faculty-dashboard.html";
                 } else if (userRole === "student") {
                     window.location.href = "student-dashboard.html";
+                } else if (userRole === "admin") {
+                    window.location.href = "admin-dashboard.html";
                 } else {
-                    window.location.href = "index.html";
+                    window.location.href = "admin-dashboard.html";
                 }
             }, 800);
 
