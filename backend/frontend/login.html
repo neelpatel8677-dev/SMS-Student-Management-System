@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login | Student Management System</title>
-  <link rel="icon" type="image/png" href="SMS Logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -290,7 +289,6 @@
 <script>
   const API_URL = "https://sms-student-management-system-1.onrender.com"; 
 
-  // Password toggle utility
   const passwordEl = document.getElementById('password');
   const togglePwBtn = document.getElementById('togglePw');
   if (togglePwBtn && passwordEl) {
@@ -301,7 +299,6 @@
     });
   }
 
-  // Live Login Action
   async function handleLogin() {
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
@@ -324,8 +321,6 @@
     if (btnText) btnText.textContent = "Signing In...";
 
     try {
-        console.log("Sending login request to backend..."); 
-        
         const res = await fetch(`${API_URL}/api/auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -333,40 +328,50 @@
         });
 
         const data = await res.json();
-        console.log("Backend Response Data:", data); 
 
         if (res.ok) {
-            console.log("Login Success! Saving token...");
-            
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("user", JSON.stringify(data.user));
+            // ✅ Clean previous user session completely to avoid profile bleed/glitches
+            localStorage.clear();
+
+            const userData = data.user || data.student || data.faculty || {};
+            const userRole = (userData.role || data.role || "student").toLowerCase();
+
+            localStorage.setItem("token", data.token || "");
+            localStorage.setItem("user", JSON.stringify({
+                id: userData.id || userData._id || "",
+                name: userData.name || email.split('@')[0],
+                email: userData.email || email,
+                role: userRole,
+                rollNo: userData.rollNo || userData.rollNumber || "",
+                course: userData.course || "",
+                branch: userData.branch || "",
+                year: userData.year || "",
+                department: userData.department || ""
+            }));
 
             if (successAlert) successAlert.classList.add("show");
             
             setTimeout(() => {
-                console.log("Redirecting to specific dashboard based on role...");
-                
-                // Dynamic routing logic maps user roles directly to unique interface endpoints
-                if (data.user && data.user.role === 'admin') {
-                    window.location.href = "admin-dashboard.html";
-                } else if (data.user && data.user.role === 'faculty') {
-                    window.location.href = "index.html"; // Repurposed current admin files for faculty operations
+                // ✅ Smart role router
+                if (userRole === "faculty") {
+                    window.location.href = "faculty-dashboard.html";
+                } else if (userRole === "student") {
+                    window.location.href = "student-dashboard.html";
                 } else {
-                    window.location.href = "profile.html"; // Redirects students to their personal layout
+                    window.location.href = "index.html";
                 }
-            }, 1000);
+            }, 800);
 
         } else {
-            console.warn("Login failed according to server:", data.message);
             if (errorAlert) {
                 document.getElementById("errorMsg").textContent = data.message || "Invalid email or password.";
                 errorAlert.classList.add("show");
             }
         }
     } catch (error) {
-        console.error("Network or Client Error:", error);
+        console.error("Login Error:", error);
         if (errorAlert) {
-            document.getElementById("errorMsg").textContent = "Connection refused. Please check if backend is running.";
+            document.getElementById("errorMsg").textContent = "Connection refused. Please check backend status.";
             errorAlert.classList.add("show");
         }
     } finally {
@@ -379,9 +384,6 @@
   const mainSubmitBtn = document.getElementById("loginBtn");
   if (mainSubmitBtn) {
       mainSubmitBtn.addEventListener("click", handleLogin);
-      console.log("✅ Login button listener successfully attached.");
-  } else {
-      console.error("❌ Error: Element with id 'loginBtn' was not found in HTML!");
   }
 
   if (passwordEl) {
