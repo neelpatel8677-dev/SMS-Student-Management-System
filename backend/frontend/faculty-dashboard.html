@@ -134,7 +134,7 @@
 
     .logout-btn:hover { background: rgba(248,81,73,0.1); }
 
-    /* ── Main Layout ── */
+    /* ── Main Workspace ── */
     .main {
       margin-left: 240px;
       flex: 1;
@@ -197,7 +197,7 @@
     .welcome-text p  { font-size: 0.85rem; color: var(--muted); }
     .welcome-emoji   { font-size: 2.2rem; }
 
-    /* Stat Cards Grid */
+    /* Stat Cards Grid Sequence */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -261,7 +261,7 @@
     .stat-value { font-size: 1.75rem; font-weight: 700; line-height: 1; margin: 0.15rem 0; }
     .stat-sub   { font-size: 0.75rem; color: var(--muted); }
 
-    /* Bottom Grid */
+    /* Bottom Panels */
     .bottom-grid {
       display: grid;
       grid-template-columns: 1.5fr 1fr;
@@ -287,7 +287,7 @@
     .panel-link  { font-size: 0.78rem; color: #93c5fd; text-decoration: none; font-weight: 500; cursor: pointer; }
     .panel-link:hover { text-decoration: underline; }
 
-    /* Table Component */
+    /* Table Styles */
     .table-wrap { overflow-x: auto; }
 
     table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
@@ -312,7 +312,6 @@
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: var(--surface2); }
 
-    /* Badges & Pills */
     .pill {
       display: inline-block;
       padding: 0.2rem 0.6rem;
@@ -327,7 +326,7 @@
     .pill.pass     { background: rgba(63,185,80,0.2);   color: var(--success); }
     .pill.year     { background: rgba(37,99,235,0.15);  color: #93c5fd; }
 
-    /* Action Grid Buttons */
+    /* Quick Actions Grid */
     .actions-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -361,7 +360,7 @@
     .action-btn .act-icon { font-size: 1.6rem; }
     .action-btn .act-label { font-size: 0.88rem; font-weight: 600; }
 
-    /* Control Bar Toolbar */
+    /* Filter Toolbar Component */
     .filter-bar {
       display: flex;
       align-items: center;
@@ -448,7 +447,7 @@
       cursor: pointer;
     }
 
-    /* Sub-Tab Navigation Strip */
+    /* Sub Tabs Strip */
     .sub-tabs {
       display: flex;
       gap: 0.5rem;
@@ -479,7 +478,7 @@
       color: #fff;
     }
 
-    /* Forms Inside Modals */
+    /* Form Fields */
     .form-group {
       margin-bottom: 1rem;
       display: flex;
@@ -539,7 +538,7 @@
       cursor: pointer;
     }
 
-    /* Settings View Container */
+    /* System Settings Views */
     .settings-container {
       max-width: 540px;
       margin: 0 auto;
@@ -668,7 +667,7 @@
         <div class="welcome-emoji">🛡️</div>
       </div>
 
-      <!-- Stat Cards Sequence Matches Screenshot Exactly -->
+      <!-- Stat Cards Sequence -->
       <div class="stats-grid">
         <div class="stat-card blue" onclick="switchView('students')">
           <div class="stat-icon">👨‍🎓</div>
@@ -761,7 +760,7 @@
             <span class="panel-title">Quick Actions Control</span>
           </div>
           <div class="actions-grid">
-            <div class="action-btn" onclick="openAddStudentModal()">
+            <div class="action-btn" onclick="switchView('students')">
               <span class="act-icon" style="color: #a78bfa;">➕</span>
               <span class="act-label">Add Student</span>
             </div>
@@ -782,14 +781,14 @@
       </div>
     </div>
 
-    <!-- 2. STUDENTS VIEW (image_d0de9f.png) -->
+    <!-- 2. STUDENTS VIEW -->
     <div id="studentsView" style="display:none;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
         <div>
           <h2 style="font-size:1.3rem; font-weight:700;">Students</h2>
           <p style="font-size:0.8rem; color:var(--muted); margin-top:0.15rem;">4 total students</p>
         </div>
-        <button class="btn-action-primary" onclick="openAddStudentModal()">➕ Add Student</button>
+        <button class="btn-action-primary" onclick="alert('Open Add Student Form')">➕ Add Student</button>
       </div>
 
       <div class="filter-bar">
@@ -862,7 +861,7 @@
       </div>
     </div>
 
-    <!-- 3. ATTENDANCE VIEW (35_2.png) -->
+    <!-- 3. ATTENDANCE VIEW -->
     <div id="attendanceView" style="display:none;">
       <div style="margin-bottom:1.25rem;">
         <h2 style="font-size:1.3rem; font-weight:700;">Attendance</h2>
@@ -946,7 +945,7 @@
       </div>
     </div>
 
-    <!-- 4. FEES VIEW (36_2.png) -->
+    <!-- 4. FEES VIEW -->
     <div id="feesView" style="display:none;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
         <div>
@@ -1041,7 +1040,7 @@
       </div>
     </div>
 
-    <!-- 5. RESULTS VIEW (37_2.png) -->
+    <!-- 5. RESULTS VIEW -->
     <div id="resultsView" style="display:none;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
         <div>
@@ -1169,7 +1168,7 @@
 </div>
 
 <script>
-  const API_URL = "https://sms-student-management-system-1.onrender.com";
+  const API_URL = "https://sms-student-management-system-1.onrender.com/api";
 
   // Auth Guard
   const token = localStorage.getItem('token');
@@ -1250,22 +1249,19 @@
     }
   }
 
-  // Hydrate User Data
+  // Hydrate Active User Data
   function syncFacultyUI(u) {
     const fName = u.name || "Nidhi Patel";
 
     document.getElementById('sidebarAvatar').textContent = fName.charAt(0).toUpperCase();
     document.getElementById('sidebarName').textContent   = fName;
+    document.getElementById('sidebarRole').textContent   = u.role || "Faculty";
 
     const greeting = 'Good afternoon';
     document.getElementById('welcomeMsg').textContent = `${greeting}, ${fName.split(' ')[0]}! 👋`;
 
     document.getElementById('setFacultyName').value  = fName;
     document.getElementById('setFacultyEmail').value = u.email || "nidhi@sms.com";
-  }
-
-  function openAddStudentModal() {
-    switchView('students');
   }
 
   function saveProfileSettings(e) {
