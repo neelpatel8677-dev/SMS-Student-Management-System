@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Student Dashboard | SMS Portal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <title>Student Portal | SMS</title>
+  <link rel="icon" type="image/png" href="SMS Logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -34,437 +35,176 @@
 
     /* ── Sidebar ── */
     .sidebar {
-      width: 240px;
-      min-height: 100vh;
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      top: 0; left: 0; bottom: 0;
-      z-index: 100;
-      transition: transform 0.3s ease;
+      width: 240px; min-height: 100vh; background: var(--surface);
+      border-right: 1px solid var(--border); display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; transition: transform 0.3s ease;
     }
+    .sidebar-brand { display: flex; align-items: center; gap: 0.6rem; padding: 1.25rem 1rem; border-bottom: 1px solid var(--border); }
+    .brand-icon { width: 34px; height: 34px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+    .brand-text { font-size: 0.9rem; font-weight: 700; }
+    .brand-sub { font-size: 0.68rem; color: var(--muted); }
 
-    .sidebar-brand {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 1.25rem 1rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .brand-icon {
-      width: 36px; height: 36px;
-      background: var(--accent);
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem; flex-shrink: 0;
-    }
-
-    .brand-text { font-size: 0.95rem; font-weight: 700; color: var(--text); }
-    .brand-sub  { font-size: 0.68rem; color: var(--muted); }
-
-    .nav-section {
-      padding: 1rem 0.75rem 0.25rem;
-      font-size: 0.68rem;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
+    .nav-section { padding: 1rem 0.75rem 0.25rem; font-size: 0.68rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
     .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 0.65rem;
-      padding: 0.6rem 0.875rem;
-      margin: 0.15rem 0.5rem;
-      border-radius: 8px;
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--muted);
-      cursor: pointer;
-      transition: background 0.15s, color 0.15s;
-      text-decoration: none;
+      display: flex; align-items: center; gap: 0.65rem; padding: 0.55rem 0.875rem; margin: 0.1rem 0.5rem;
+      border-radius: 8px; font-size: 0.875rem; font-weight: 500; color: var(--muted); cursor: pointer;
+      transition: background 0.15s, color 0.15s; text-decoration: none;
     }
-
-    .nav-item:hover { background: var(--surface2); color: var(--text); }
-    .nav-item.active { background: rgba(37,99,235,0.15); color: #93c5fd; border-left: 3px solid var(--accent); }
+    .nav-item:hover, .nav-item.active { color: var(--text); }
+    .nav-item.active { background: rgba(37,99,235,0.15); color: #93c5fd; }
     .nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
 
-    .sidebar-footer {
-      margin-top: auto;
-      padding: 1rem;
-      border-top: 1px solid var(--border);
-    }
-
-    .user-card {
-      display: flex;
-      align-items: center;
-      gap: 0.65rem;
-      padding: 0.5rem;
-      border-radius: 8px;
-    }
-
-    .avatar {
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      background: var(--accent);
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
-      color: #fff;
-    }
-
-    .user-name  { font-size: 0.85rem; font-weight: 600; }
-    .user-role  { font-size: 0.72rem; color: var(--muted); text-transform: capitalize; }
-
+    .sidebar-footer { margin-top: auto; padding: 1rem; border-top: 1px solid var(--border); }
+    .user-card { display: flex; align-items: center; gap: 0.65rem; padding: 0.5rem; }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+    .user-name { font-size: 0.85rem; font-weight: 600; text-transform: capitalize; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .user-role { font-size: 0.72rem; color: var(--muted); text-transform: capitalize; }
+    
     .logout-btn {
-      display: flex; align-items: center; gap: 0.5rem;
-      padding: 0.5rem 0.875rem;
-      margin-top: 0.5rem;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      color: var(--danger);
-      cursor: pointer;
-      background: none; border: none; font-family: inherit;
-      width: 100%;
-      transition: background 0.15s;
+      display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.875rem; margin-top: 0.5rem;
+      border-radius: 8px; font-size: 0.85rem; color: var(--danger); cursor: pointer;
+      background: none; border: none; font-family: inherit; width: 100%; transition: background 0.15s;
     }
-
     .logout-btn:hover { background: rgba(248,81,73,0.1); }
 
-    /* ── Main Layout ── */
-    .main {
-      margin-left: 240px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
-    /* Topbar */
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 1.5rem;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      position: sticky; top: 0; z-index: 50;
-    }
-
+    /* ── Main Layout Workspace ── */
+    .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
     .topbar-left { display: flex; align-items: center; gap: 0.75rem; }
-
-    .hamburger {
-      display: none;
-      background: none; border: none;
-      color: var(--text); font-size: 1.25rem;
-      cursor: pointer; padding: 0.25rem;
-    }
-
+    .hamburger { display: none; background: none; border: none; color: var(--text); font-size: 1.25rem; cursor: pointer; padding: 0.25rem; }
     .page-title { font-size: 1.1rem; font-weight: 700; }
-    .page-sub   { font-size: 0.78rem; color: var(--muted); margin-top: 0.1rem; }
+    .page-sub { font-size: 0.78rem; color: var(--muted); margin-top: 0.1rem; }
+    .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; }
+    .badge.student { background: rgba(63,185,80,0.15); color: #3fb950; }
 
-    .badge {
-      display: inline-block;
-      padding: 0.25rem 0.75rem;
-      border-radius: 999px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      background: rgba(63,185,80,0.15); color: #3fb950;
-      border: 1px solid rgba(63,185,80,0.3);
-    }
-
-    /* Content Area */
     .content { padding: 1.5rem; flex: 1; }
 
+    /* Views */
+    .workspace-view { display: none; }
+    .workspace-view.active { display: block; }
+
+    /* Banner & Cards */
     .welcome-banner {
       background: linear-gradient(135deg, rgba(37,99,235,0.15), rgba(124,58,237,0.1));
-      border: 1px solid rgba(37,99,235,0.25);
-      border-radius: 12px;
-      padding: 1.25rem 1.5rem;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
+      border: 1px solid rgba(37,99,235,0.25); border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
     }
+    .welcome-text h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .welcome-text p { font-size: 0.85rem; color: var(--muted); }
+    .welcome-emoji { font-size: 2.5rem; }
 
-    .welcome-text h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem; }
-    .welcome-text p  { font-size: 0.85rem; color: var(--muted); }
-    .welcome-emoji   { font-size: 2.2rem; }
-
-    /* Stat Cards */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1.25rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      transition: border-color 0.2s, transform 0.2s;
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-    }
-
-    .stat-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-
-    .stat-card::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-    }
-
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 0.4rem; }
+    .stat-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
     .stat-card.purple::after { background: var(--purple); }
-    .stat-card.green::after  { background: var(--success); }
+    .stat-card.green::after { background: var(--success); }
     .stat-card.yellow::after { background: var(--warning); }
-    .stat-card.cyan::after   { background: var(--cyan); }
+    .stat-card.cyan::after { background: var(--cyan); }
 
-    .stat-icon {
-      font-size: 1.25rem;
-      width: 38px; height: 38px;
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-    }
-
+    .stat-icon { font-size: 1.5rem; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
     .stat-card.purple .stat-icon { background: rgba(124,58,237,0.15); }
-    .stat-card.green  .stat-icon { background: rgba(63,185,80,0.15); }
+    .stat-card.green .stat-icon { background: rgba(63,185,80,0.15); }
     .stat-card.yellow .stat-icon { background: rgba(227,179,65,0.15); }
-    .stat-card.cyan   .stat-icon { background: rgba(34,211,238,0.15); }
+    .stat-card.cyan .stat-icon { background: rgba(34,211,238,0.15); }
 
     .stat-label { font-size: 0.78rem; color: var(--muted); font-weight: 500; }
-    .stat-value { font-size: 1.5rem; font-weight: 700; line-height: 1.1; margin-top: 0.2rem; }
-    .stat-sub   { font-size: 0.75rem; color: var(--muted); }
+    .stat-value { font-size: 1.75rem; font-weight: 700; line-height: 1; }
+    .stat-sub { font-size: 0.75rem; color: var(--muted); }
 
-    /* Layout Panels */
-    .bottom-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.25rem;
-    }
-
-    .panel {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    .panel-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 1.25rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .panel-title { font-size: 0.92rem; font-weight: 600; }
-    .panel-link  { font-size: 0.78rem; color: #93c5fd; text-decoration: none; font-weight: 500; cursor: pointer; }
+    .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem; }
+    .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); }
+    .panel-title { font-size: 0.9rem; font-weight: 600; }
+    .panel-link { font-size: 0.78rem; color: var(--accent); text-decoration: none; cursor: pointer; }
     .panel-link:hover { text-decoration: underline; }
 
-    /* Profile Details Card */
-    .profile-card {
-      padding: 1.25rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.85rem;
-    }
-
-    .profile-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.85rem;
-    }
-
+    .profile-card { padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; }
+    .profile-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
     .profile-key { color: var(--muted); font-size: 0.8rem; }
-    .profile-val { font-weight: 600; }
+    .profile-val { font-weight: 500; }
 
-    /* Progress & Indicators */
-    .progress-bar {
-      height: 8px;
-      border-radius: 4px;
-      background: var(--surface2);
-      overflow: hidden;
-      margin: 0.5rem 0;
+    .progress-bar { height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; margin-top: 0.25rem; }
+    .progress-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+
+    .pill { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; text-transform: capitalize; }
+    .pill.paid, .pill.present { background: rgba(63,185,80,0.15); color: var(--success); }
+    .pill.pending, .pill.absent { background: rgba(227,179,65,0.15); color: var(--warning); }
+
+    /* ── Sub-Pages Centered Containers (Images 40, 41, 42, 43 Exact Match) ── */
+    .centered-sub-container {
+      max-width: 480px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.75rem; box-shadow: 0 12px 40px rgba(0,0,0,0.5);
     }
+    .sub-header-bar { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .sub-back-arrow { font-size: 1.4rem; color: var(--text); cursor: pointer; text-decoration: none; line-height: 1; }
 
-    .progress-fill {
-      height: 100%;
-      border-radius: 4px;
-      background: var(--success);
-      transition: width 0.6s ease;
+    /* Donut Progress Chart */
+    .chart-container { display: flex; justify-content: center; align-items: center; margin-bottom: 1.5rem; position: relative; }
+    .circular-progress {
+      position: relative; height: 160px; width: 160px; border-radius: 50%;
+      background: conic-gradient(var(--success) 0deg 360deg, var(--border) 0deg);
+      display: flex; align-items: center; justify-content: center; transition: background 0.4s ease;
     }
+    .circular-progress::before { content: ""; position: absolute; height: 100px; width: 100px; border-radius: 50%; background: var(--surface); z-index: 2; }
+    .chart-center-text { position: absolute; z-index: 3; text-align: center; display: flex; flex-direction: column; }
+    .chart-center-val { font-size: 1.5rem; font-weight: 800; color: var(--text); }
+    .chart-center-lbl { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
-    .pill {
-      display: inline-block;
-      padding: 0.2rem 0.65rem;
-      border-radius: 999px;
-      font-size: 0.72rem;
-      font-weight: 600;
+    .legend-row { display: flex; justify-content: space-around; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; background: var(--surface2); padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border); }
+    .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 500; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.present { background: var(--success); }
+    .dot.absent { background: var(--danger); }
+    .dot.leave { background: var(--warning); }
+    .dot.holiday { background: var(--cyan); }
+
+    .calendar-wrapper { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; }
+    .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .month-label { font-weight: 600; font-size: 1rem; }
+    .cal-nav-btn { background: none; border: none; color: var(--text); font-size: 1.1rem; cursor: pointer; padding: 0.2rem 0.5rem; border-radius: 4px; }
+    .weekdays-grid { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 0.75rem; font-weight: 600; color: var(--muted); margin-bottom: 0.5rem; }
+    .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 0.6rem; column-gap: 0.4rem; }
+    .day-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 500; border-radius: 8px; border: 1px solid var(--border); background: rgba(255,255,255,0.02); }
+    .day-cell.is-present { background: var(--success) !important; color: #fff !important; font-weight: 700; border-color: var(--success) !important; }
+    .day-cell.is-absent { background: var(--danger) !important; color: #fff !important; font-weight: 700; border-color: var(--danger) !important; }
+    .day-cell.empty-day { opacity: 0.15; border: none; background: none; }
+    .day-cell.is-today { border: 2px solid var(--accent); }
+
+    .back-dashboard-btn {
+      display: inline-flex; align-items: center; justify-content: center; width: 100%; padding: 0.7rem; margin-top: 1.25rem;
+      background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--muted);
+      text-decoration: none; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
     }
+    .back-dashboard-btn:hover { border-color: var(--accent); color: var(--text); background: rgba(37,99,235,0.05); }
 
-    .pill.pending { background: rgba(227,179,65,0.15); color: var(--warning); border: 1px solid rgba(227,179,65,0.3); }
-    .pill.paid    { background: rgba(63,185,80,0.15);  color: var(--success); border: 1px solid rgba(63,185,80,0.3); }
+    /* Fee Management Box (Image 41) */
+    .status-banner { padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.9rem; font-weight: 700; text-align: center; margin-bottom: 1.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .status-banner.pending { background: rgba(227,179,65,0.15); border: 1px solid var(--warning); color: var(--warning); }
+    .status-banner.paid { background: rgba(63,185,80,0.15); border: 1px solid var(--success); color: var(--success); }
 
-    /* ── Sub-View Cards (Modal / View Overlay) ── */
-    .view-card-container {
-      max-width: 480px;
-      margin: 1rem auto;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.5rem;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      display: none;
+    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .stat-box { background: var(--surface2); border: 1px solid var(--border); padding: 1rem; border-radius: 10px; }
+    .stat-box-lbl { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; }
+    .stat-box-val { font-size: 1.2rem; font-weight: 700; margin-top: 0.25rem; }
+
+    .table-wrap { overflow-x: auto; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
+    th, td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); }
+    th { background: rgba(255,255,255,0.01); font-weight: 600; color: var(--muted); font-size: 0.75rem; }
+    tr:last-child td { border-bottom: none; }
+
+    /* Edit Profile Form (Image 43) */
+    .edit-form-group { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.4rem; }
+    .edit-form-group label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em; }
+    .edit-form-group input, .edit-form-group select {
+      width: 100%; background: var(--bg); border: 1px solid var(--border); padding: 0.7rem 0.85rem;
+      border-radius: 8px; color: var(--text); outline: none; font-size: 0.9rem; font-family: inherit;
     }
+    .edit-form-group input:focus, .edit-form-group select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+    .save-profile-btn { width: 100%; padding: 0.75rem; background: var(--accent); border: none; color: #fff; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; margin-top: 0.5rem; }
+    .save-profile-btn:hover { background: var(--accent-h); }
 
-    .view-header {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 1.25rem;
-    }
-
-    .back-btn {
-      display: block;
-      width: 100%;
-      padding: 0.75rem;
-      margin-top: 1.25rem;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-weight: 600;
-      font-size: 0.85rem;
-      text-align: center;
-      cursor: pointer;
-      transition: background 0.15s;
-      text-decoration: none;
-    }
-
-    .back-btn:hover { background: var(--border); }
-
-    /* Form Styles */
-    .form-group {
-      margin-bottom: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.35rem;
-    }
-
-    .form-label {
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .form-input, .form-select {
-      width: 100%;
-      padding: 0.65rem 0.85rem;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.875rem;
-      outline: none;
-    }
-
-    .form-input:focus, .form-select:focus {
-      border-color: var(--accent);
-    }
-
-    .btn-submit {
-      width: 100%;
-      padding: 0.75rem;
-      background: var(--accent);
-      border: none;
-      border-radius: 8px;
-      color: #fff;
-      font-weight: 600;
-      font-size: 0.875rem;
-      cursor: pointer;
-      margin-top: 0.5rem;
-    }
-
-    .btn-submit:hover { background: var(--accent-h); }
-
-    /* Calendar & Ring Gauge Components */
-    .gauge-circle {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      border: 12px solid var(--success);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 1rem;
-    }
-
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 0.4rem;
-      text-align: center;
-      margin-top: 1rem;
-    }
-
-    .cal-day-head { font-size: 0.72rem; color: var(--muted); font-weight: 600; }
-    .cal-day {
-      padding: 0.4rem;
-      border-radius: 6px;
-      background: var(--surface2);
-      font-size: 0.78rem;
-    }
-
-    .cal-day.active-present {
-      background: var(--success);
-      color: #fff;
-      font-weight: 700;
-    }
-
-    .cal-day.today {
-      border: 1px solid var(--accent);
-    }
-
-    .inset-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-      font-size: 0.8rem;
-    }
-
-    .inset-table th, .inset-table td {
-      padding: 0.6rem;
-      border-bottom: 1px solid var(--border);
-      text-align: left;
-    }
-
-    .overlay {
-      display: none;
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.6);
-      z-index: 99;
-    }
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
 
     @media (max-width: 768px) {
       .sidebar { transform: translateX(-100%); }
@@ -473,15 +213,16 @@
       .main { margin-left: 0; }
       .hamburger { display: block; }
       .bottom-grid { grid-template-columns: 1fr; }
-      .welcome-emoji { display: none; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
+
 <body>
 
 <div class="overlay" id="overlay"></div>
 
-<!-- ── Sidebar ── -->
+<!-- ── Student Navigation Sidebar ── -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-brand">
     <div class="brand-icon">🎓</div>
@@ -492,288 +233,231 @@
   </div>
 
   <div class="nav-section">Main</div>
-  <a class="nav-item active" id="nav-main" onclick="switchView('main')">
+  <div class="nav-item active" id="nav-dashboard" onclick="switchStudentWorkspace('dashboardView', 'nav-dashboard')">
     <span class="nav-icon">🏠</span> Dashboard
-  </a>
+  </div>
 
   <div class="nav-section">My Academics</div>
-  <a class="nav-item" id="nav-attendance" onclick="switchView('attendance')">
+  <div class="nav-item" id="nav-att" onclick="switchStudentWorkspace('attendanceView', 'nav-att')">
     <span class="nav-icon">📋</span> My Attendance
-  </a>
-  <a class="nav-item" id="nav-fees" onclick="switchView('fees')">
+  </div>
+  <div class="nav-item" id="nav-fees" onclick="switchStudentWorkspace('feesView', 'nav-fees')">
     <span class="nav-icon">💰</span> My Fees
-  </a>
-  <a class="nav-item" id="nav-results" onclick="switchView('results')">
+  </div>
+  <div class="nav-item" id="nav-results" onclick="switchStudentWorkspace('resultsView', 'nav-results')">
     <span class="nav-icon">📊</span> My Results
-  </a>
-  <a class="nav-item" id="nav-profile" onclick="switchView('profile')">
+  </div>
+  <div class="nav-item" id="nav-profile" onclick="switchStudentWorkspace('editProfileView', 'nav-profile')">
     <span class="nav-icon">👤</span> My Profile
-  </a>
+  </div>
 
   <div class="sidebar-footer">
     <div class="user-card">
-      <div class="avatar" id="sidebarAvatar">S</div>
+      <div class="avatar" id="sbAvatar">A</div>
       <div>
-        <div class="user-name" id="sidebarName">Loading...</div>
-        <div class="user-role">Student</div>
+        <div class="user-name" id="sbName">Arya Patel</div>
+        <div class="user-role" id="sbRole">Student</div>
       </div>
     </div>
-    <button class="logout-btn" id="logoutBtn">
-      🚪 Sign out
-    </button>
+    <button class="logout-btn" onclick="triggerSystemLogout()">🚪 Sign out</button>
   </div>
 </aside>
 
-<!-- ── Main Workspace ── -->
 <div class="main">
-
   <header class="topbar">
     <div class="topbar-left">
       <button class="hamburger" id="hamburger">☰</button>
       <div>
-        <div class="page-title" id="pageTitle">Dashboard</div>
-        <div class="page-sub" id="dateLabel">—</div>
+        <div class="page-title" id="pageTitleText">Dashboard</div>
+        <div class="page-sub" id="liveTimestampLabel">Monday, 22 June 2026</div>
       </div>
     </div>
-    <div class="topbar-right">
-      <span class="badge">STUDENT</span>
-    </div>
+    <span class="badge student">STUDENT</span>
   </header>
 
   <div class="content">
 
-    <!-- 1. MAIN DASHBOARD VIEW -->
-    <div id="mainDashboardView">
+    <!-- 1. MAIN STUDENT DASHBOARD (Image 39) -->
+    <div id="dashboardView" class="workspace-view active">
       <div class="welcome-banner">
         <div class="welcome-text">
-          <h2 id="welcomeMsg">Welcome back! 👋</h2>
+          <h2>Good morning, <span id="welcomeStudentFirstName">Arya</span>! 👋</h2>
           <p>Here's your academic summary.</p>
         </div>
         <div class="welcome-emoji">🎒</div>
       </div>
 
       <div class="stats-grid">
-        <div class="stat-card purple" onclick="switchView('profile')">
+        <div class="stat-card purple">
           <div class="stat-icon">📚</div>
           <div class="stat-label">Course & Branch</div>
-          <div class="stat-value" id="cardCourse">—</div>
-          <div class="stat-sub" id="cardYear">—</div>
+          <div class="stat-value" style="font-size:1.1rem" id="cardCourseBranch">B.Sc (Science)</div>
+          <div class="stat-sub" id="cardYear">Year 1</div>
         </div>
-
-        <div class="stat-card green" onclick="switchView('attendance')">
+        <div class="stat-card green">
           <div class="stat-icon">📋</div>
           <div class="stat-label">Attendance</div>
           <div class="stat-value" id="cardAttPct">100%</div>
-          <div class="stat-sub" id="cardAttClasses">1/1 classes</div>
+          <div class="stat-sub" id="cardAttCount">1/1 classes</div>
         </div>
-
-        <div class="stat-card yellow" onclick="switchView('fees')">
+        <div class="stat-card yellow">
           <div class="stat-icon">💰</div>
           <div class="stat-label">Fee Status</div>
-          <div class="stat-value" id="cardFeeStatus">Pending</div>
-          <div class="stat-sub" id="cardFeeDue">Due: ₹60,000</div>
+          <div class="stat-value" style="font-size:1.1rem" id="cardFeeStatus">Pending</div>
+          <div class="stat-sub" id="cardFeeDue">Due: ₹60000</div>
         </div>
-
-        <div class="stat-card cyan" onclick="switchView('results')">
+        <div class="stat-card cyan">
           <div class="stat-icon">📊</div>
           <div class="stat-label">Latest Score</div>
-          <div class="stat-value" id="cardScore">0%</div>
-          <div class="stat-sub">No exams recorded yet</div>
+          <div class="stat-value" id="cardLatestScore">0%</div>
+          <div class="stat-sub" id="cardLatestExam">No exams recorded yet</div>
         </div>
       </div>
 
       <div class="bottom-grid">
-        <!-- Profile Overview -->
         <div class="panel">
           <div class="panel-header">
             <span class="panel-title">My Profile</span>
-            <span class="panel-link" onclick="switchView('profile')">Edit →</span>
+            <span class="panel-link" onclick="switchStudentWorkspace('editProfileView', 'nav-profile')">Edit →</span>
           </div>
           <div class="profile-card">
-            <div class="profile-row"><span class="profile-key">Full Name</span><span class="profile-val" id="profName">—</span></div>
-            <div class="profile-row"><span class="profile-key">Roll Number</span><span class="profile-val" id="profRoll">—</span></div>
-            <div class="profile-row"><span class="profile-key">Email</span><span class="profile-val" id="profEmail">—</span></div>
-            <div class="profile-row"><span class="profile-key">Course</span><span class="profile-val" id="profCourse">—</span></div>
-            <div class="profile-row"><span class="profile-key">Branch</span><span class="profile-val" id="profBranch">—</span></div>
-            <div class="profile-row"><span class="profile-key">Year</span><span class="profile-val" id="profYear">—</span></div>
+            <div class="profile-row"><span class="profile-key">Full Name</span><span class="profile-val" id="ovFullName">Arya Patel</span></div>
+            <div class="profile-row"><span class="profile-key">Roll Number</span><span class="profile-val" id="ovRollNo">2</span></div>
+            <div class="profile-row"><span class="profile-key">Email</span><span class="profile-val" id="ovEmail">arya123@gmail.com</span></div>
+            <div class="profile-row"><span class="profile-key">Course</span><span class="profile-val" id="ovCourse">B.Sc</span></div>
+            <div class="profile-row"><span class="profile-key">Branch</span><span class="profile-val" id="ovBranch">Science</span></div>
+            <div class="profile-row"><span class="profile-key">Year</span><span class="profile-val" id="ovYear">Year 1</span></div>
           </div>
         </div>
 
-        <!-- Attendance Progress -->
         <div class="panel">
           <div class="panel-header">
             <span class="panel-title">Attendance Progress</span>
-            <span class="panel-link" onclick="switchView('attendance')">Details →</span>
+            <span class="panel-link" onclick="switchStudentWorkspace('attendanceView', 'nav-att')">Details →</span>
           </div>
           <div class="profile-card">
-            <div class="profile-row">
-              <span class="profile-key">Attendance %</span>
-              <span class="profile-val" style="color:var(--success)" id="progressPctText">100%</span>
+            <div class="profile-row"><span class="profile-key">Attendance %</span><span class="profile-val" style="color:var(--success)" id="ovAttPct">100%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:100%; background:var(--success)" id="ovAttFill"></div></div>
+            <div class="stat-sub" style="margin-top:0.5rem;" id="ovAttNotice">✅ Attendance is good!</div>
+            
+            <div style="margin-top:1rem;">
+              <div class="profile-row"><span class="profile-key">Fee Status</span><span class="pill pending" id="ovFeePill">pending</span></div>
             </div>
-            <div class="progress-bar">
-              <div class="progress-fill" id="progressBarFill" style="width:100%;"></div>
-            </div>
-            <div style="font-size:0.78rem; color:var(--success); font-weight:600;">
-              ✓ Attendance is good!
-            </div>
-
-            <div style="margin-top:1.25rem;">
-              <div class="profile-row">
-                <span class="profile-key">Fee Status</span>
-                <span class="pill pending" id="profFeePill">pending</span>
-              </div>
-            </div>
-
-            <div style="margin-top:0.85rem;">
-              <div class="profile-row">
-                <span class="profile-key">Latest Result</span>
-                <span class="profile-val" id="profLatestResult">0%</span>
-              </div>
-              <div class="profile-key" style="font-size:0.72rem; margin-top:0.2rem;">No exams recorded yet</div>
+            <div style="margin-top:0.75rem;">
+              <div class="profile-row"><span class="profile-key">Latest Result</span><span class="profile-val" id="ovScoreVal">0%</span></div>
+              <div class="stat-sub" id="ovExamVal">No exams recorded yet</div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 2. EDIT PROFILE VIEW -->
-    <div class="view-card-container" id="profileView">
-      <div class="view-header" style="justify-content: center;">
-        Edit My Profile 👤
+    <!-- 2. ATTENDANCE CALENDAR (Image 40) -->
+    <div id="attendanceView" class="workspace-view">
+      <div class="centered-sub-container">
+        <div class="sub-header-bar">
+          <span class="sub-back-arrow" onclick="switchStudentWorkspace('dashboardView', 'nav-dashboard')">‹</span>
+          <span style="font-size:1.2rem; font-weight:700;">Attendance</span>
+        </div>
+
+        <div class="chart-container">
+          <div class="circular-progress" id="circularProgress">
+            <div class="chart-center-text">
+              <span class="chart-center-val" id="centerPct">100%</span>
+              <span class="chart-center-lbl">PRESENT</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="legend-row">
+          <div class="legend-item"><span class="dot present"></span>Present</div>
+          <div class="legend-item"><span class="dot absent"></span>Absent</div>
+          <div class="legend-item"><span class="dot leave"></span>Leave</div>
+          <div class="legend-item"><span class="dot holiday"></span>Holiday</div>
+        </div>
+
+        <div class="calendar-wrapper">
+          <div class="cal-header">
+            <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+            <span class="month-label" id="monthYearLabel">June 2026</span>
+            <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+          </div>
+          <div class="weekdays-grid"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+          <div class="days-grid" id="daysGridContainer"></div>
+        </div>
+
+        <button class="back-dashboard-btn" onclick="switchStudentWorkspace('dashboardView', 'nav-dashboard')">← Back to Dashboard</button>
       </div>
-      <form id="profileForm" onsubmit="saveProfile(event)">
-        <div class="form-group">
-          <label class="form-label">Full Name</label>
-          <input type="text" class="form-input" id="inputName" required />
+    </div>
+
+    <!-- 3. FEE MANAGEMENT (Image 41) -->
+    <div id="feesView" class="workspace-view">
+      <div class="centered-sub-container">
+        <div class="sub-header-bar">
+          <span class="sub-back-arrow" onclick="switchStudentWorkspace('dashboardView', 'nav-dashboard')">‹</span>
+          <span style="font-size:1.2rem; font-weight:700;">Fee Management</span>
         </div>
-        <div class="form-group">
-          <label class="form-label">Roll Number</label>
-          <input type="text" class="form-input" id="inputRoll" required />
+
+        <div class="status-banner pending" id="statusBanner">PENDING</div>
+
+        <div class="summary-grid">
+          <div class="stat-box"><div class="stat-box-lbl">TOTAL COURSE FEE</div><div class="stat-box-val" id="subTotalFee">₹60,000</div></div>
+          <div class="stat-box"><div class="stat-box-lbl">PAID AMOUNT</div><div class="stat-box-val" style="color:var(--success)" id="subPaidFee">₹0</div></div>
+          <div class="stat-box" style="grid-column: 1 / -1;"><div class="stat-box-lbl">OUTSTANDING BALANCE (DUE)</div><div class="stat-box-val" style="color:var(--danger)" id="subDueFee">₹60,000</div></div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Course</label>
-          <input type="text" class="form-input" id="inputCourse" required />
+
+        <h3 style="font-size:0.95rem; margin-bottom:0.75rem;">Payment History</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>TXN ID</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead>
+            <tbody id="transactionBody"><tr><td colspan="4" style="text-align:center; color:var(--muted)">No invoices tracked yet.</td></tr></tbody>
+          </table>
         </div>
-        <div class="form-group">
-          <label class="form-label">Branch</label>
-          <input type="text" class="form-input" id="inputBranch" required />
+
+        <button class="back-dashboard-btn" onclick="switchStudentWorkspace('dashboardView', 'nav-dashboard')">← Back to Dashboard</button>
+      </div>
+    </div>
+
+    <!-- 4. EXAMINATION RESULTS (Image 42) -->
+    <div id="resultsView" class="workspace-view">
+      <div class="centered-sub-container">
+        <div class="sub-header-bar">
+          <span class="sub-back-arrow" onclick="switchStudentWorkspace('dashboardView', 'nav-dashboard')">‹</span>
+          <span style="font-size:1.2rem; font-weight:700;">Examination Results</span>
         </div>
-        <div class="form-group">
-          <label class="form-label">Year</label>
-          <select class="form-select" id="inputYear">
-            <option value="Year 1">1st Year</option>
-            <option value="Year 2">2nd Year</option>
-            <option value="Year 3">3rd Year</option>
-            <option value="Year 4">4th Year</option>
+
+        <div style="background:var(--surface2); border:1px solid var(--border); padding:1.25rem; border-radius:12px; text-align:center; margin-bottom:1.5rem;">
+          <div style="font-size:0.8rem; color:var(--muted);">Latest Semester Average Score</div>
+          <div style="font-size:2.2rem; font-weight:800; color:var(--accent); margin:0.25rem 0;" id="resAvgScore">0%</div>
+          <div style="font-size:0.8rem; color:var(--muted);" id="resExamSub">No exams recorded yet</div>
+        </div>
+
+        <div style="font-size:0.8rem; color:var(--muted); text-transform:uppercase; margin-bottom:0.75rem; letter-spacing:0.05em; font-weight:600;">ACADEMIC SEMESTER BREAKDOWN</div>
+        <div id="examsListContainer">
+          <div style="text-align:center; padding:1.5rem; color:var(--muted); font-size:0.85rem; background:var(--surface2); border-radius:10px; border:1px solid var(--border);">No academic reports found in the server log databases.</div>
+        </div>
+
+        <button class="back-dashboard-btn" onclick="switchStudentWorkspace('dashboardView', 'nav-dashboard')">← Back to Dashboard</button>
+      </div>
+    </div>
+
+    <!-- 5. EDIT MY PROFILE (Image 43) -->
+    <div id="editProfileView" class="workspace-view">
+      <div class="centered-sub-container">
+        <h2 style="font-size:1.25rem; font-weight:700; text-align:center; margin-bottom:1.5rem;">Edit My Profile 👤</h2>
+        <div class="edit-form-group"><label>FULL NAME</label><input type="text" id="pName"></div>
+        <div class="edit-form-group"><label>ROLL NUMBER</label><input type="text" id="pRollNo"></div>
+        <div class="edit-form-group"><label>COURSE</label><input type="text" id="pCourse" placeholder="e.g. B.Sc"></div>
+        <div class="edit-form-group"><label>BRANCH</label><input type="text" id="pBranch" placeholder="e.g. Science"></div>
+        <div class="edit-form-group"><label>YEAR</label>
+          <select id="pYear">
+            <option value="1">1st Year</option><option value="2">2nd Year</option>
+            <option value="3">3rd Year</option><option value="4">4th Year</option>
           </select>
         </div>
-        <button type="submit" class="btn-submit">Save Changes</button>
-        <button type="button" class="back-btn" onclick="switchView('main')">← Back to Dashboard</button>
-      </form>
-    </div>
-
-    <!-- 3. ATTENDANCE VIEW -->
-    <div class="view-card-container" id="attendanceView">
-      <div class="view-header">
-        ‹ Attendance
+        <button class="save-profile-btn" id="saveProfileBtn">Save Changes</button>
+        <button class="back-dashboard-btn" onclick="switchStudentWorkspace('dashboardView', 'nav-dashboard')">← Back to Dashboard</button>
       </div>
-      <div class="gauge-circle">
-        <span style="font-size: 1.25rem; font-weight: 700;">100%</span>
-        <span style="font-size: 0.65rem; color: var(--muted); letter-spacing: 0.05em;">PRESENT</span>
-        <span style="font-size: 0.8rem; margin-top: 0.2rem; font-weight:600;">1</span>
-      </div>
-
-      <div style="display:flex; justify-content:space-around; font-size:0.75rem; background:var(--surface2); padding:0.6rem; border-radius:8px; border:1px solid var(--border);">
-        <span><span style="color:var(--success)">●</span> Present</span>
-        <span><span style="color:var(--danger)">●</span> Absent</span>
-        <span><span style="color:var(--warning)">●</span> Leave</span>
-        <span><span style="color:var(--cyan)">●</span> Holiday</span>
-      </div>
-
-      <div style="background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:1rem; margin-top:1rem;">
-        <div style="text-align:center; font-weight:700; font-size:0.9rem; margin-bottom:0.75rem;">July 2026</div>
-        <div class="calendar-grid">
-          <div class="cal-day-head">Mon</div><div class="cal-day-head">Tue</div><div class="cal-day-head">Wed</div>
-          <div class="cal-day-head">Thu</div><div class="cal-day-head">Fri</div><div class="cal-day-head">Sat</div><div class="cal-day-head">Sun</div>
-          
-          <div class="cal-day">1</div><div class="cal-day">2</div><div class="cal-day">3</div><div class="cal-day">4</div><div class="cal-day">5</div><div class="cal-day">6</div><div class="cal-day">7</div>
-          <div class="cal-day">8</div><div class="cal-day">9</div><div class="cal-day">10</div><div class="cal-day">11</div><div class="cal-day">12</div><div class="cal-day">13</div><div class="cal-day">14</div>
-          <div class="cal-day">15</div><div class="cal-day">16</div><div class="cal-day">17</div><div class="cal-day">18</div><div class="cal-day">19</div><div class="cal-day">20</div><div class="cal-day active-present">21</div>
-          <div class="cal-day today">22</div><div class="cal-day">23</div><div class="cal-day">24</div><div class="cal-day">25</div><div class="cal-day">26</div><div class="cal-day">27</div><div class="cal-day">28</div>
-          <div class="cal-day">29</div><div class="cal-day">30</div><div class="cal-day">31</div>
-        </div>
-      </div>
-
-      <button type="button" class="back-btn" onclick="switchView('main')">← Back to Dashboard</button>
-    </div>
-
-    <!-- 4. FEE MANAGEMENT VIEW -->
-    <div class="view-card-container" id="feesView">
-      <div class="view-header">
-        ‹ Fee Management
-      </div>
-
-      <div style="text-align:center; padding:0.6rem; background:rgba(227,179,65,0.1); border:1px solid rgba(227,179,65,0.3); color:var(--warning); border-radius:8px; font-weight:700; font-size:0.85rem; margin-bottom:1rem;">
-        PENDING
-      </div>
-
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:0.75rem;">
-        <div style="background:var(--surface2); padding:0.85rem; border-radius:8px; border:1px solid var(--border);">
-          <div style="font-size:0.68rem; color:var(--muted); font-weight:600;">TOTAL COURSE FEE</div>
-          <div style="font-size:1.2rem; font-weight:700; margin-top:0.25rem;">₹60,000</div>
-        </div>
-        <div style="background:var(--surface2); padding:0.85rem; border-radius:8px; border:1px solid var(--border);">
-          <div style="font-size:0.68rem; color:var(--muted); font-weight:600;">PAID AMOUNT</div>
-          <div style="font-size:1.2rem; font-weight:700; color:var(--success); margin-top:0.25rem;">₹0</div>
-        </div>
-      </div>
-
-      <div style="background:var(--surface2); padding:0.85rem; border-radius:8px; border:1px solid var(--border); margin-bottom:1.25rem;">
-        <div style="font-size:0.68rem; color:var(--muted); font-weight:600;">OUTSTANDING BALANCE (DUE)</div>
-        <div style="font-size:1.2rem; font-weight:700; color:var(--danger); margin-top:0.25rem;">₹60,000</div>
-      </div>
-
-      <div style="font-size:0.85rem; font-weight:600;">Payment History</div>
-      <table class="inset-table">
-        <thead>
-          <tr>
-            <th>TXN ID</th>
-            <th>Date</th>
-            <th>Amount</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td colspan="4" style="text-align:center; color:var(--muted); padding:1.5rem 0;">No invoices tracked yet.</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <button type="button" class="back-btn" onclick="switchView('main')">← Back to Dashboard</button>
-    </div>
-
-    <!-- 5. RESULTS VIEW -->
-    <div class="view-card-container" id="resultsView">
-      <div class="view-header">
-        ‹ Examination Results
-      </div>
-
-      <div style="background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:1.5rem; text-align:center; margin-bottom:1.25rem;">
-        <div style="font-size:0.78rem; color:var(--muted); font-weight:500;">Latest Semester Average Score</div>
-        <div style="font-size:2rem; font-weight:700; color:var(--accent); margin:0.3rem 0;">0%</div>
-        <div style="font-size:0.75rem; color:var(--muted);">No exams recorded yet</div>
-      </div>
-
-      <div style="font-size:0.72rem; font-weight:700; color:var(--muted); letter-spacing:0.05em; margin-bottom:0.75rem;">
-        ACADEMIC SEMESTER BREAKDOWN
-      </div>
-
-      <div style="text-align:center; color:var(--muted); font-size:0.82rem; padding:2rem 0; background:var(--surface2); border-radius:8px; border:1px solid var(--border);">
-        No academic reports found in the server log databases.
-      </div>
-
-      <button type="button" class="back-btn" onclick="switchView('main')">← Back to Dashboard</button>
     </div>
 
   </div>
@@ -781,180 +465,206 @@
 
 <script>
   const API_URL = "https://sms-student-management-system-1.onrender.com";
-
-  // Auth Guard
   const token = localStorage.getItem('token');
-  const user  = JSON.parse(localStorage.getItem('user') || '{}');
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-  if (!token) {
-    window.location.href = 'login.html';
-  }
+  if (!token) window.location.href = 'login.html';
 
-  // Mobile Drawer Setup
-  const sidebar   = document.getElementById('sidebar');
-  const overlay   = document.getElementById('overlay');
+  let currentCalendarDate = new Date();
+  let studentAttendanceRecords = [];
+
+  // Mobile menu setup
   const hamburger = document.getElementById('hamburger');
-
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
   if (hamburger) {
-    hamburger.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
-      overlay.classList.toggle('show');
-    });
+    hamburger.addEventListener('click', () => { sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
+    overlay.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('show'); });
   }
 
-  if (overlay) {
-    overlay.addEventListener('click', () => {
-      sidebar.classList.remove('open');
-      overlay.classList.remove('show');
-    });
+  function triggerSystemLogout() { localStorage.clear(); window.location.href = 'login.html'; }
+
+  function switchStudentWorkspace(targetViewId, navBtnId) {
+    document.querySelectorAll('.workspace-view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.sidebar .nav-item').forEach(b => btn.classList.remove('active'));
+
+    const vEl = document.getElementById(targetViewId);
+    if (vEl) vEl.classList.add('active');
+    const bEl = document.getElementById(navBtnId);
+    if (bEl) bEl.classList.add('active');
+
+    const titleMap = { 'dashboardView':'Dashboard', 'attendanceView':'Attendance', 'feesView':'Fee Management', 'resultsView':'Examination Results', 'editProfileView':'Edit Profile' };
+    document.getElementById('pageTitleText').textContent = titleMap[targetViewId] || 'Dashboard';
   }
 
-  // Date Label
-  const now = new Date();
-  document.getElementById('dateLabel').textContent = now.toLocaleDateString('en-IN', {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-  });
+  // 1. Fetch Real-time Data Pipelines
+  async function fetchLiveStudentData() {
+    try {
+      // 1A. Profile Fetch
+      const pRes = await fetch(`${API_URL}/api/students/me`, { headers: { 'Authorization': `Bearer ${token}` } });
+      if (pRes.ok) {
+        const student = await pRes.json();
+        const full = student.name || user.name || 'Student User';
+        const first = full.split(' ')[0];
 
-  // Logout
-  document.getElementById('logoutBtn').addEventListener('click', () => {
-    localStorage.clear();
-    window.location.href = 'login.html';
-  });
+        document.getElementById('sbAvatar').textContent = first.charAt(0).toUpperCase();
+        document.getElementById('sbName').textContent = full;
+        document.getElementById('welcomeStudentFirstName').textContent = first;
 
-  // Tab View Switcher (Prevents invalid 401 logouts during internal navigation)
-  function switchView(view) {
-    document.getElementById('mainDashboardView').style.display = 'none';
-    document.getElementById('profileView').style.display       = 'none';
-    document.getElementById('attendanceView').style.display    = 'none';
-    document.getElementById('feesView').style.display          = 'none';
-    document.getElementById('resultsView').style.display       = 'none';
+        document.getElementById('cardCourseBranch').textContent = `${student.course || 'B.Sc'} (${student.branch || 'Science'})`;
+        document.getElementById('cardYear').textContent = `Year ${student.year || 1}`;
 
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        document.getElementById('ovFullName').textContent = full;
+        document.getElementById('ovRollNo').textContent = student.rollNo || '—';
+        document.getElementById('ovEmail').textContent = student.email || user.email || '—';
+        document.getElementById('ovCourse').textContent = student.course || '—';
+        document.getElementById('ovBranch').textContent = student.branch || '—';
+        document.getElementById('ovYear').textContent = `Year ${student.year || 1}`;
 
-    const titleEl = document.getElementById('pageTitle');
+        // Populate Edit Form Input Fields (Image 43)
+        document.getElementById('pName').value = full;
+        document.getElementById('pRollNo').value = student.rollNo || '';
+        document.getElementById('pCourse').value = student.course || '';
+        document.getElementById('pBranch').value = student.branch || '';
+        document.getElementById('pYear').value = student.year || '1';
+      }
 
-    if (view === 'main') {
-      document.getElementById('mainDashboardView').style.display = 'block';
-      const navMain = document.getElementById('nav-main');
-      if (navMain) navMain.classList.add('active');
-      titleEl.textContent = 'Dashboard';
-    } else if (view === 'profile') {
-      document.getElementById('profileView').style.display = 'block';
-      const navProf = document.getElementById('nav-profile');
-      if (navProf) navProf.classList.add('active');
-      titleEl.textContent = 'Edit Profile';
-    } else if (view === 'attendance') {
-      document.getElementById('attendanceView').style.display = 'block';
-      const navAtt = document.getElementById('nav-attendance');
-      if (navAtt) navAtt.classList.add('active');
-      titleEl.textContent = 'My Attendance';
-    } else if (view === 'fees') {
-      document.getElementById('feesView').style.display = 'block';
-      const navFees = document.getElementById('nav-fees');
-      if (navFees) navFees.classList.add('active');
-      titleEl.textContent = 'My Fees';
-    } else if (view === 'results') {
-      document.getElementById('resultsView').style.display = 'block';
-      const navRes = document.getElementById('nav-results');
-      if (navRes) navRes.classList.add('active');
-      titleEl.textContent = 'My Results';
+      // 1B. Real-Time Attendance Fetch
+      const aRes = await fetch(`${API_URL}/api/attendance/me`, { headers: { 'Authorization': `Bearer ${token}` } });
+      if (aRes.ok) {
+        const att = await aRes.json();
+        studentAttendanceRecords = att.history || [];
+
+        const pct = att.percentage ?? (att.history?.length > 0 ? 100 : 0);
+        document.getElementById('cardAttPct').textContent = `${pct}%`;
+        document.getElementById('cardAttCount').textContent = `${att.present || (pct > 0 ? 1 : 0)}/${att.total || (pct > 0 ? 1 : 0)} classes`;
+        
+        document.getElementById('ovAttPct').textContent = `${pct}%`;
+        document.getElementById('ovAttFill').style.width = `${pct}%`;
+        document.getElementById('centerPct').textContent = `${pct}%`;
+
+        if (pct < 75) {
+          document.getElementById('ovAttNotice').textContent = "⚠️ Below 75% — improve attendance";
+          document.getElementById('ovAttPct').style.color = "var(--warning)";
+          document.getElementById('ovAttFill').style.background = "var(--warning)";
+        }
+      }
+
+      // 1C. Real-Time Fees Fetch
+      const fRes = await fetch(`${API_URL}/api/fees/me`, { headers: { 'Authorization': `Bearer ${token}` } });
+      if (fRes.ok) {
+        const fee = await fRes.json();
+        const status = (fee.status || 'pending').toLowerCase();
+
+        document.getElementById('cardFeeStatus').textContent = status.toUpperCase();
+        document.getElementById('cardFeeDue').textContent = status === 'paid' ? 'All clear' : `Due: ₹${fee.due || 60000}`;
+        document.getElementById('ovFeePill').textContent = status;
+        document.getElementById('ovFeePill').className = `pill ${status === 'paid' ? 'paid' : 'pending'}`;
+
+        document.getElementById('statusBanner').textContent = status.toUpperCase();
+        document.getElementById('statusBanner').className = `status-banner ${status}`;
+
+        const totalAmt = fee.totalFee || 60000;
+        const paidAmt = status === 'paid' ? totalAmt : (fee.paidAmount || 0);
+        const dueAmt = totalAmt - paidAmt;
+
+        document.getElementById('subTotalFee').textContent = `₹${totalAmt.toLocaleString('en-IN')}`;
+        document.getElementById('subPaidFee').textContent = `₹${paidAmt.toLocaleString('en-IN')}`;
+        document.getElementById('subDueFee').textContent = `₹${dueAmt.toLocaleString('en-IN')}`;
+      }
+
+      // 1D. Real-Time Results Fetch
+      const rRes = await fetch(`${API_URL}/api/results/me`, { headers: { 'Authorization': `Bearer ${token}` } });
+      if (rRes.ok) {
+        const resData = await rRes.json();
+        const score = resData.latestScore ?? 0;
+
+        document.getElementById('cardLatestScore').textContent = `${score}%`;
+        document.getElementById('ovScoreVal').textContent = `${score}%`;
+        document.getElementById('resAvgScore').textContent = `${score}%`;
+
+        if (resData.latestExam) {
+          document.getElementById('cardLatestExam').textContent = resData.latestExam;
+          document.getElementById('ovExamVal').textContent = resData.latestExam;
+          document.getElementById('resExamSub').textContent = resData.latestExam;
+        }
+      }
+
+      renderCalendarEngine();
+    } catch(err) { console.error("Error fetching live student metrics:", err); }
+  }
+
+  // 2. Attendance Calendar Engine Renders
+  function renderCalendarEngine() {
+    const container = document.getElementById('daysGridContainer');
+    container.innerHTML = '';
+
+    const year = currentCalendarDate.getFullYear();
+    const month = currentCalendarDate.getMonth();
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    document.getElementById('monthYearLabel').textContent = `${monthNames[month]} ${year}`;
+
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    const firstDayIndex = new Date(year, month, 1).getDay();
+    const paddingLeftDays = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
+
+    for (let i = 0; i < paddingLeftDays; i++) {
+      const emptyCell = document.createElement('div');
+      emptyCell.className = 'day-cell empty-day';
+      container.appendChild(emptyCell);
     }
 
-    if (window.innerWidth <= 768) {
-      sidebar.classList.remove('open');
-      overlay.classList.remove('show');
+    const todayLocal = new Date();
+    const todayStr = `${todayLocal.getFullYear()}-${String(todayLocal.getMonth() + 1).padStart(2, '0')}-${String(todayLocal.getDate()).padStart(2, '0')}`;
+
+    for (let day = 1; day <= totalDays; day++) {
+      const cell = document.createElement('div');
+      cell.className = 'day-cell';
+      cell.textContent = day;
+
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      if (dateStr === todayStr) cell.classList.add('is-today');
+
+      const match = studentAttendanceRecords.find(r => r.date?.split('T')[0] === dateStr);
+      if (match) {
+        if (match.status === 'present') cell.classList.add('is-present');
+        if (match.status === 'absent') cell.classList.add('is-absent');
+      }
+
+      container.appendChild(cell);
     }
   }
 
-  // Dynamic Session Hydration
-  function syncUIFromUser(u) {
-    const sName   = u.name || "Student";
-    const sRoll   = u.rollNo || u.rollNumber || "N/A";
-    const sEmail  = u.email || "N/A";
-    const sCourse = u.course || "B.Sc";
-    const sBranch = u.branch || "Science";
-    const sYear   = u.year || "Year 1";
+  window.changeMonth = function(direction) {
+    currentCalendarDate.setMonth(currentCalendarDate.getMonth() + direction);
+    renderCalendarEngine();
+  };
 
-    document.getElementById('sidebarAvatar').textContent = sName.charAt(0).toUpperCase();
-    document.getElementById('sidebarName').textContent   = sName;
-    document.getElementById('welcomeMsg').textContent   = `Good morning, ${sName.split(' ')[0]}! 👋`;
-
-    // Overview Stats
-    document.getElementById('cardCourse').textContent = `${sCourse} (${sBranch})`;
-    document.getElementById('cardYear').textContent   = sYear;
-
-    // Profile Summary Card
-    document.getElementById('profName').textContent   = sName;
-    document.getElementById('profRoll').textContent   = sRoll;
-    document.getElementById('profEmail').textContent  = sEmail;
-    document.getElementById('profCourse').textContent = sCourse;
-    document.getElementById('profBranch').textContent = sBranch;
-    document.getElementById('profYear').textContent   = sYear;
-
-    // Form Field Defaults
-    document.getElementById('inputName').value   = sName;
-    document.getElementById('inputRoll').value   = sRoll;
-    document.getElementById('inputCourse').value = sCourse;
-    document.getElementById('inputBranch').value = sBranch;
-    
-    const yearSelect = document.getElementById('inputYear');
-    if (yearSelect) {
-      yearSelect.value = sYear.includes('Year') ? sYear : `Year ${sYear}`;
-    }
-  }
-
-  // Save Profile Locally
-  function saveProfile(e) {
-    e.preventDefault();
-    const updatedUser = {
-      ...user,
-      name: document.getElementById('inputName').value,
-      rollNo: document.getElementById('inputRoll').value,
-      course: document.getElementById('inputCourse').value,
-      branch: document.getElementById('inputBranch').value,
-      year: document.getElementById('inputYear').value
+  // 3. Edit Profile Save Action Sync
+  document.getElementById('saveProfileBtn').addEventListener('click', async () => {
+    const payload = {
+      name: document.getElementById('pName').value.trim(),
+      rollNo: document.getElementById('pRollNo').value.trim(),
+      course: document.getElementById('pCourse').value.trim(),
+      branch: document.getElementById('pBranch').value.trim(),
+      year: parseInt(document.getElementById('pYear').value) || 1
     };
 
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-    syncUIFromUser(updatedUser);
-    switchView('main');
-  }
-
-  // Safe Network Fetching
-  async function apiFetch(endpoint) {
     try {
-      const res = await fetch(`${API_URL}${endpoint}`, {
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'user-id': user.id || user._id || '' 
-        }
+      const res = await fetch(`${API_URL}/api/students/me`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(payload)
       });
       if (res.ok) {
-        return await res.json();
-      }
-    } catch (err) {
-      console.warn(`Silently caught fetch error for ${endpoint}:`, err);
-    }
-    return null;
-  }
+        alert("Profile updated successfully! 🎉");
+        fetchLiveStudentData();
+        switchStudentWorkspace('dashboardView', 'nav-dashboard');
+      } else { alert("Failed to update profile."); }
+    } catch(err) { alert("Network error."); }
+  });
 
-  async function loadStudentData() {
-    // 1. Immediately hydrate with the active local session details
-    syncUIFromUser(user);
-
-    // 2. Open dashboard view on load
-    switchView('main');
-
-    // 3. Silently fetch updated records from backend if available
-    const remoteData = await apiFetch('/api/students/me');
-    if (remoteData) {
-      const mergedUser = { ...user, ...remoteData };
-      localStorage.setItem('user', JSON.stringify(mergedUser));
-      syncUIFromUser(mergedUser);
-    }
-  }
-
-  loadStudentData();
+  window.onload = fetchLiveStudentData;
 </script>
 </body>
 </html>
