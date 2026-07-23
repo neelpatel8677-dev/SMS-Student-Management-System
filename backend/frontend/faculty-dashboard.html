@@ -56,11 +56,10 @@
 
     .brand-icon {
       width: 36px; height: 36px;
-      background: var(--purple);
+      background: var(--accent);
       border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
       font-size: 1.1rem; flex-shrink: 0;
-      box-shadow: 0 0 12px rgba(124, 58, 237, 0.3);
     }
 
     .brand-text { font-size: 0.95rem; font-weight: 700; color: var(--text); }
@@ -91,7 +90,7 @@
     }
 
     .nav-item:hover { background: var(--surface2); color: var(--text); }
-    .nav-item.active { background: rgba(124,58,237,0.15); color: #c084fc; border-left: 3px solid var(--purple); }
+    .nav-item.active { background: rgba(37,99,235,0.15); color: #93c5fd; border-left: 3px solid var(--accent); }
     .nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
 
     .sidebar-footer {
@@ -111,14 +110,14 @@
     .avatar {
       width: 36px; height: 36px;
       border-radius: 50%;
-      background: var(--purple);
+      background: var(--accent);
       display: flex; align-items: center; justify-content: center;
       font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
       color: #fff;
     }
 
     .user-name  { font-size: 0.85rem; font-weight: 600; }
-    .user-role  { font-size: 0.72rem; color: #c084fc; text-transform: uppercase; font-weight: 600; }
+    .user-role  { font-size: 0.72rem; color: var(--muted); text-transform: capitalize; }
 
     .logout-btn {
       display: flex; align-items: center; gap: 0.5rem;
@@ -179,12 +178,12 @@
       border: 1px solid rgba(124,58,237,0.3);
     }
 
-    /* Content Area */
     .content { padding: 1.5rem; flex: 1; }
 
+    /* Welcome Banner */
     .welcome-banner {
-      background: linear-gradient(135deg, rgba(124,58,237,0.18), rgba(37,99,235,0.1));
-      border: 1px solid rgba(124,58,237,0.25);
+      background: linear-gradient(135deg, rgba(37,99,235,0.15), rgba(124,58,237,0.1));
+      border: 1px solid rgba(37,99,235,0.25);
       border-radius: 12px;
       padding: 1.25rem 1.5rem;
       margin-bottom: 1.5rem;
@@ -198,10 +197,17 @@
     .welcome-text p  { font-size: 0.85rem; color: var(--muted); }
     .welcome-emoji   { font-size: 2.2rem; }
 
-    /* Stat Cards */
+    /* Stat Cards Grid */
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .stats-grid-row2 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       gap: 1rem;
       margin-bottom: 1.5rem;
     }
@@ -210,52 +216,52 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 1.25rem;
+      padding: 1.15rem;
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
-      transition: border-color 0.2s, transform 0.2s;
+      gap: 0.4rem;
       position: relative;
       overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.2s;
     }
 
-    .stat-card:hover { border-color: var(--purple); transform: translateY(-2px); }
+    .stat-card:hover { border-color: var(--accent); transform: translateY(-2px); }
 
     .stat-card::after {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
-      height: 3px;
+      height: 2px;
     }
 
+    .stat-card.blue::after   { background: var(--accent); }
     .stat-card.purple::after { background: var(--purple); }
     .stat-card.green::after  { background: var(--success); }
-    .stat-card.blue::after   { background: var(--accent); }
+    .stat-card.yellow::after { background: var(--warning); }
     .stat-card.cyan::after   { background: var(--cyan); }
-
-    .stat-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+    .stat-card.red::after    { background: var(--danger); }
 
     .stat-icon {
       font-size: 1.25rem;
       width: 38px; height: 38px;
       border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
+      margin-bottom: 0.25rem;
     }
 
+    .stat-card.blue .stat-icon   { background: rgba(37,99,235,0.15); }
     .stat-card.purple .stat-icon { background: rgba(124,58,237,0.15); }
-    .stat-card.green  .stat-icon { background: rgba(63,185,80,0.15); }
-    .stat-card.blue   .stat-icon { background: rgba(37,99,235,0.15); }
-    .stat-card.cyan   .stat-icon { background: rgba(34,211,238,0.15); }
+    .stat-card.green .stat-icon  { background: rgba(63,185,80,0.15); }
+    .stat-card.yellow .stat-icon { background: rgba(227,179,65,0.15); }
+    .stat-card.cyan .stat-icon   { background: rgba(34,211,238,0.15); }
+    .stat-card.red .stat-icon    { background: rgba(248,81,73,0.15); }
 
-    .stat-label { font-size: 0.78rem; color: var(--muted); font-weight: 500; }
-    .stat-value { font-size: 1.65rem; font-weight: 700; line-height: 1.1; margin-top: 0.2rem; }
+    .stat-label { font-size: 0.8rem; color: var(--muted); font-weight: 500; }
+    .stat-value { font-size: 1.75rem; font-weight: 700; line-height: 1; margin: 0.15rem 0; }
     .stat-sub   { font-size: 0.75rem; color: var(--muted); }
 
-    /* Bottom Layout Panel */
+    /* Bottom Grid */
     .bottom-grid {
       display: grid;
       grid-template-columns: 1.5fr 1fr;
@@ -278,10 +284,10 @@
     }
 
     .panel-title { font-size: 0.95rem; font-weight: 600; }
-    .panel-link  { font-size: 0.78rem; color: #c084fc; text-decoration: none; font-weight: 500; cursor: pointer; }
+    .panel-link  { font-size: 0.78rem; color: #93c5fd; text-decoration: none; font-weight: 500; cursor: pointer; }
     .panel-link:hover { text-decoration: underline; }
 
-    /* Table Styles */
+    /* Table Component */
     .table-wrap { overflow-x: auto; }
 
     table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
@@ -306,6 +312,7 @@
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: var(--surface2); }
 
+    /* Badges & Pills */
     .pill {
       display: inline-block;
       padding: 0.2rem 0.6rem;
@@ -315,8 +322,12 @@
     }
 
     .pill.active   { background: rgba(63,185,80,0.15);  color: var(--success); }
+    .pill.pending  { background: rgba(227,179,65,0.15); color: var(--warning); }
+    .pill.paid     { background: rgba(63,185,80,0.15);  color: var(--success); }
+    .pill.pass     { background: rgba(63,185,80,0.2);   color: var(--success); }
+    .pill.year     { background: rgba(37,99,235,0.15);  color: #93c5fd; }
 
-    /* Actions Grid */
+    /* Action Grid Buttons */
     .actions-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -342,36 +353,133 @@
     }
 
     .action-btn:hover {
-      border-color: var(--purple);
-      background: rgba(124,58,237,0.1);
+      border-color: var(--accent);
+      background: rgba(37,99,235,0.1);
       transform: translateY(-2px);
     }
 
     .action-btn .act-icon { font-size: 1.6rem; }
     .action-btn .act-label { font-size: 0.88rem; font-weight: 600; }
 
-    /* ── Sub-Views Container ── */
-    .view-card-container {
-      max-width: 650px;
-      margin: 1rem auto;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.5rem;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      display: none;
-    }
-
-    .view-header {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 1.25rem;
-      color: var(--text);
+    /* Control Bar Toolbar */
+    .filter-bar {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
     }
 
+    .search-input-wrap {
+      flex: 1;
+      min-width: 240px;
+      position: relative;
+    }
+
+    .search-input-wrap input {
+      width: 100%;
+      padding: 0.65rem 0.85rem 0.65rem 2.2rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.875rem;
+      outline: none;
+    }
+
+    .search-input-wrap::before {
+      content: '🔍';
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.85rem;
+      opacity: 0.6;
+    }
+
+    .filter-select {
+      padding: 0.65rem 0.85rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.85rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .btn-action-primary {
+      padding: 0.65rem 1.1rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+
+    .btn-action-primary:hover { background: var(--accent-h); }
+
+    .btn-sm-edit {
+      padding: 0.35rem 0.75rem;
+      background: rgba(37,99,235,0.15);
+      border: 1px solid rgba(37,99,235,0.3);
+      color: #93c5fd;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-sm-delete {
+      padding: 0.35rem 0.75rem;
+      background: rgba(248,81,73,0.15);
+      border: 1px solid rgba(248,81,73,0.3);
+      color: var(--danger);
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Sub-Tab Navigation Strip */
+    .sub-tabs {
+      display: flex;
+      gap: 0.5rem;
+      background: var(--surface);
+      padding: 0.35rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      width: fit-content;
+      margin-bottom: 1.25rem;
+    }
+
+    .sub-tab-btn {
+      padding: 0.5rem 1rem;
+      border-radius: 7px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      background: none;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .sub-tab-btn.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    /* Forms Inside Modals */
     .form-group {
       margin-bottom: 1rem;
       display: flex;
@@ -404,7 +512,6 @@
     }
 
     .btn-submit {
-      width: auto;
       padding: 0.65rem 1.25rem;
       background: var(--accent);
       border: none;
@@ -413,8 +520,6 @@
       font-weight: 600;
       font-size: 0.875rem;
       cursor: pointer;
-      margin-top: 0.5rem;
-      transition: background 0.15s;
     }
 
     .btn-submit:hover { background: var(--accent-h); }
@@ -434,7 +539,7 @@
       cursor: pointer;
     }
 
-    /* ── Settings View Card Styles (Matching Screenshot 38_2.png) ── */
+    /* Settings View Container */
     .settings-container {
       max-width: 540px;
       margin: 0 auto;
@@ -459,22 +564,15 @@
       border-bottom: 1px solid var(--border);
     }
 
-    .schedule-card {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 0.75rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
     .overlay {
       display: none;
       position: fixed; inset: 0;
       background: rgba(0,0,0,0.6);
       z-index: 99;
+    }
+
+    @media (max-width: 1024px) {
+      .stats-grid, .stats-grid-row2 { grid-template-columns: repeat(2, 1fr); }
     }
 
     @media (max-width: 900px) {
@@ -500,7 +598,7 @@
     <div class="brand-icon">🎓</div>
     <div>
       <div class="brand-text">SMS Portal</div>
-      <div class="brand-sub">Faculty Workspace</div>
+      <div class="brand-sub">Student Management</div>
     </div>
   </div>
 
@@ -509,18 +607,18 @@
     <span class="nav-icon">🏠</span> Dashboard
   </a>
 
-  <div class="nav-section">Academic Hub</div>
+  <div class="nav-section">Management</div>
+  <a class="nav-item" id="nav-students" onclick="switchView('students')">
+    <span class="nav-icon">👨‍🎓</span> Students
+  </a>
   <a class="nav-item" id="nav-attendance" onclick="switchView('attendance')">
-    <span class="nav-icon">📋</span> Mark Attendance
+    <span class="nav-icon">📋</span> Attendance
+  </a>
+  <a class="nav-item" id="nav-fees" onclick="switchView('fees')">
+    <span class="nav-icon">💰</span> Fees
   </a>
   <a class="nav-item" id="nav-results" onclick="switchView('results')">
-    <span class="nav-icon">📊</span> Upload Results
-  </a>
-  <a class="nav-item" id="nav-schedule" onclick="switchView('schedule')">
-    <span class="nav-icon">📚</span> Course Schedule
-  </a>
-  <a class="nav-item" id="nav-roster" onclick="switchView('roster')">
-    <span class="nav-icon">👨‍🎓</span> Student Roster
+    <span class="nav-icon">📊</span> Results
   </a>
 
   <div class="nav-section">System</div>
@@ -549,8 +647,8 @@
     <div class="topbar-left">
       <button class="hamburger" id="hamburger">☰</button>
       <div>
-        <div class="page-title" id="pageTitle">Faculty Portal</div>
-        <div class="page-sub" id="pageSub">Here's an overview of your workspace today.</div>
+        <div class="page-title" id="pageTitle">Dashboard</div>
+        <div class="page-sub" id="pageSub">Thursday, 16 July 2026</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -564,91 +662,93 @@
     <div id="dashboardView">
       <div class="welcome-banner">
         <div class="welcome-text">
-          <h2 id="welcomeMsg">Welcome back, Professor! 👋</h2>
-          <p id="welcomeSub">Here is your academic overview and workspace summary for today.</p>
+          <h2 id="welcomeMsg">Good afternoon, Nidhi! 👋</h2>
+          <p id="welcomeSub">Here's an overview of your institution today.</p>
         </div>
-        <div class="welcome-emoji">👨‍🏫</div>
+        <div class="welcome-emoji">🛡️</div>
       </div>
 
+      <!-- Stat Cards Sequence Matches Screenshot Exactly -->
       <div class="stats-grid">
+        <div class="stat-card blue" onclick="switchView('students')">
+          <div class="stat-icon">👨‍🎓</div>
+          <div class="stat-label">Total Students</div>
+          <div class="stat-value">4</div>
+          <div class="stat-sub">4 joined this month</div>
+        </div>
+
         <div class="stat-card purple">
-          <div class="stat-header">
-            <span class="stat-label">Assigned Department</span>
-            <div class="stat-icon">🏛️</div>
-          </div>
-          <div class="stat-value" id="deptVal" style="font-size:1.15rem;">Diploma</div>
-          <div class="stat-sub">Active Duty Division</div>
+          <div class="stat-icon">📚</div>
+          <div class="stat-label">Courses</div>
+          <div class="stat-value">—</div>
+          <div class="stat-sub">0 active</div>
         </div>
 
         <div class="stat-card green" onclick="switchView('attendance')">
-          <div class="stat-header">
-            <span class="stat-label">Avg Class Attendance</span>
-            <div class="stat-icon">📋</div>
-          </div>
-          <div class="stat-value" id="attVal">85%</div>
-          <div class="stat-sub" id="attSub">4 Present today</div>
+          <div class="stat-icon">📋</div>
+          <div class="stat-label">Avg Attendance</div>
+          <div class="stat-value">77%</div>
+          <div class="stat-sub">Today: 0 present</div>
         </div>
 
-        <div class="stat-card blue" onclick="switchView('schedule')">
-          <div class="stat-header">
-            <span class="stat-label">Active Courses Taught</span>
-            <div class="stat-icon">📚</div>
-          </div>
-          <div class="stat-value" id="coursesVal">2</div>
-          <div class="stat-sub">Enrolled modules</div>
+        <div class="stat-card yellow" onclick="switchView('fees')">
+          <div class="stat-icon">💰</div>
+          <div class="stat-label">Fees Collected</div>
+          <div class="stat-value">₹—</div>
+          <div class="stat-sub">0 pending</div>
         </div>
+      </div>
 
-        <div class="stat-card cyan" onclick="switchView('roster')">
-          <div class="stat-header">
-            <span class="stat-label">Total Students Taught</span>
-            <div class="stat-icon">👨‍🎓</div>
-          </div>
-          <div class="stat-value" id="studentsVal">4</div>
-          <div class="stat-sub">Under supervision</div>
+      <div class="stats-grid-row2">
+        <div class="stat-card cyan" onclick="switchView('results')">
+          <div class="stat-icon">📊</div>
+          <div class="stat-label">Avg Result</div>
+          <div class="stat-value">—%</div>
+          <div class="stat-sub">0 passed this term</div>
         </div>
       </div>
 
       <div class="bottom-grid">
-        <!-- Student Overview Table -->
+        <!-- Recent Students Table -->
         <div class="panel">
           <div class="panel-header">
-            <span class="panel-title">Assigned Students Preview</span>
-            <span class="panel-link" onclick="switchView('roster')">View Roster →</span>
+            <span class="panel-title">Recent Students</span>
+            <span class="panel-link" onclick="switchView('students')">View all →</span>
           </div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Student Name</th>
+                  <th>Name</th>
                   <th>Roll No</th>
                   <th>Course</th>
-                  <th>Status</th>
+                  <th>Fees</th>
                 </tr>
               </thead>
-              <tbody id="studentTableBody">
-                <tr>
-                  <td style="font-weight:600;">Test Panchal</td>
-                  <td>4</td>
-                  <td>Deploma</td>
-                  <td><span class="pill active">Active</span></td>
-                </tr>
-                <tr>
-                  <td style="font-weight:600;">smit gohil</td>
-                  <td>12</td>
-                  <td>diploma</td>
-                  <td><span class="pill active">Active</span></td>
-                </tr>
+              <tbody>
                 <tr>
                   <td style="font-weight:600;">dev pandya</td>
                   <td>37</td>
                   <td>diploma</td>
-                  <td><span class="pill active">Active</span></td>
+                  <td><span class="pill pending">pending</span></td>
                 </tr>
                 <tr>
                   <td style="font-weight:600;">himanshu machhi</td>
                   <td>26</td>
                   <td>diploma</td>
-                  <td><span class="pill active">Active</span></td>
+                  <td><span class="pill paid">paid</span></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:600;">smit gohil</td>
+                  <td>12</td>
+                  <td>diploma</td>
+                  <td><span class="pill pending">pending</span></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:600;">Test Panchal</td>
+                  <td>4</td>
+                  <td>Deploma</td>
+                  <td><span class="pill pending">pending</span></td>
                 </tr>
               </tbody>
             </table>
@@ -661,7 +761,7 @@
             <span class="panel-title">Quick Actions Control</span>
           </div>
           <div class="actions-grid">
-            <div class="action-btn" onclick="switchView('addStudent')">
+            <div class="action-btn" onclick="openAddStudentModal()">
               <span class="act-icon" style="color: #a78bfa;">➕</span>
               <span class="act-label">Add Student</span>
             </div>
@@ -682,158 +782,350 @@
       </div>
     </div>
 
-    <!-- 2. ADD STUDENT VIEW -->
-    <div class="view-card-container" id="addStudentView">
-      <div class="view-header">➕ Add New Student</div>
-      <form onsubmit="submitNewStudent(event)">
-        <div class="form-group">
-          <label class="form-label">Full Name</label>
-          <input type="text" class="form-input" id="newStudentName" placeholder="Enter student full name" required />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Roll Number</label>
-          <input type="text" class="form-input" id="newStudentRoll" placeholder="e.g. 45" required />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Course</label>
-          <input type="text" class="form-input" id="newStudentCourse" placeholder="e.g. Diploma" required />
-        </div>
-        <button type="submit" class="btn-submit">Add Student to Roster</button>
-        <button type="button" class="back-btn" onclick="switchView('dashboard')">← Back to Dashboard</button>
-      </form>
-    </div>
-
-    <!-- 3. MARK ATTENDANCE VIEW -->
-    <div class="view-card-container" id="attendanceView">
-      <div class="view-header">📋 Mark Class Attendance</div>
-      <form onsubmit="submitAttendance(event)">
-        <div class="form-group">
-          <label class="form-label">Select Course</label>
-          <select class="form-select" id="attCourse">
-            <option>Diploma - Computer Science</option>
-            <option>B.Tech - Year 3</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Date</label>
-          <input type="date" class="form-input" id="attDate" required />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Default Mark</label>
-          <select class="form-select">
-            <option>Present All</option>
-            <option>Absent All</option>
-          </select>
-        </div>
-        <button type="submit" class="btn-submit">Save Attendance Log</button>
-        <button type="button" class="back-btn" onclick="switchView('dashboard')">← Back to Dashboard</button>
-      </form>
-    </div>
-
-    <!-- 4. MANAGE FEES VIEW -->
-    <div class="view-card-container" id="feesView">
-      <div class="view-header">💰 Fee Management Control</div>
-      <form onsubmit="submitFeeUpdate(event)">
-        <div class="form-group">
-          <label class="form-label">Select Student</label>
-          <select class="form-select">
-            <option>Test Panchal (Roll: 4)</option>
-            <option>smit gohil (Roll: 12)</option>
-            <option>dev pandya (Roll: 37)</option>
-            <option>himanshu machhi (Roll: 26)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Fee Amount (₹)</label>
-          <input type="number" class="form-input" placeholder="e.g. 60000" required />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Status</label>
-          <select class="form-select">
-            <option value="Paid">Paid</option>
-            <option value="Pending" selected>Pending</option>
-          </select>
-        </div>
-        <button type="submit" class="btn-submit">Update Fee Record</button>
-        <button type="button" class="back-btn" onclick="switchView('dashboard')">← Back to Dashboard</button>
-      </form>
-    </div>
-
-    <!-- 5. UPLOAD RESULTS VIEW -->
-    <div class="view-card-container" id="resultsView">
-      <div class="view-header">📊 Upload Student Grades</div>
-      <form onsubmit="submitGrades(event)">
-        <div class="form-group">
-          <label class="form-label">Select Student</label>
-          <select class="form-select">
-            <option>Test Panchal (Roll: 4)</option>
-            <option>smit gohil (Roll: 12)</option>
-            <option>dev pandya (Roll: 37)</option>
-            <option>himanshu machhi (Roll: 26)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Exam Title</label>
-          <input type="text" class="form-input" placeholder="e.g. Mid-Term Semester 1" required />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Score Obtained (%)</label>
-          <input type="number" class="form-input" min="0" max="100" placeholder="e.g. 85" required />
-        </div>
-        <button type="submit" class="btn-submit">Publish Result</button>
-        <button type="button" class="back-btn" onclick="switchView('dashboard')">← Back to Dashboard</button>
-      </form>
-    </div>
-
-    <!-- 6. COURSE SCHEDULE VIEW -->
-    <div class="view-card-container" id="scheduleView">
-      <div class="view-header">📚 Active Course Timetable</div>
-      
-      <div class="schedule-card">
+    <!-- 2. STUDENTS VIEW (image_d0de9f.png) -->
+    <div id="studentsView" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
         <div>
-          <h4 style="font-size:0.9rem; font-weight:600;">Computer Networks & Security</h4>
-          <p style="font-size:0.75rem; color:var(--muted); margin-top:0.2rem;">Lecture Hall 102 • Mon, Wed, Fri</p>
+          <h2 style="font-size:1.3rem; font-weight:700;">Students</h2>
+          <p style="font-size:0.8rem; color:var(--muted); margin-top:0.15rem;">4 total students</p>
         </div>
-        <div style="font-size:0.8rem; font-weight:700; color:#c084fc;">09:30 AM</div>
+        <button class="btn-action-primary" onclick="openAddStudentModal()">➕ Add Student</button>
       </div>
 
-      <div class="schedule-card">
-        <div>
-          <h4 style="font-size:0.9rem; font-weight:600;">Database Management Systems</h4>
-          <p style="font-size:0.75rem; color:var(--muted); margin-top:0.2rem;">Lab 04 • Tue, Thu</p>
+      <div class="filter-bar">
+        <div class="search-input-wrap">
+          <input type="text" placeholder="Search by name, roll no, email..." />
         </div>
-        <div style="font-size:0.8rem; font-weight:700; color:#c084fc;">01:30 PM</div>
+        <select class="filter-select"><option>All Courses</option><option>Diploma</option></select>
+        <select class="filter-select"><option>All Years</option><option>Year 1</option><option>Year 3</option></select>
+        <select class="filter-select"><option>All Fee Status</option><option>Pending</option><option>Paid</option></select>
+        <button class="filter-select" style="font-weight:600;">🔄 Reset</button>
       </div>
 
-      <button type="button" class="back-btn" onclick="switchView('dashboard')">← Back to Dashboard</button>
+      <div class="panel">
+        <div style="padding:0.75rem 1.25rem; font-size:0.78rem; color:var(--muted); border-bottom:1px solid var(--border);">
+          Showing 1–4 of 4 students
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>NAME ↕</th>
+                <th>ROLL NO ↕</th>
+                <th>EMAIL</th>
+                <th>COURSE ↕</th>
+                <th>YEAR ↕</th>
+                <th>FEE STATUS</th>
+                <th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div style="display:flex; align-items:center; gap:0.6rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">DP</div><b>dev pandya</b></div></td>
+                <td>37</td>
+                <td style="color:var(--muted);">devpandya230@gmail.com</td>
+                <td>diploma</td>
+                <td><span class="pill year">Year 3</span></td>
+                <td><span class="pill pending">pending</span></td>
+                <td><div style="display:flex; gap:0.4rem;"><button class="btn-sm-edit">✏️ Edit</button><button class="btn-sm-delete">🗑️ Delete</button></div></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex; align-items:center; gap:0.6rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">HM</div><b>himanshu machhi</b></div></td>
+                <td>26</td>
+                <td style="color:var(--muted);">himanshumachhi65@gmail.com</td>
+                <td>diploma</td>
+                <td><span class="pill year">Year 3</span></td>
+                <td><span class="pill paid">paid</span></td>
+                <td><div style="display:flex; gap:0.4rem;"><button class="btn-sm-edit">✏️ Edit</button><button class="btn-sm-delete">🗑️ Delete</button></div></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex; align-items:center; gap:0.6rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">SG</div><b>smit gohil</b></div></td>
+                <td>12</td>
+                <td style="color:var(--muted);">smitgohil5012@gmail.com</td>
+                <td>diploma</td>
+                <td><span class="pill year">Year 3</span></td>
+                <td><span class="pill pending">pending</span></td>
+                <td><div style="display:flex; gap:0.4rem;"><button class="btn-sm-edit">✏️ Edit</button><button class="btn-sm-delete">🗑️ Delete</button></div></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex; align-items:center; gap:0.6rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">TP</div><b>Test Panchal</b></div></td>
+                <td>4</td>
+                <td style="color:var(--muted);">test123456@gmail.com</td>
+                <td>Deploma</td>
+                <td><span class="pill year">Year 1</span></td>
+                <td><span class="pill pending">pending</span></td>
+                <td><div style="display:flex; gap:0.4rem;"><button class="btn-sm-edit">✏️ Edit</button><button class="btn-sm-delete">🗑️ Delete</button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
-    <!-- 7. FULL ROSTER VIEW -->
-    <div class="view-card-container" id="rosterView">
-      <div class="view-header">👨‍🎓 Assigned Student Roster</div>
-      <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
-        <thead>
-          <tr style="background:var(--surface2);">
-            <th style="padding:0.6rem; text-align:left;">Name</th>
-            <th style="padding:0.6rem; text-align:left;">Roll No</th>
-            <th style="padding:0.6rem; text-align:left;">Course</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td style="padding:0.6rem; border-bottom:1px solid var(--border);">Test Panchal</td><td style="padding:0.6rem; border-bottom:1px solid var(--border);">4</td><td style="padding:0.6rem; border-bottom:1px solid var(--border);">Deploma</td></tr>
-          <tr><td style="padding:0.6rem; border-bottom:1px solid var(--border);">smit gohil</td><td style="padding:0.6rem; border-bottom:1px solid var(--border);">12</td><td style="padding:0.6rem; border-bottom:1px solid var(--border);">diploma</td></tr>
-          <tr><td style="padding:0.6rem; border-bottom:1px solid var(--border);">dev pandya</td><td style="padding:0.6rem; border-bottom:1px solid var(--border);">37</td><td style="padding:0.6rem; border-bottom:1px solid var(--border);">diploma</td></tr>
-          <tr><td style="padding:0.6rem; border-bottom:1px solid var(--border);">himanshu machhi</td><td style="padding:0.6rem; border-bottom:1px solid var(--border);">26</td><td style="padding:0.6rem; border-bottom:1px solid var(--border);">diploma</td></tr>
-        </tbody>
-      </table>
-      <button type="button" class="back-btn" onclick="switchView('dashboard')">← Back to Dashboard</button>
+    <!-- 3. ATTENDANCE VIEW (35_2.png) -->
+    <div id="attendanceView" style="display:none;">
+      <div style="margin-bottom:1.25rem;">
+        <h2 style="font-size:1.3rem; font-weight:700;">Attendance</h2>
+        <p style="font-size:0.8rem; color:var(--muted); margin-top:0.15rem;">Track & manage student attendance</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-label">TOTAL STUDENTS</div>
+          <div class="stat-value">2</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">PRESENT TODAY</div>
+          <div class="stat-value">0</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">ABSENT TODAY</div>
+          <div class="stat-value">0</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-label">AVG ATTENDANCE</div>
+          <div class="stat-value">60%</div>
+          <div class="stat-sub">overall</div>
+        </div>
+      </div>
+
+      <div class="sub-tabs">
+        <button class="sub-tab-btn active">📋 Mark Attendance</button>
+        <button class="sub-tab-btn">📊 Records</button>
+      </div>
+
+      <div class="panel" style="padding:1.25rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.25rem;">
+          <h3 style="font-size:1rem; font-weight:700;">Mark Attendance</h3>
+          <div style="display:flex; gap:0.6rem; align-items:center;">
+            <input type="date" class="filter-select" id="attDatePicker" value="2026-06-22" />
+            <select class="filter-select"><option>All Courses</option><option>Diploma</option></select>
+            <button class="btn-action-primary">Save Attendance</button>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1.25rem; font-size:0.82rem; color:var(--muted);">
+          <span>Mark all as:</span>
+          <button style="padding:0.4rem 0.85rem; background:rgba(63,185,80,0.15); border:1px solid rgba(63,185,80,0.3); color:var(--success); border-radius:6px; font-weight:600; cursor:pointer;">✓ Present</button>
+          <button style="padding:0.4rem 0.85rem; background:rgba(248,81,73,0.15); border:1px solid rgba(248,81,73,0.3); color:var(--danger); border-radius:6px; font-weight:600; cursor:pointer;">✕ Absent</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>STUDENT</th>
+                <th>STATUS</th>
+                <th>REMARKS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div style="display:flex; align-items:center; gap:0.6rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">AP</div><div><b>Arya Patel</b><div style="font-size:0.72rem; color:var(--muted);">2</div></div></div></td>
+                <td>
+                  <div style="display:flex; gap:0.4rem;">
+                    <button style="padding:0.35rem 0.6rem; background:rgba(63,185,80,0.2); border:1px solid var(--success); color:var(--success); border-radius:6px;">✓</button>
+                    <button style="padding:0.35rem 0.6rem; background:var(--surface2); border:1px solid var(--border); color:var(--muted); border-radius:6px;">✕</button>
+                  </div>
+                </td>
+                <td><input type="text" class="form-input" style="max-width:260px;" placeholder="Remarks (optional)" /></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex; align-items:center; gap:0.6rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">KP</div><div><b>Kanubhai Patel</b><div style="font-size:0.72rem; color:var(--muted);">1</div></div></div></td>
+                <td>
+                  <div style="display:flex; gap:0.4rem;">
+                    <button style="padding:0.35rem 0.6rem; background:rgba(63,185,80,0.2); border:1px solid var(--success); color:var(--success); border-radius:6px;">✓</button>
+                    <button style="padding:0.35rem 0.6rem; background:var(--surface2); border:1px solid var(--border); color:var(--muted); border-radius:6px;">✕</button>
+                  </div>
+                </td>
+                <td><input type="text" class="form-input" style="max-width:260px;" placeholder="Remarks (optional)" /></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
-    <!-- 8. SYSTEM SETTINGS VIEW (Matching 38_2.png) -->
+    <!-- 4. FEES VIEW (36_2.png) -->
+    <div id="feesView" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+        <div>
+          <h2 style="font-size:1.3rem; font-weight:700;">Fees Management</h2>
+          <p style="font-size:0.8rem; color:var(--muted); margin-top:0.15rem;">Track total, paid & pending fees</p>
+        </div>
+        <button class="btn-action-primary">➕ Assign Fee</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon">💼</div>
+          <div class="stat-label">TOTAL FEES</div>
+          <div class="stat-value">₹1,20,000</div>
+          <div class="stat-sub">2 students</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon">✓</div>
+          <div class="stat-label">PAID FEES</div>
+          <div class="stat-value">₹0</div>
+          <div class="stat-sub">0 students paid</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-label">PENDING FEES</div>
+          <div class="stat-value">₹1,20,000</div>
+          <div class="stat-sub">2 students pending</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-icon">🚨</div>
+          <div class="stat-label">OVERDUE FEES</div>
+          <div class="stat-value">₹0</div>
+          <div class="stat-sub">0 students overdue</div>
+        </div>
+      </div>
+
+      <div class="sub-tabs">
+        <button class="sub-tab-btn active">All Students</button>
+        <button class="sub-tab-btn">⏳ Pending</button>
+        <button class="sub-tab-btn">✓ Paid</button>
+        <button class="sub-tab-btn">🚨 Overdue</button>
+      </div>
+
+      <div class="filter-bar">
+        <div class="search-input-wrap">
+          <input type="text" placeholder="Search by name or roll no..." />
+        </div>
+        <select class="filter-select"><option>All Courses</option></select>
+        <select class="filter-select"><option>All Years</option></select>
+        <button class="filter-select" style="font-weight:600;">🔄 Reset</button>
+      </div>
+
+      <div class="panel">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>STUDENT</th>
+                <th>COURSE / YEAR</th>
+                <th>TOTAL FEE</th>
+                <th>PAID</th>
+                <th>PENDING</th>
+                <th>DUE DATE</th>
+                <th>STATUS</th>
+                <th>ACTION</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div style="display:flex; align-items:center; gap:0.6rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">KP</div><div><b>Kanubhai Patel</b><div style="font-size:0.72rem; color:var(--muted);">1</div></div></div></td>
+                <td>B.Sc / Year 1</td>
+                <td><b>₹60,000</b></td>
+                <td style="color:var(--success); font-weight:600;">₹0</td>
+                <td style="color:var(--warning); font-weight:600;">₹60,000</td>
+                <td style="color:var(--muted);">—</td>
+                <td><span class="pill pending">pending</span></td>
+                <td><button class="btn-sm-edit">💳 Update</button></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex; align-items:center; gap:0.6rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">AP</div><div><b>Arya Patel</b><div style="font-size:0.72rem; color:var(--muted);">2</div></div></div></td>
+                <td>B.Sc / Year 1</td>
+                <td><b>₹60,000</b></td>
+                <td style="color:var(--success); font-weight:600;">₹0</td>
+                <td style="color:var(--warning); font-weight:600;">₹60,000</td>
+                <td style="color:var(--muted);">—</td>
+                <td><span class="pill pending">pending</span></td>
+                <td><button class="btn-sm-edit">💳 Update</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. RESULTS VIEW (37_2.png) -->
+    <div id="resultsView" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+        <div>
+          <h2 style="font-size:1.3rem; font-weight:700;">Results</h2>
+          <p style="font-size:0.8rem; color:var(--muted); margin-top:0.15rem;">Marks, percentage & grades</p>
+        </div>
+        <button class="btn-action-primary">➕ Add Result</button>
+      </div>
+
+      <div class="stats-grid" style="grid-template-columns: repeat(5, 1fr);">
+        <div class="stat-card blue">
+          <div class="stat-label">TOTAL RESULTS</div>
+          <div class="stat-value">1</div>
+          <div class="stat-sub">records</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">PASSED</div>
+          <div class="stat-value">1</div>
+          <div class="stat-sub">100% pass rate</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">FAILED</div>
+          <div class="stat-value">0</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-label">AVG PERCENTAGE</div>
+          <div class="stat-value">70.0%</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-label">HIGHEST SCORE</div>
+          <div class="stat-value">70.0%</div>
+        </div>
+      </div>
+
+      <div class="panel" style="padding:1.25rem;">
+        <h3 style="font-size:1rem; font-weight:700; margin-bottom:1rem;">All Results</h3>
+        
+        <div class="filter-bar">
+          <div class="search-input-wrap">
+            <input type="text" placeholder="Search by name, roll no, exam..." />
+          </div>
+          <select class="filter-select"><option>All Courses</option></select>
+          <select class="filter-select"><option>All Exams</option></select>
+          <select class="filter-select"><option>All Results</option></select>
+          <button class="filter-select" style="font-weight:600;">🔄 Reset</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>STUDENT</th>
+                <th>COURSE / YEAR</th>
+                <th>EXAM</th>
+                <th>MARKS OBTAINED</th>
+                <th>OUT OF</th>
+                <th>PERCENTAGE</th>
+                <th>GRADE</th>
+                <th>RESULT</th>
+                <th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div style="display:flex; align-items:center; gap:0.6rem;"><div class="avatar" style="width:28px;height:28px;font-size:0.75rem;">KP</div><div><b>Kanubhai Patel</b><div style="font-size:0.72rem; color:var(--muted);">1</div></div></div></td>
+                <td>B.Sc / Yr 1</td>
+                <td>Sem1</td>
+                <td><b style="color:var(--warning);">70</b><div style="font-size:0.7rem; color:var(--muted);">Obtained</div></td>
+                <td><b>100</b><div style="font-size:0.7rem; color:var(--muted);">Total</div></td>
+                <td><span style="font-weight:700; color:var(--warning);">70%</span></td>
+                <td><span class="pill year" style="font-weight:700;">B</span></td>
+                <td><span class="pill pass">✓ Pass</span></td>
+                <td><div style="display:flex; gap:0.4rem;"><button class="btn-sm-edit">✏️</button><button class="btn-sm-delete">🗑️</button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. SETTINGS VIEW -->
     <div id="settingsView" style="display:none;">
       <div class="settings-container">
         
-        <!-- Faculty Profile Info Card -->
         <div class="settings-card">
           <div class="settings-card-title">Faculty Profile Info</div>
           <form onsubmit="saveProfileSettings(event)">
@@ -849,7 +1141,6 @@
           </form>
         </div>
 
-        <!-- Security & Password Card -->
         <div class="settings-card">
           <div class="settings-card-title">Security & Password</div>
           <form onsubmit="updatePassword(event)">
@@ -888,7 +1179,7 @@
     window.location.href = 'login.html';
   }
 
-  // Drawer setup
+  // Drawer Setup
   const sidebar   = document.getElementById('sidebar');
   const overlay   = document.getElementById('overlay');
   const hamburger = document.getElementById('hamburger');
@@ -907,25 +1198,13 @@
     });
   }
 
-  // Date Label
-  const now = new Date();
-  document.getElementById('dateLabel').textContent = now.toLocaleDateString('en-IN', {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-  });
-
-  // Default Date for Attendance Form
-  const attDateInput = document.getElementById('attDate');
-  if (attDateInput) attDateInput.valueAsDate = now;
-
   // View Navigation Router
   function switchView(view) {
     document.getElementById('dashboardView').style.display  = 'none';
-    document.getElementById('addStudentView').style.display = 'none';
+    document.getElementById('studentsView').style.display   = 'none';
     document.getElementById('attendanceView').style.display = 'none';
     document.getElementById('feesView').style.display       = 'none';
     document.getElementById('resultsView').style.display    = 'none';
-    document.getElementById('scheduleView').style.display   = 'none';
-    document.getElementById('rosterView').style.display     = 'none';
     document.getElementById('settingsView').style.display   = 'none';
 
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -936,41 +1215,33 @@
     if (view === 'dashboard') {
       document.getElementById('dashboardView').style.display = 'block';
       document.getElementById('nav-dashboard').classList.add('active');
-      titleEl.textContent = 'Faculty Portal';
-      subEl.textContent = "Here's an overview of your workspace today.";
-    } else if (view === 'addStudent') {
-      document.getElementById('addStudentView').style.display = 'block';
-      titleEl.textContent = 'Add Student';
-      subEl.textContent = 'Enroll a new student to your workspace roster.';
+      titleEl.textContent = 'Dashboard';
+      subEl.textContent = 'Thursday, 16 July 2026';
+    } else if (view === 'students') {
+      document.getElementById('studentsView').style.display = 'block';
+      document.getElementById('nav-students').classList.add('active');
+      titleEl.textContent = 'Students';
+      subEl.textContent = 'Student Management';
     } else if (view === 'attendance') {
       document.getElementById('attendanceView').style.display = 'block';
       document.getElementById('nav-attendance').classList.add('active');
-      titleEl.textContent = 'Mark Attendance';
-      subEl.textContent = 'Track & manage student attendance.';
+      titleEl.textContent = 'Attendance';
+      subEl.textContent = 'Track & manage student attendance';
     } else if (view === 'fees') {
       document.getElementById('feesView').style.display = 'block';
-      titleEl.textContent = 'Manage Fees';
-      subEl.textContent = 'Track total, paid & pending student fees.';
+      document.getElementById('nav-fees').classList.add('active');
+      titleEl.textContent = 'Fees Management';
+      subEl.textContent = 'Track total, paid & pending fees';
     } else if (view === 'results') {
       document.getElementById('resultsView').style.display = 'block';
       document.getElementById('nav-results').classList.add('active');
-      titleEl.textContent = 'Upload Results';
-      subEl.textContent = 'Marks, percentage & grades manager.';
-    } else if (view === 'schedule') {
-      document.getElementById('scheduleView').style.display = 'block';
-      document.getElementById('nav-schedule').classList.add('active');
-      titleEl.textContent = 'Course Schedule';
-      subEl.textContent = 'View active module lecture schedule.';
-    } else if (view === 'roster') {
-      document.getElementById('rosterView').style.display = 'block';
-      document.getElementById('nav-roster').classList.add('active');
-      titleEl.textContent = 'Student Roster';
-      subEl.textContent = 'Overview of all enrolled students.';
+      titleEl.textContent = 'Results';
+      subEl.textContent = 'Marks, percentage & grades';
     } else if (view === 'settings') {
       document.getElementById('settingsView').style.display = 'block';
       document.getElementById('nav-settings').classList.add('active');
       titleEl.textContent = 'System Settings';
-      subEl.textContent = 'Manage profile credentials & security.';
+      subEl.textContent = 'Manage profile credentials & security';
     }
 
     if (window.innerWidth <= 768) {
@@ -979,45 +1250,22 @@
     }
   }
 
-  // Hydrate Active Faculty Details
+  // Hydrate User Data
   function syncFacultyUI(u) {
     const fName = u.name || "Nidhi Patel";
-    const fDept = u.department || "Diploma";
 
     document.getElementById('sidebarAvatar').textContent = fName.charAt(0).toUpperCase();
     document.getElementById('sidebarName').textContent   = fName;
 
-    const hour = now.getHours();
-    const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+    const greeting = 'Good afternoon';
     document.getElementById('welcomeMsg').textContent = `${greeting}, ${fName.split(' ')[0]}! 👋`;
-    document.getElementById('deptVal').textContent    = fDept;
 
     document.getElementById('setFacultyName').value  = fName;
     document.getElementById('setFacultyEmail').value = u.email || "nidhi@sms.com";
   }
 
-  // Submit Handlers
-  function submitNewStudent(e) {
-    e.preventDefault();
-    const name = document.getElementById('newStudentName').value;
-    const roll = document.getElementById('newStudentRoll').value;
-    const course = document.getElementById('newStudentCourse').value;
-
-    const tbody = document.getElementById('studentTableBody');
-    tbody.innerHTML += `
-      <tr>
-        <td style="font-weight:600;">${name}</td>
-        <td>${roll}</td>
-        <td>${course}</td>
-        <td><span class="pill active">Active</span></td>
-      </tr>
-    `;
-
-    alert('Student added successfully!');
-    document.getElementById('newStudentName').value = '';
-    document.getElementById('newStudentRoll').value = '';
-    document.getElementById('newStudentCourse').value = '';
-    switchView('dashboard');
+  function openAddStudentModal() {
+    switchView('students');
   }
 
   function saveProfileSettings(e) {
@@ -1036,24 +1284,6 @@
     e.preventDefault();
     alert('Password updated successfully!');
     e.target.reset();
-  }
-
-  function submitAttendance(e) {
-    e.preventDefault();
-    alert('Attendance log recorded!');
-    switchView('dashboard');
-  }
-
-  function submitFeeUpdate(e) {
-    e.preventDefault();
-    alert('Fee record updated!');
-    switchView('dashboard');
-  }
-
-  function submitGrades(e) {
-    e.preventDefault();
-    alert('Grades updated successfully!');
-    switchView('dashboard');
   }
 
   // Logout Action
